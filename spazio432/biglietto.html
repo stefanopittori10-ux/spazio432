@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biglietto — spazio 432</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+    --bg: #f5f4f0;
+    --fg: #0a0a0a;
+    --muted: #666;
+    --border: #0a0a0a;
+    --ticket-w: 480px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--mono);
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 32px;
+  }
+
+  /* ── TICKET ───────────────────────────────────────────────── */
+  .ticket-wrap {
+    width: var(--ticket-w);
+    max-width: 100%;
+  }
+
+  .ticket {
+    background: #fff;
+    border: 2px solid var(--border);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Fascia colorata categoria in cima */
+  .ticket-stripe {
+    height: 6px;
+    background: var(--cat-color, #534AB7);
+    transition: background 0.2s;
+  }
+
+  /* Corpo principale */
+  .ticket-body {
+    padding: 24px 24px 20px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .ticket-left { flex: 1; min-width: 0; }
+
+  .ticket-venue {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .ticket-cat {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--cat-color, #534AB7);
+    margin-bottom: 4px;
+    transition: color 0.2s;
+  }
+
+  .ticket-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--fg);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    word-break: break-word;
+  }
+
+  .ticket-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 16px;
+  }
+
+  .ticket-meta-row {
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+    font-size: 11px;
+  }
+  .ticket-meta-label {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    width: 52px;
+  }
+  .ticket-meta-val { color: var(--fg); font-weight: bold; }
+
+  .ticket-holder {
+    border-top: 1px solid #e5e5e5;
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .ticket-holder-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+  .ticket-holder-val {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--fg);
+    margin-bottom: 6px;
+  }
+  .ticket-holder-email {
+    font-size: 11px;
+    color: #555;
+  }
+
+  /* QR */
+  .ticket-qr {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .qr-box {
+    width: 96px;
+    height: 96px;
+    border: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .qr-box canvas, .qr-box img { width: 88px !important; height: 88px !important; }
+  .qr-label {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* ── PERFORAZIONE ─────────────────────────────────────────── */
+  .ticket-perf {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    height: 1px;
+    margin: 0;
+  }
+  .perf-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin: -9px -2px;
+    position: relative;
+    z-index: 2;
+  }
+  .perf-line {
+    flex: 1;
+    border-top: 2px dashed #ccc;
+    margin: 0 2px;
+  }
+
+  /* ── STUB ─────────────────────────────────────────────────── */
+  .ticket-stub {
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .stub-code {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: var(--fg);
+  }
+
+  .stub-seats {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stub-logo {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--fg);
+  }
+  .stub-logo span { color: var(--muted); }
+
+  /* ── AZIONI ───────────────────────────────────────────────── */
+  .ticket-actions {
+    width: var(--ticket-w);
+    max-width: 100%;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .act-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 7px 16px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--fg);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .act-btn:hover { background: var(--fg); color: #fff; }
+  .act-btn.primary { background: var(--fg); color: #fff; }
+  .act-btn.primary:hover { opacity: 0.8; }
+
+  @media (max-width: 520px) {
+    :root { --ticket-w: 100%; }
+    .ticket-body { flex-direction: column-reverse; gap: 16px; }
+    .ticket-qr { flex-direction: row; align-self: flex-start; gap: 10px; align-items: center; }
+    .qr-label { writing-mode: initial; }
+    .ticket-name { font-size: 18px; }
+  }
+
+  @media print {
+    @page {
+      size: A4 portrait;
+      margin: 16mm;
+    }
+    body {
+      background: #fff;
+      padding: 0;
+      margin: 0;
+      min-height: unset;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ticket-actions { display: none !important; }
+
+    .ticket-wrap {
+      width: 170mm;
+      max-width: 170mm;
+    }
+
+    .ticket { border-width: 2px; }
+
+    /* Fascia più alta */
+    .ticket-stripe { height: 12px; }
+
+    /* Corpo: layout verticale con QR sotto i dati */
+    .ticket-body {
+      flex-direction: column;
+      padding: 30px 30px 24px;
+      gap: 24px;
+    }
+
+    .ticket-venue { font-size: 11px; margin-bottom: 14px; letter-spacing: 2px; }
+    .ticket-cat   { font-size: 13px; margin-bottom: 8px; }
+    .ticket-name  { font-size: 36px; line-height: 1.1; margin-bottom: 24px; }
+
+    .ticket-meta { gap: 8px; margin-bottom: 24px; }
+    .ticket-meta-row { font-size: 14px; }
+    .ticket-meta-label { width: 70px; }
+
+    .ticket-holder { padding-top: 18px; gap: 4px; }
+    .ticket-holder-label { font-size: 11px; }
+    .ticket-holder-val   { font-size: 16px; margin-bottom: 8px; }
+    .ticket-holder-email { font-size: 13px; }
+
+    /* QR: riga orizzontale centrata */
+    .ticket-qr {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 16px;
+      padding-top: 18px;
+      border-top: 1px solid #e5e5e5;
+    }
+    .qr-box { width: 110px; height: 110px; border: none; }
+    .qr-box canvas, .qr-box img { width: 110px !important; height: 110px !important; }
+    .qr-label {
+      font-size: 10px;
+      text-align: left;
+      line-height: 1.8;
+      letter-spacing: 1px;
+    }
+
+    /* Perforazione */
+    .perf-circle { width: 22px; height: 22px; margin: -11px -2px; }
+
+    /* Stub */
+    .ticket-stub { padding: 18px 30px; }
+    .stub-code  { font-size: 17px; letter-spacing: 5px; }
+    .stub-seats { font-size: 13px; }
+    .stub-logo  { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TICKET -->
+<div class="ticket-wrap">
+  <div class="ticket" id="ticket">
+
+    <div class="ticket-stripe" id="t-stripe"></div>
+
+    <div class="ticket-body">
+      <div class="ticket-left">
+        <div class="ticket-venue">spazio 432 — via ceva 47, torino</div>
+        <div class="ticket-cat" id="t-cat">Musica</div>
+        <div class="ticket-name" id="t-name">Concerto di Primavera</div>
+        <div class="ticket-meta">
+          <div class="ticket-meta-row">
+            <span class="ticket-meta-label">Data</span>
+            <span class="ticket-meta-val" id="t-date">14 Giugno 2026</span>
+          </div>
+          <div class="ticket-meta-row">
+            <span class="ticket-meta-label">Ora</span>
+            <span class="ticket-meta-val" id="t-time">21:00</span>
+          </div>
+          <div class="ticket-meta-row">
+            <span class="ticket-meta-label">Posti</span>
+            <span class="ticket-meta-val" id="t-seats">2</span>
+          </div>
+        </div>
+        <div class="ticket-holder">
+          <div class="ticket-holder-label">Intestato a</div>
+          <div class="ticket-holder-val" id="t-holder">Mario Rossi</div>
+          <div class="ticket-holder-label">Email</div>
+          <div class="ticket-holder-email" id="t-email">mario@email.it</div>
+        </div>
+      </div>
+
+      <div class="ticket-qr">
+        <div class="qr-box" id="qr-box"></div>
+        <div class="qr-label">scansiona<br>all'ingresso</div>
+      </div>
+    </div>
+
+    <div class="ticket-perf">
+      <div class="perf-circle"></div>
+      <div class="perf-line"></div>
+      <div class="perf-circle"></div>
+    </div>
+
+    <div class="ticket-stub">
+      <div class="stub-code" id="t-code">S432-···</div>
+      <div class="stub-seats" id="t-stub-seats">2 posti</div>
+      <div class="stub-logo">spazio<span>432</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="ticket-actions">
+  <button class="act-btn primary" onclick="printAsPDF()">↓ salva PDF</button>
+  <span style="font-family:var(--mono);font-size:9px;color:#999;text-transform:uppercase;letter-spacing:0.5px;align-self:center;">nel dialogo scegli → salva come PDF</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const CAT_COLORS = {
+  music: '#534AB7',
+  film:  '#993C1D',
+  lab:   '#3B6D11',
+  art:   '#854F0B',
+  meet:  '#4B5563'
+};
+const CAT_LABELS = {
+  music: 'Musica',
+  film:  'Cinema',
+  lab:   'Laboratorio',
+  art:   'Arte',
+  meet:  'Riunioni'
+};
+
+let qrInstance = null;
+
+function genCode(name, event, date) {
+  // Codice leggibile: S432-XXXX basato su hash semplice
+  const str = name + event + date;
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  const hex = Math.abs(h).toString(16).toUpperCase().padStart(4, '0').slice(0, 4);
+  return 'S432-' + hex;
+}
+
+function updateTicket(data) {
+  const name   = (data && data.name)  || 'Mario Rossi';
+  const email  = (data && data.email) || 'mario@email.it';
+  const event  = (data && data.event) || 'Concerto di Primavera';
+  const cat    = (data && data.cat)   || 'music';
+  const date   = (data && data.date)  || '14 Giugno 2026';
+  const time   = (data && data.time)  || '21:00';
+  const seats  = (data && data.seats) || '2';
+
+  const color = CAT_COLORS[cat] || '#534AB7';
+  const code  = genCode(name, event, date);
+
+  // Aggiorna testi
+  document.getElementById('t-cat').textContent    = CAT_LABELS[cat];
+  document.getElementById('t-cat').style.color    = color;
+  document.getElementById('t-stripe').style.background = color;
+  document.getElementById('t-name').textContent   = event;
+  document.getElementById('t-date').textContent   = date;
+  document.getElementById('t-time').textContent   = time;
+  document.getElementById('t-seats').textContent  = seats;
+  document.getElementById('t-holder').textContent = name;
+  document.getElementById('t-email').textContent  = email;
+  document.getElementById('t-code').textContent   = code;
+  document.getElementById('t-stub-seats').textContent = seats + (seats == 1 ? ' posto' : ' posti');
+
+  // Genera QR
+  const qrData = `SPAZIO432|${code}|${name}|${event}|${date} ${time}|posti:${seats}`;
+  const box = document.getElementById('qr-box');
+  box._qrData = qrData;
+  box.innerHTML = '';
+  new QRCode(box, {
+    text: qrData,
+    width: 88,
+    height: 88,
+    colorDark: '#0a0a0a',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
+function printAsPDF() {
+  // Su Chrome/Edge imposta automaticamente salva come PDF
+  if (window.chrome || navigator.userAgent.includes('Edg')) {
+    const style = document.createElement('style');
+    style.id = 'pdf-hint';
+    style.textContent = '@media print { @page { size: A4 portrait; } }';
+    document.head.appendChild(style);
+  }
+  window.print();
+  const hint = document.getElementById('pdf-hint');
+  if (hint) hint.remove();
+}
+
+// Init: leggi dati da localStorage se passati dal calendario
+(function() {
+  try {
+    const raw = localStorage.getItem('s432_ticket');
+    if (raw) {
+      const data = JSON.parse(raw);
+      localStorage.removeItem('s432_ticket'); // consuma il dato
+      updateTicket(data);
+    } else {
+      updateTicket(); // fallback dati demo
+    }
+  } catch(e) {
+    updateTicket();
+  }
+})();
+
+// Rigenera QR ad alta risoluzione per la stampa
+window.addEventListener('beforeprint', () => {
+  const box = document.getElementById('qr-box');
+  const qrData = box._qrData;
+  if (!qrData) return;
+  box.innerHTML = '';
+  new QRCode(box, {
+    text: qrData,
+    width: 110,
+    height: 110,
+    colorDark: '#0a0a0a',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+});
+window.addEventListener('afterprint', () => {
+  const box = document.getElementById('qr-box');
+  const qrData = box._qrData;
+  if (!qrData) return;
+  box.innerHTML = '';
+  new QRCode(box, {
+    text: qrData,
+    width: 88,
+    height: 88,
+    colorDark: '#0a0a0a',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+});
+</script>
+</body>
+</html>
