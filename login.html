@@ -231,6 +231,39 @@
   }
   .bk-stat-num  { font-size: 22px; font-weight: bold; color: var(--fg); }
   .bk-stat-label{ font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+
+  .bk-item { cursor: default; transition: background .15s; }
+  .bk-item.checked-in { background: #EAF3DE; border-color: #3B6D11; }
+  [data-theme="dark"] .bk-item.checked-in { background: #0d1f08; border-color: #3B6D11; }
+
+  .bk-checkin {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border-light);
+  }
+  .bk-checkin-box {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    transition: all .15s; background: var(--bg);
+  }
+  .bk-checkin-box.checked {
+    background: #3B6D11; border-color: #3B6D11; color: #fff;
+  }
+  .bk-checkin-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--muted); cursor: pointer; user-select: none;
+  }
+  .bk-checkin-box.checked + .bk-checkin-label { color: #3B6D11; font-weight: bold; }
+  .bk-checkin-time { font-size: 9px; color: var(--muted); margin-left: auto; }
+
+  /* Counter check-in nei stats */
+  .bk-stat.checkin-stat .bk-stat-num { color: #3B6D11; }
 </style>
 </head>
 <body>
@@ -324,7 +357,8 @@
       <div id="mgmt-lista" style="display:none;">
         <div class="bk-stats">
           <div class="bk-stat"><div class="bk-stat-num" id="bk-total">—</div><div class="bk-stat-label">prenotazioni</div></div>
-          <div class="bk-stat"><div class="bk-stat-num" id="bk-posti">—</div><div class="bk-stat-label">posti totali</div></div>
+          <div class="bk-stat"><div class="bk-stat-num" id="bk-posti">—</div><div class="bk-stat-label">da verificare</div></div>
+          <div class="bk-stat checkin-stat"><div class="bk-stat-num" id="bk-checkin-count">0</div><div class="bk-stat-label">entrati</div></div>
         </div>
         <div class="bk-filter-row">
           <select class="bk-filter-sel" id="bk-event-filter" onchange="loadBookings()">
@@ -10518,6 +10552,62 @@ let scanning = false, cooldown = false, stream = null;
 let scannerOpen = false;
 
 
+
+// ── CHECK-IN ──────────────────────────────────────────────────
+const checkinSet   = new Set(); // IDs prenotazioni spuntate
+const checkinTimes = {};        // orari di check-in
+
+async function toggleCheckin(boxEl, bookingId) {
+  const id     = String(bookingId);
+  const item   = boxEl.closest('.bk-item');
+  const label  = boxEl.nextElementSibling;
+  const timeEl = document.getElementById('ci-time-' + bookingId);
+
+  // Disabilita temporaneamente per evitare doppio click
+  boxEl.style.pointerEvents = 'none';
+
+  if (checkinSet.has(id)) {
+    // ── Rimuovi check-in ──
+    const { error } = await _supabase
+      .from('bookings')
+      .update({ checked_in: false, checked_in_at: null })
+      .eq('id', bookingId);
+
+    if (error) { console.error(error); boxEl.style.pointerEvents = ''; return; }
+
+    checkinSet.delete(id);
+    delete checkinTimes[id];
+    boxEl.classList.remove('checked');
+    boxEl.textContent = '';
+    item.classList.remove('checked-in');
+    if (label) label.textContent = 'segna entrata';
+    if (timeEl) timeEl.textContent = '';
+
+  } else {
+    // ── Segna check-in ──
+    const now = new Date();
+    const { error } = await _supabase
+      .from('bookings')
+      .update({ checked_in: true, checked_in_at: now.toISOString() })
+      .eq('id', bookingId);
+
+    if (error) { console.error(error); boxEl.style.pointerEvents = ''; return; }
+
+    const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    checkinSet.add(id);
+    checkinTimes[id] = t;
+    boxEl.classList.add('checked');
+    boxEl.textContent = '✓';
+    item.classList.add('checked-in');
+    if (label) label.textContent = 'entrato';
+    if (timeEl) timeEl.textContent = t;
+  }
+
+  // Aggiorna counter
+  const countEl = document.getElementById('bk-checkin-count');
+  if (countEl) countEl.textContent = checkinSet.size;
+  boxEl.style.pointerEvents = '';
+}
 // ── GESTIONE PRENOTAZIONI — TABS ──────────────────────────────
 function switchMgmtTab(tab) {
   document.getElementById('tab-scanner').classList.toggle('active', tab === 'scanner');
@@ -10560,7 +10650,8 @@ async function loadBookings() {
   // Carica prenotazioni
   let query = _supabase
     .from('bookings')
-    .select('id, name, email, seats, note, created_at, event_id')
+    .select('id, name, email, seats, note, created_at, event_id, checked_in, checked_in_at')
+    .order('checked_in', { ascending: true })
     .order('created_at', { ascending: false });
 
   const selectedEvent = filterEl.value;
@@ -10580,9 +10671,9 @@ async function loadBookings() {
     return;
   }
 
-  const totalPosti = bookings.reduce((s, b) => s + (b.seats || 1), 0);
+  const daVerificare = bookings.filter(b => !b.checked_in).length;
   totalEl.textContent = bookings.length;
-  postiEl.textContent = totalPosti;
+  postiEl.textContent = daVerificare;
 
   listEl.innerHTML = '';
   bookings.forEach(b => {
@@ -10593,6 +10684,18 @@ async function loadBookings() {
 
     const item = document.createElement('div');
     item.className = 'bk-item';
+    item.dataset.bid = b.id;
+    // Stato check-in da Supabase (fonte di verità)
+    const isChecked = b.checked_in === true;
+    if (isChecked) {
+      checkinSet.add(String(b.id));
+      if (b.checked_in_at) {
+        const d = new Date(b.checked_in_at);
+        checkinTimes[String(b.id)] = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+      }
+      item.classList.add('checked-in');
+    }
+
     item.innerHTML = `
       <div class="bk-item-seats">${b.seats || 1} ${(b.seats || 1) === 1 ? 'posto' : 'posti'}</div>
       <div class="bk-item-name">${b.name}</div>
@@ -10602,12 +10705,18 @@ async function loadBookings() {
         <span>${dateStr}</span>
         ${b.note ? '<span>📝 ' + b.note + '</span>' : ''}
       </div>
+      <div class="bk-checkin">
+        <div class="bk-checkin-box ${checkinSet.has(String(b.id)) ? 'checked' : ''}" onclick="toggleCheckin(this, '${b.id}')">
+          ${checkinSet.has(String(b.id)) ? '✓' : ''}
+        </div>
+        <span class="bk-checkin-label">${checkinSet.has(String(b.id)) ? 'entrato' : 'segna entrata'}</span>
+        <span class="bk-checkin-time" id="ci-time-${b.id}">${checkinTimes[String(b.id)] || ''}</span>
+      </div>
     `;
     listEl.appendChild(item);
   });
 }
 
-const MONTHS = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
 function toggleScanner() {
   const panel = document.getElementById('scanner-panel');
   const card  = document.getElementById('scanner-card');
