@@ -1831,16 +1831,20 @@ function buildListView() {
     return;
   }
 
-  // Raggruppa per series_id, oppure per nome+cat se non hanno series_id
+  // Raggruppa per series_id o nome+cat (solo se groupingEnabled)
   const groups = [];
   const seen = new Set();
   filteredEvents.forEach(ev => {
-    const key = ev.series_id ? 'sid:' + ev.series_id : 'name:' + ev.name.trim().toLowerCase() + '|' + ev.cat;
+    const key = groupingEnabled
+      ? (ev.series_id ? 'sid:' + ev.series_id : 'name:' + ev.name.trim().toLowerCase() + '|' + ev.cat)
+      : 'solo:' + ev.id;
     if (!seen.has(key)) {
       seen.add(key);
-      const siblings = ev.series_id
-        ? filteredEvents.filter(e => e.series_id === ev.series_id)
-        : filteredEvents.filter(e => !e.series_id && e.name.trim().toLowerCase() === ev.name.trim().toLowerCase() && e.cat === ev.cat);
+      const siblings = groupingEnabled
+        ? (ev.series_id
+            ? filteredEvents.filter(e => e.series_id === ev.series_id)
+            : filteredEvents.filter(e => !e.series_id && e.name.trim().toLowerCase() === ev.name.trim().toLowerCase() && e.cat === ev.cat))
+        : [ev];
       groups.push(siblings);
     }
   });
