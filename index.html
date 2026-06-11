@@ -233,6 +233,22 @@
 
   .header-right { display: flex; align-items: center; gap: 10px; }
   .month-display { cursor: default; padding: 4px 0; }
+
+  /* Bottone raggruppa eventi — visibile solo in vista riepilogo */
+  .group-toggle-btn {
+    width: 36px; height: 36px; padding: 0;
+    border-radius: 50%; cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--pill-bg); color: var(--fg-muted);
+    display: none;
+    align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    flex-shrink: 0; font-size: 18px; line-height: 1;
+  }
+  .group-toggle-btn:hover:not(.active) { background: var(--border-light); color: var(--fg); }
+  .group-toggle-btn.active { background: var(--fg) !important; color: var(--bg) !important; border-color: var(--fg) !important; }
+  .group-toggle-btn:not(.active) { background: var(--pill-bg) !important; color: var(--fg-muted) !important; border-color: var(--border) !important; }
+  .group-toggle-btn.list-visible { display: inline-flex; }
   .view-switch-btn {
     width: 36px; height: 36px; padding: 0;
     border-radius: 50%; cursor: pointer;
@@ -409,6 +425,45 @@
   .recap-booking-form.open { grid-template-rows: 1fr; opacity: 1; }
   .recap-booking-form-inner { overflow: hidden; padding: 10px 0 0 0; display: flex; flex-direction: column; gap: 8px; }
 
+
+  /* Gruppi eventi ricorrenti nel riepilogo */
+  .recap-group {
+    border: 1px solid var(--border-light);
+    border-left: 5px solid var(--cat-color, #534AB7);
+    margin-bottom: 0;
+  }
+  .recap-group-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .recap-group-header:hover { background: var(--surface-hover, #f5f5f5); }
+  .recap-group-left { flex: 1; min-width: 0; }
+  .recap-group-cat  { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+  .recap-group-name { font-size: 16px; font-weight: bold; color: var(--fg); }
+  .recap-group-count { font-size: 10px; color: var(--fg-muted); white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .recap-group-arrow { font-size: 12px; transition: transform 0.2s; }
+  .recap-group-arrow.open { transform: rotate(90deg); }
+  .recap-group-body {
+    display: none;
+    flex-direction: column;
+    border-top: 1px solid var(--border-light);
+  }
+  .recap-group-body.open { display: flex; }
+  .recap-group-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-light);
+    gap: 10px;
+  }
+  .recap-group-item:last-child { border-bottom: none; }
+  .recap-group-item-date { font-size: 12px; color: var(--fg); font-weight: bold; }
+  .recap-group-item-time { font-size: 11px; color: var(--fg-muted); }
   /* Descrizione nel riepilogo */
   .recap-desc { font-size: 12px; color: var(--det-desc); margin-top: 4px; font-style: italic; line-height: 1.4; }
   
@@ -1075,7 +1130,8 @@
         </div>
       </div>
       <div class="header-right">
-        <button class="view-switch-btn" id="view-switch-btn" onclick="toggleListView()" title="Cambia vista">
+        <button class="group-toggle-btn" id="group-toggle-btn" onclick="toggleGrouping()" title="Raggruppa eventi simili">⊞</button>
+          <button class="view-switch-btn" id="view-switch-btn" onclick="toggleListView()" title="Cambia vista">
           <svg id="view-icon-grid" width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="6" fill="currentColor"/><rect x="8" y="0" width="6" height="6" fill="currentColor"/><rect x="0" y="8" width="6" height="6" fill="currentColor"/><rect x="8" y="8" width="6" height="6" fill="currentColor"/></svg>
           <svg id="view-icon-list" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:none"><rect x="0" y="1" width="14" height="2" fill="currentColor"/><rect x="0" y="6" width="14" height="2" fill="currentColor"/><rect x="0" y="11" width="14" height="2" fill="currentColor"/></svg>
         </button>
@@ -1324,32 +1380,95 @@ function buildListView() {
     recapContainer.innerHTML = '<div style="padding:30px;text-align:center;font-size:12px;color:#666;">Nessun evento programmato per questo mese.</div>';
     return;
   }
+
+  // Raggruppa per series_id o per nome+cat (se groupingEnabled)
+  const groups = [];
+  const seen = new Set();
   filteredEvents.forEach(ev => {
-    const row = document.createElement('div');
-    row.className = 'recap-row';
-    row.style.borderLeft = `5px solid ${CAT_COLORS[ev.cat]}`;
-    const cat = document.createElement('div');
-    cat.className = 'recap-cat';
-    cat.textContent = CAT_LABELS[ev.cat].toUpperCase();
-    cat.style.color = CAT_COLORS[ev.cat];
-    const name = document.createElement('div');
-    name.className = 'recap-name';
-    name.textContent = ev.name;
-    const meta = document.createElement('div');
-    meta.className = 'recap-meta';
-    let t = ev.time; if (ev.endTime) t += ' - ' + ev.endTime;
-    meta.innerHTML = `<span>Data: ${ev.day} ${MONTHS[ev.month]} ${ev.year}</span> <span>Ora: ${t}</span>`;
-    row.appendChild(cat);
-    row.appendChild(name);
-    row.appendChild(meta);
-    if (ev.description) {
-      const descEl = document.createElement('div');
-      descEl.className = 'recap-desc';
-      descEl.textContent = ev.description;
-      row.appendChild(descEl);
+    const key = groupingEnabled
+      ? (ev.series_id ? 'sid:' + ev.series_id : 'name:' + ev.name.trim().toLowerCase() + '|' + ev.cat)
+      : 'solo:' + ev.id;
+    if (!seen.has(key)) {
+      seen.add(key);
+      const siblings = groupingEnabled
+        ? (ev.series_id
+            ? filteredEvents.filter(e => e.series_id === ev.series_id)
+            : filteredEvents.filter(e => !e.series_id && e.name.trim().toLowerCase() === ev.name.trim().toLowerCase() && e.cat === ev.cat))
+        : [ev];
+      groups.push(siblings);
     }
-    row.appendChild(buildRecapBookingBlock(ev));
-    recapContainer.appendChild(row);
+  });
+
+  groups.forEach(evts => {
+    const first = evts[0];
+    const isGroup = evts.length > 1;
+
+    if (!isGroup) {
+      const row = document.createElement('div');
+      row.className = 'recap-row';
+      row.style.borderLeft = `5px solid ${CAT_COLORS[first.cat]}`;
+      const cat = document.createElement('div');
+      cat.className = 'recap-cat';
+      cat.textContent = CAT_LABELS[first.cat].toUpperCase();
+      cat.style.color = CAT_COLORS[first.cat];
+      const name = document.createElement('div');
+      name.className = 'recap-name';
+      name.textContent = first.name;
+      const meta = document.createElement('div');
+      meta.className = 'recap-meta';
+      let t = first.time; if (first.endTime) t += ' - ' + first.endTime;
+      meta.innerHTML = `<span>Data: ${first.day} ${MONTHS[first.month]} ${first.year}</span> <span>Ora: ${t}</span>`;
+      row.appendChild(cat);
+      row.appendChild(name);
+      row.appendChild(meta);
+      if (first.description) {
+        const d = document.createElement('div'); d.className = 'recap-desc'; d.textContent = first.description; row.appendChild(d);
+      }
+      row.appendChild(buildRecapBookingBlock(first));
+      recapContainer.appendChild(row);
+
+    } else {
+      // Card gruppo collassabile
+      const groupEl = document.createElement('div');
+      groupEl.className = 'recap-group';
+      groupEl.style.setProperty('--cat-color', CAT_COLORS[first.cat]);
+
+      const header = document.createElement('div');
+      header.className = 'recap-group-header';
+      header.innerHTML = `
+        <div class="recap-group-left">
+          <div class="recap-group-cat" style="color:${CAT_COLORS[first.cat]}">${CAT_LABELS[first.cat].toUpperCase()}</div>
+          <div class="recap-group-name">${first.name}</div>
+        </div>
+        <div class="recap-group-count">
+          <span>${evts.length} date</span>
+          <span class="recap-group-arrow">›</span>
+        </div>
+      `;
+
+      const body = document.createElement('div');
+      body.className = 'recap-group-body';
+
+      evts.forEach(ev => {
+        const item = document.createElement('div');
+        item.className = 'recap-group-item';
+        const t = ev.time + (ev.endTime ? ' - ' + ev.endTime : '');
+        const dateDiv = document.createElement('div');
+        dateDiv.innerHTML = `<div class="recap-group-item-date">${ev.day} ${MONTHS[ev.month]}</div><div class="recap-group-item-time">ore ${t}</div>`;
+        item.appendChild(dateDiv);
+        item.appendChild(buildRecapBookingBlock(ev));
+        body.appendChild(item);
+      });
+
+      header.onclick = () => {
+        const open = body.classList.toggle('open');
+        header.querySelector('.recap-group-arrow').classList.toggle('open', open);
+      };
+
+      groupEl.appendChild(header);
+      groupEl.appendChild(body);
+      recapContainer.appendChild(groupEl);
+    }
   });
 }
 
@@ -1379,11 +1498,13 @@ function setView(listMode) {
     closeBookingPanel();
     currentDetailDay = null;
     footerEl.style.display = 'none';
+    document.getElementById('group-toggle-btn')?.classList.add('list-visible');
   } else {
     listEl.classList.remove('open');
     detailEl.classList.remove('open');
     closeBookingPanel();
     currentDetailDay = null;
+    document.getElementById('group-toggle-btn')?.classList.remove('list-visible');
     gridEl.classList.remove('hidden');
     if (isMobile) gridEl.style.display = 'grid';
     footerEl.style.display = 'flex';
@@ -2158,6 +2279,23 @@ function ticketPrint_unused() {
       }
     }, 500);
   }, 150);
+}
+
+let groupingEnabled = true; // attivo di default
+
+function toggleGrouping() {
+  groupingEnabled = !groupingEnabled;
+  const btn = document.getElementById('group-toggle-btn');
+  if (btn) {
+    btn.classList.toggle('active', groupingEnabled);
+    btn.title = groupingEnabled ? 'Raggruppa eventi simili (attivo)' : 'Raggruppa eventi simili (disattivo)';
+  }
+  buildListView();
+}
+
+function initGroupBtn() {
+  const btn = document.getElementById('group-toggle-btn');
+  if (btn) btn.classList.toggle('active', groupingEnabled);
 }
 
 fetchAndBuild();

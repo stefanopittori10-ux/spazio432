@@ -168,6 +168,69 @@
     display: flex; align-items: center; justify-content: center;
   }
   .footer-note { font-size: 9px; color: var(--border-light); text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* Dashboard prenotazioni */
+  .mgmt-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 12px;
+  }
+  .mgmt-tab {
+    flex: 1; padding: 9px 8px;
+    font-family: var(--mono); font-size: 10px; font-weight: bold;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    background: none; border: none; border-bottom: 2px solid transparent;
+    color: var(--muted); cursor: pointer; transition: all .15s;
+  }
+  .mgmt-tab.active { color: var(--fg); border-bottom-color: var(--fg); }
+
+  /* Lista prenotazioni */
+  .bk-filter-row {
+    display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .bk-filter-sel {
+    flex: 1; min-width: 0;
+    font-family: var(--mono); font-size: 11px;
+    padding: 7px 10px;
+    border: 1px solid var(--border-light);
+    background: var(--bg); color: var(--fg);
+    outline: none;
+  }
+  .bk-refresh-btn {
+    font-family: var(--mono); font-size: 11px; font-weight: bold;
+    padding: 7px 12px;
+    border: 1px solid var(--border-light);
+    background: none; color: var(--fg); cursor: pointer;
+    transition: all .15s; flex-shrink: 0;
+  }
+  .bk-refresh-btn:hover { background: var(--fg); color: var(--bg); }
+
+  .bk-list { display: flex; flex-direction: column; gap: 6px; max-height: 340px; overflow-y: auto; }
+  .bk-item {
+    padding: 10px 12px;
+    border: 1px solid var(--border-light);
+    display: flex; flex-direction: column; gap: 2px;
+    position: relative;
+  }
+  .bk-item-name  { font-size: 13px; font-weight: bold; color: var(--fg); }
+  .bk-item-event { font-size: 11px; color: var(--muted); }
+  .bk-item-meta  { font-size: 10px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+  .bk-item-seats {
+    position: absolute; top: 10px; right: 12px;
+    font-size: 11px; font-weight: bold;
+    background: var(--border-light); color: var(--fg);
+    padding: 2px 8px; border-radius: 10px;
+  }
+  .bk-empty { font-size: 11px; color: var(--muted); padding: 16px 0; text-align: center; }
+  .bk-stats {
+    display: flex; gap: 8px; margin-bottom: 10px;
+  }
+  .bk-stat {
+    flex: 1; padding: 10px; border: 1px solid var(--border-light);
+    display: flex; flex-direction: column; gap: 2px; align-items: center;
+  }
+  .bk-stat-num  { font-size: 22px; font-weight: bold; color: var(--fg); }
+  .bk-stat-label{ font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -215,38 +278,65 @@
       <div class="section-card-arrow">→</div>
     </a>
 
-    <!-- Scanner QR biglietti — card + pannello collassabile -->
+    <!-- Gestione prenotazioni — card + pannello collassabile -->
     <div class="section-card scanner-card" onclick="toggleScanner()" id="scanner-card">
       <div class="section-card-left">
-        <div class="section-card-name">scanner qr</div>
-        <div class="section-card-desc">verifica biglietti all'ingresso</div>
+        <div class="section-card-name">gestione prenotazioni</div>
+        <div class="section-card-desc">scanner QR e lista prenotati</div>
       </div>
       <div class="section-card-arrow" id="scanner-arrow">→</div>
     </div>
 
-    <div id="scanner-panel" style="display:none;flex-direction:column;gap:8px;">
-      <div class="scanner-wrap">
-        <video id="qr-video" playsinline muted autoplay></video>
-        <canvas id="qr-canvas" style="display:none"></canvas>
-        <div class="scanner-overlay">
-          <div class="scanner-frame" id="scan-frame">
-            <span></span>
-            <div class="scan-line"></div>
+    <div id="scanner-panel" style="display:none;flex-direction:column;gap:10px;">
+
+      <!-- Tab switcher -->
+      <div class="mgmt-tabs">
+        <button class="mgmt-tab active" id="tab-scanner" onclick="switchMgmtTab('scanner')">📷 Scanner QR</button>
+        <button class="mgmt-tab" id="tab-lista" onclick="switchMgmtTab('lista')">📋 Prenotati</button>
+      </div>
+
+      <!-- TAB SCANNER -->
+      <div id="mgmt-scanner">
+        <div class="scanner-wrap">
+          <video id="qr-video" playsinline muted autoplay></video>
+          <canvas id="qr-canvas" style="display:none"></canvas>
+          <div class="scanner-overlay">
+            <div class="scanner-frame" id="scan-frame">
+              <span></span>
+              <div class="scan-line"></div>
+            </div>
+          </div>
+          <div class="scanner-status" id="scan-status">punta la fotocamera sul QR</div>
+          <div class="scanner-start" id="scan-start" onclick="startScanner()">
+            <div class="scanner-start-icon">📷</div>
+            <div class="scanner-start-label">tocca per attivare<br>la fotocamera</div>
           </div>
         </div>
-        <div class="scanner-status" id="scan-status">punta la fotocamera sul QR</div>
-        <div class="scanner-start" id="scan-start" onclick="startScanner()">
-          <div class="scanner-start-icon">📷</div>
-          <div class="scanner-start-label">tocca per attivare<br>la fotocamera</div>
+        <div class="scan-result" id="scan-result">
+          <div class="scan-result-status" id="scan-status-text"></div>
+          <div class="scan-result-name"  id="scan-name"></div>
+          <div class="scan-result-event" id="scan-event"></div>
+          <div class="scan-result-meta"  id="scan-meta"></div>
         </div>
       </div>
 
-      <div class="scan-result" id="scan-result">
-        <div class="scan-result-status" id="scan-status-text"></div>
-        <div class="scan-result-name"  id="scan-name"></div>
-        <div class="scan-result-event" id="scan-event"></div>
-        <div class="scan-result-meta"  id="scan-meta"></div>
+      <!-- TAB LISTA PRENOTATI -->
+      <div id="mgmt-lista" style="display:none;">
+        <div class="bk-stats">
+          <div class="bk-stat"><div class="bk-stat-num" id="bk-total">—</div><div class="bk-stat-label">prenotazioni</div></div>
+          <div class="bk-stat"><div class="bk-stat-num" id="bk-posti">—</div><div class="bk-stat-label">posti totali</div></div>
+        </div>
+        <div class="bk-filter-row">
+          <select class="bk-filter-sel" id="bk-event-filter" onchange="loadBookings()">
+            <option value="">tutti gli eventi</option>
+          </select>
+          <button class="bk-refresh-btn" onclick="loadBookings()">↺</button>
+        </div>
+        <div class="bk-list" id="bk-list">
+          <div class="bk-empty">caricamento…</div>
+        </div>
       </div>
+
     </div>
 
     <div class="logout-row">
@@ -10427,6 +10517,97 @@ if (sessionStorage.getItem(SESSION_KEY) === '1') {
 let scanning = false, cooldown = false, stream = null;
 let scannerOpen = false;
 
+
+// ── GESTIONE PRENOTAZIONI — TABS ──────────────────────────────
+function switchMgmtTab(tab) {
+  document.getElementById('tab-scanner').classList.toggle('active', tab === 'scanner');
+  document.getElementById('tab-lista').classList.toggle('active', tab === 'lista');
+  document.getElementById('mgmt-scanner').style.display = tab === 'scanner' ? 'block' : 'none';
+  document.getElementById('mgmt-lista').style.display   = tab === 'lista'   ? 'block' : 'none';
+  if (tab === 'lista') {
+    stopScanner();
+    loadBookings();
+  }
+  if (tab === 'scanner') {
+    setTimeout(startScanner, 150);
+  }
+}
+
+async function loadBookings() {
+  const listEl   = document.getElementById('bk-list');
+  const filterEl = document.getElementById('bk-event-filter');
+  const totalEl  = document.getElementById('bk-total');
+  const postiEl  = document.getElementById('bk-posti');
+
+  listEl.innerHTML = '<div class="bk-empty">caricamento…</div>';
+
+  // Carica eventi per il filtro
+  const { data: evts } = await _supabase
+    .from('events')
+    .select('id, name, day, month, year')
+    .order('day', { ascending: true });
+
+  // Popola il select solo la prima volta
+  if (filterEl.options.length <= 1 && evts) {
+    evts.forEach(ev => {
+      const opt = document.createElement('option');
+      opt.value = ev.id;
+      opt.textContent = `${ev.day} ${MONTHS[ev.month]} — ${ev.name}`;
+      filterEl.appendChild(opt);
+    });
+  }
+
+  // Carica prenotazioni
+  let query = _supabase
+    .from('bookings')
+    .select('id, name, email, seats, note, created_at, event_id')
+    .order('created_at', { ascending: false });
+
+  const selectedEvent = filterEl.value;
+  if (selectedEvent) query = query.eq('event_id', selectedEvent);
+
+  const { data: bookings, error } = await query;
+
+  if (error || !bookings) {
+    listEl.innerHTML = '<div class="bk-empty">errore nel caricamento</div>';
+    return;
+  }
+
+  if (bookings.length === 0) {
+    listEl.innerHTML = '<div class="bk-empty">nessuna prenotazione trovata</div>';
+    totalEl.textContent = '0';
+    postiEl.textContent = '0';
+    return;
+  }
+
+  const totalPosti = bookings.reduce((s, b) => s + (b.seats || 1), 0);
+  totalEl.textContent = bookings.length;
+  postiEl.textContent = totalPosti;
+
+  listEl.innerHTML = '';
+  bookings.forEach(b => {
+    const ev = evts?.find(e => String(e.id) === String(b.event_id));
+    const evLabel = ev ? `${ev.day} ${MONTHS[ev.month]} — ${ev.name}` : 'evento sconosciuto';
+    const date = new Date(b.created_at);
+    const dateStr = date.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+
+    const item = document.createElement('div');
+    item.className = 'bk-item';
+    item.innerHTML = `
+      <div class="bk-item-seats">${b.seats || 1} ${(b.seats || 1) === 1 ? 'posto' : 'posti'}</div>
+      <div class="bk-item-name">${b.name}</div>
+      <div class="bk-item-event">${evLabel}</div>
+      <div class="bk-item-meta">
+        <span>${b.email}</span>
+        <span>${dateStr}</span>
+        ${b.note ? '<span>📝 ' + b.note + '</span>' : ''}
+      </div>
+    `;
+    listEl.appendChild(item);
+  });
+}
+
+const MONTHS = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
 function toggleScanner() {
   const panel = document.getElementById('scanner-panel');
   const card  = document.getElementById('scanner-card');
@@ -10436,8 +10617,8 @@ function toggleScanner() {
     panel.style.display = 'flex';
     card.classList.add('open');
     arrow.textContent = '↓';
-    // Auto-avvia la fotocamera
-    setTimeout(startScanner, 150);
+    // Mostra tab scanner di default e avvia fotocamera
+    switchMgmtTab('scanner');
   } else {
     panel.style.display = 'none';
     card.classList.remove('open');
