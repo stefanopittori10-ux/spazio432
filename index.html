@@ -917,25 +917,20 @@
   /* ── TICKET OVERLAY ──────────────────────────────────────── */
   .ticket-overlay {
     display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
+    background: rgba(0,0,0,0.06);
+    border-top: 1px solid var(--border);
     padding: 20px;
   }
-  .ticket-overlay.open { display: flex; }
+  .ticket-overlay.open { display: block; }
 
   .ticket-overlay-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    max-height: 100dvh;
-    overflow-y: auto;
     width: 100%;
     max-width: 500px;
+    margin: 0 auto;
   }
 
   .ticket-wrap { width: 100%; max-width: 480px; }
@@ -981,6 +976,7 @@
     width: 100%;
     max-width: 480px;
     justify-content: space-between;
+    padding-bottom: 8px;
   }
   .t-act-close {
     font-family: var(--font-mono);
@@ -1012,13 +1008,10 @@
 
   @media print {
     @page { size: A4 portrait; margin: 16mm; }
-    body > *:not(.ticket-overlay) { display: none !important; }
     .ticket-overlay {
-      display: flex !important;
-      position: static !important;
+      display: block !important;
       background: #fff !important;
       padding: 0 !important;
-      align-items: flex-start;
     }
     .ticket-overlay-inner { max-height: none; }
     .ticket-overlay-actions { display: none !important; }
@@ -2197,13 +2190,16 @@ function openTicketOverlay(data) {
   box.innerHTML = '';
   new QRCode(box, { text: qrData, width: 80, height: 80, colorDark: '#0a0a0a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
 
-  document.getElementById('ticket-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  const overlay = document.getElementById('ticket-overlay');
+  overlay.classList.add('open');
+  // Scroll verso il biglietto — funziona su tutti i browser mobile
+  setTimeout(() => overlay.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
 }
 
 function closeTicketOverlay() {
   document.getElementById('ticket-overlay').classList.remove('open');
-  document.body.style.overflow = '';
+  // Scroll back up
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 
