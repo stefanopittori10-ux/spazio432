@@ -307,6 +307,22 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
 
   .header-right { display: flex; align-items: center; gap: 10px; }
   .month-display { cursor: default; padding: 4px 0; }
+
+  /* Bottone raggruppa eventi — visibile solo in vista riepilogo */
+  .group-toggle-btn {
+    width: 36px; height: 36px; padding: 0;
+    border-radius: 50%; cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--pill-bg); color: var(--fg-muted);
+    display: none;
+    align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    flex-shrink: 0; font-size: 18px; line-height: 1;
+  }
+  .group-toggle-btn:hover:not(.active) { background: var(--border-light); color: var(--fg); }
+  .group-toggle-btn.active { background: var(--fg) !important; color: var(--bg) !important; border-color: var(--fg) !important; }
+  .group-toggle-btn:not(.active) { background: var(--pill-bg) !important; color: var(--fg-muted) !important; border-color: var(--border) !important; }
+  .group-toggle-btn.list-visible { display: inline-flex; }
   .view-switch-btn {
     width: 36px; height: 36px; padding: 0;
     border-radius: 50%; cursor: pointer;
@@ -654,6 +670,109 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
   @media (max-width: 768px) {
     .edit-panel.open { max-height: 900px; }
   }
+
+  /* Serie eventi */
+  .ev-series-badge {
+    font-size: 8px;
+    opacity: 0.7;
+    font-weight: normal;
+    display: block;
+    margin-top: 1px;
+  }
+  .recap-group {
+    border: 1px solid var(--border-light);
+    border-left: 5px solid var(--cat-color, #534AB7);
+    margin-bottom: 0;
+  }
+  .recap-group-header {
+    padding: 12px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    user-select: none;
+  }
+  .recap-group-header:hover { background: var(--surface-hover); }
+  .recap-group-left { flex: 1; min-width: 0; }
+  .recap-group-cat  { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+  .recap-group-name { font-size: 16px; font-weight: bold; color: var(--fg); }
+  .recap-group-count { font-size: 10px; color: var(--fg-muted); white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .recap-group-arrow { font-size: 12px; transition: transform 0.2s; }
+  .recap-group-arrow.open { transform: rotate(90deg); }
+  .recap-group-body {
+    display: none;
+    flex-direction: column;
+    border-top: 1px solid var(--border-light);
+  }
+  .recap-group-body.open { display: flex; }
+  .recap-group-item {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px dashed var(--border-light);
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .recap-group-item:last-child { border-bottom: none; }
+  .recap-group-item-date { font-size: 12px; color: var(--fg); font-weight: bold; }
+  .recap-group-item-time { font-size: 11px; color: var(--fg-muted); }
+  .recap-group-item-actions { display: flex; gap: 12px; }
+
+  /* Campo ricorrenza nel form */
+  .recur-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .recur-label {
+    font-size: 11px;
+    color: var(--fg-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .recur-toggle {
+    appearance: none;
+    width: 32px; height: 18px;
+    background: var(--border-light);
+    border-radius: 9px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .recur-toggle:checked { background: #534AB7; }
+  .recur-toggle::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    top: 2px; left: 2px;
+    transition: left 0.2s;
+  }
+  .recur-toggle:checked::after { left: 16px; }
+  .recur-options {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .recur-options.visible { display: flex; }
+  .recur-options select, .recur-options input {
+    font-size: 13px; padding: 5px 8px;
+    border: 1px solid var(--border);
+    background: var(--input-bg); color: var(--input-fg);
+    outline: none; border-radius: 4px;
+    font-family: var(--font-mono);
+  }
+  .recur-options select { width: 130px; }
+  .recur-options input  { width: 55px; }
   /* Descrizione nel riepilogo */
   .recap-desc { font-size: 12px; color: var(--det-desc); margin-top: 4px; font-style: italic; line-height: 1.4; }
   
@@ -814,7 +933,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     .booking-panel.open { max-height: 700px; }
 
     /* Form aggiungi evento: layout verticale ottimizzato */
-    .add-area.open { max-height: 700px; }
+    .add-area.open { max-height: 900px; }
     .add-row {
       flex-direction: column;
       align-items: stretch;
@@ -1335,7 +1454,8 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
         </div>
       </div>
       <div class="header-right">
-        <button class="view-switch-btn" id="view-switch-btn" onclick="toggleListView()" title="Cambia vista">
+        <button class="group-toggle-btn" id="group-toggle-btn" onclick="toggleGrouping()" title="Raggruppa eventi simili">⊞</button>
+          <button class="view-switch-btn" id="view-switch-btn" onclick="toggleListView()" title="Cambia vista">
           <svg id="view-icon-grid" width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="6" fill="currentColor"/><rect x="8" y="0" width="6" height="6" fill="currentColor"/><rect x="0" y="8" width="6" height="6" fill="currentColor"/><rect x="8" y="8" width="6" height="6" fill="currentColor"/></svg>
           <svg id="view-icon-list" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:none"><rect x="0" y="1" width="14" height="2" fill="currentColor"/><rect x="0" y="6" width="14" height="2" fill="currentColor"/><rect x="0" y="11" width="14" height="2" fill="currentColor"/></svg>
         </button>
@@ -1394,6 +1514,27 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
       </div>
       <div class="add-desc">
         <textarea id="new-desc" placeholder="Descrizione dell'evento (facoltativa)..."></textarea>
+      </div>
+      <div class="recur-row">
+        <label class="recur-label">
+          <input type="checkbox" class="recur-toggle" id="recur-on" onchange="toggleRecur()">
+          Evento ricorrente
+        </label>
+        <div class="recur-options" id="recur-options">
+          <span style="font-size:11px;color:var(--fg-muted);">ogni</span>
+          <select id="recur-weekday">
+            <option value="1">Lunedì</option>
+            <option value="2">Martedì</option>
+            <option value="3">Mercoledì</option>
+            <option value="4">Giovedì</option>
+            <option value="5">Venerdì</option>
+            <option value="6">Sabato</option>
+            <option value="0">Domenica</option>
+          </select>
+          <span style="font-size:11px;color:var(--fg-muted);">per</span>
+          <input type="number" id="recur-weeks" value="4" min="2" max="12">
+          <span style="font-size:11px;color:var(--fg-muted);">settimane</span>
+        </div>
       </div>
       <div class="add-submit-row">
         <button class="add-btn" onclick="addEvent()">Aggiungi Evento</button>
@@ -1663,6 +1804,24 @@ function buildGrid(date) {
   }
 }
 
+function buildRecapActions(ev) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;';
+  const editBtn = document.createElement('span');
+  editBtn.className = 'det-edit-btn';
+  editBtn.style.marginLeft = '0';
+  editBtn.textContent = 'Modifica';
+  editBtn.onclick = (e) => { e.stopPropagation(); openEditPanelById(ev.id); };
+  const delBtn = document.createElement('span');
+  delBtn.className = 'det-delete-btn';
+  delBtn.style.marginLeft = '0';
+  delBtn.textContent = 'Elimina';
+  delBtn.onclick = (e) => { e.stopPropagation(); deleteEvent(ev.id); };
+  wrap.appendChild(editBtn);
+  wrap.appendChild(delBtn);
+  return wrap;
+}
+
 function buildListView() {
   const recapContainer = document.getElementById('recap-list');
   recapContainer.innerHTML = '';
@@ -1671,49 +1830,97 @@ function buildListView() {
     recapContainer.innerHTML = '<div style="padding:30px;text-align:center;font-size:12px;color:#666;">Nessun evento programmato per questo mese.</div>';
     return;
   }
-  filteredEvents.forEach(ev => {
-    const row = document.createElement('div');
-    row.className = 'recap-row';
-    row.style.borderLeft = `5px solid ${CAT_COLORS[ev.cat]}`;
-    const cat = document.createElement('div');
-    cat.className = 'recap-cat';
-    cat.textContent = CAT_LABELS[ev.cat].toUpperCase();
-    cat.style.color = CAT_COLORS[ev.cat];
-    const name = document.createElement('div');
-    name.className = 'recap-name';
-    name.textContent = ev.name;
-    const meta = document.createElement('div');
-    meta.className = 'recap-meta';
-    let t = ev.time; if (ev.endTime) t += ' - ' + ev.endTime;
-    meta.innerHTML = `<span>Data: ${ev.day} ${MONTHS[ev.month]} ${ev.year}</span> <span>Ora: ${t}</span>`;
-    row.appendChild(cat);
-    row.appendChild(name);
-    row.appendChild(meta);
-    if (ev.description) {
-      const descEl = document.createElement('div');
-      descEl.className = 'recap-desc';
-      descEl.textContent = ev.description;
-      row.appendChild(descEl);
-    }
-    // Modifica / Elimina a destra nella riga meta
-    const recapActions = document.createElement('div');
-    recapActions.style.cssText = 'margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;';
-    const recapEdit = document.createElement('span');
-    recapEdit.className = 'det-edit-btn';
-    recapEdit.style.marginLeft = '0';
-    recapEdit.textContent = 'Modifica';
-    recapEdit.onclick = () => openEditPanelById(ev.id);
-    const recapDel = document.createElement('span');
-    recapDel.className = 'det-delete-btn';
-    recapDel.style.marginLeft = '0';
-    recapDel.textContent = 'Elimina';
-    recapDel.onclick = () => deleteEvent(ev.id);
-    recapActions.appendChild(recapEdit);
-    recapActions.appendChild(recapDel);
-    meta.appendChild(recapActions);
 
-    if (ev.cat !== 'meet') row.appendChild(buildRecapBookingBlock(ev));
-    recapContainer.appendChild(row);
+  // Raggruppa per series_id, oppure per nome+cat se non hanno series_id
+  const groups = [];
+  const seen = new Set();
+  filteredEvents.forEach(ev => {
+    const key = ev.series_id ? 'sid:' + ev.series_id : 'name:' + ev.name.trim().toLowerCase() + '|' + ev.cat;
+    if (!seen.has(key)) {
+      seen.add(key);
+      const siblings = ev.series_id
+        ? filteredEvents.filter(e => e.series_id === ev.series_id)
+        : filteredEvents.filter(e => !e.series_id && e.name.trim().toLowerCase() === ev.name.trim().toLowerCase() && e.cat === ev.cat);
+      groups.push(siblings);
+    }
+  });
+
+  groups.forEach(evts => {
+    const first = evts[0];
+    const isGroup = evts.length > 1;
+
+    if (!isGroup) {
+      // Riga singola normale
+      const row = document.createElement('div');
+      row.className = 'recap-row';
+      row.style.borderLeft = `5px solid ${CAT_COLORS[first.cat]}`;
+      const cat = document.createElement('div');
+      cat.className = 'recap-cat';
+      cat.textContent = CAT_LABELS[first.cat].toUpperCase();
+      cat.style.color = CAT_COLORS[first.cat];
+      const name = document.createElement('div');
+      name.className = 'recap-name';
+      name.textContent = first.name;
+      const meta = document.createElement('div');
+      meta.className = 'recap-meta';
+      let t = first.time; if (first.endTime) t += ' - ' + first.endTime;
+      meta.innerHTML = `<span>Data: ${first.day} ${MONTHS[first.month]} ${first.year}</span> <span>Ora: ${t}</span>`;
+      meta.appendChild(buildRecapActions(first));
+      row.appendChild(cat);
+      row.appendChild(name);
+      row.appendChild(meta);
+      if (first.description) {
+        const d = document.createElement('div');
+        d.className = 'recap-desc'; d.textContent = first.description;
+        row.appendChild(d);
+      }
+      if (first.cat !== 'meet') row.appendChild(buildRecapBookingBlock(first));
+      recapContainer.appendChild(row);
+
+    } else {
+      // Card gruppo collassabile
+      const groupEl = document.createElement('div');
+      groupEl.className = 'recap-group';
+      groupEl.style.setProperty('--cat-color', CAT_COLORS[first.cat]);
+
+      const header = document.createElement('div');
+      header.className = 'recap-group-header';
+      header.innerHTML = `
+        <div class="recap-group-left">
+          <div class="recap-group-cat" style="color:${CAT_COLORS[first.cat]}">${CAT_LABELS[first.cat].toUpperCase()}</div>
+          <div class="recap-group-name">${first.name}</div>
+        </div>
+        <div class="recap-group-count">
+          <span>${evts.length} date</span>
+          <span class="recap-group-arrow">›</span>
+        </div>
+      `;
+
+      const body = document.createElement('div');
+      body.className = 'recap-group-body';
+
+      evts.forEach(ev => {
+        const item = document.createElement('div');
+        item.className = 'recap-group-item';
+        const t = ev.time + (ev.endTime ? ' - ' + ev.endTime : '');
+        const dateDiv = document.createElement('div');
+        dateDiv.innerHTML = `<div class="recap-group-item-date">${ev.day} ${MONTHS[ev.month]}</div><div class="recap-group-item-time">ore ${t}</div>`;
+        const actions = buildRecapActions(ev);
+        actions.style.marginLeft = '0';
+        item.appendChild(dateDiv);
+        item.appendChild(actions);
+        body.appendChild(item);
+      });
+
+      header.onclick = () => {
+        const open = body.classList.toggle('open');
+        header.querySelector('.recap-group-arrow').classList.toggle('open', open);
+      };
+
+      groupEl.appendChild(header);
+      groupEl.appendChild(body);
+      recapContainer.appendChild(groupEl);
+    }
   });
 }
 
@@ -1743,11 +1950,13 @@ function setView(listMode) {
     closeBookingPanel();
     currentDetailDay = null;
     footerEl.style.display = 'none';
+    document.getElementById('group-toggle-btn')?.classList.add('list-visible');
   } else {
     listEl.classList.remove('open');
     detailEl.classList.remove('open');
     closeBookingPanel();
     currentDetailDay = null;
+    document.getElementById('group-toggle-btn')?.classList.remove('list-visible');
     gridEl.classList.remove('hidden');
     if (isMobile) gridEl.style.display = 'grid';
     footerEl.style.display = 'flex';
@@ -1863,35 +2072,70 @@ async function deleteEvent(id) {
   }
 }
 
+function toggleRecur() {
+  const on = document.getElementById('recur-on').checked;
+  const opts = document.getElementById('recur-options');
+  opts.classList.toggle('visible', on);
+  // Preseleziona il giorno della settimana del giorno inserito
+  if (on) {
+    const day = parseInt(document.getElementById('new-day').value);
+    if (day && day >= 1 && day <= 31) {
+      const d = new Date(cur.getFullYear(), cur.getMonth(), day);
+      document.getElementById('recur-weekday').value = String(d.getDay());
+    }
+  }
+}
+
 async function addEvent() {
-  const day = parseInt(document.getElementById('new-day').value);
-  const cat = document.getElementById('new-cat').value;
-  const name = document.getElementById('new-name').value.trim();
-  const time = document.getElementById('new-time').value;
+  const day     = parseInt(document.getElementById('new-day').value);
+  const cat     = document.getElementById('new-cat').value;
+  const name    = document.getElementById('new-name').value.trim();
+  const time    = document.getElementById('new-time').value;
   const endTime = document.getElementById('new-time-end').value;
-  const desc = document.getElementById('new-desc').value.trim();
-  const dim = new Date(cur.getFullYear(), cur.getMonth() + 1, 0).getDate();
-  
+  const desc    = document.getElementById('new-desc').value.trim();
+  const isRecur = document.getElementById('recur-on').checked;
+  const dim     = new Date(cur.getFullYear(), cur.getMonth() + 1, 0).getDate();
+
   if (!day || day < 1 || day > dim || !name) {
-    alert("Inserisci un giorno valido e un titolo!");
-    return;
+    alert("Inserisci un giorno valido e un titolo!"); return;
   }
 
-  const newRow = {
-    year: cur.getFullYear(),
-    month: cur.getMonth(),
-    day,
-    cat,
-    name,
-    time,
-    endTime: endTime || null
+  const baseRow = {
+    year: cur.getFullYear(), month: cur.getMonth(),
+    cat, name, time, endTime: endTime || null
   };
-  // Aggiungi description solo se il campo è presente nel DB
-  if (desc) newRow.description = desc;
+  if (desc) baseRow.description = desc;
 
-  const { error } = await _supabase
-    .from('events')
-    .insert([newRow]);
+  let rows = [];
+
+  if (isRecur) {
+    const weekday = parseInt(document.getElementById('recur-weekday').value);
+    const weeks   = parseInt(document.getElementById('recur-weeks').value) || 4;
+    // Genera un series_id univoco
+    const seriesId = 'series_' + Date.now();
+    // Trova tutti i giorni del mese con quel giorno della settimana, partendo dal primo >= day
+    for (let d = day; d <= dim; d++) {
+      const date = new Date(cur.getFullYear(), cur.getMonth(), d);
+      if (date.getDay() === weekday) {
+        // Abbiamo il primo giorno, ora aggiungi ogni 7 giorni per `weeks` volte
+        for (let w = 0; w < weeks; w++) {
+          const targetDay = d + w * 7;
+          if (targetDay <= dim) {
+            rows.push({ ...baseRow, day: targetDay, series_id: seriesId });
+          }
+        }
+        break;
+      }
+    }
+    if (rows.length === 0) {
+      alert("Nessun " + ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'][weekday] + " trovato in questo mese dal giorno " + day + ".");
+      return;
+    }
+  } else {
+    rows = [{ ...baseRow, day }];
+  }
+
+  const { error } = await _supabase.from('events').insert(rows);
 
   if (error) {
     alert("Errore nel salvataggio: " + error.message);
@@ -1900,6 +2144,8 @@ async function addEvent() {
     document.getElementById('new-name').value = '';
     document.getElementById('new-time-end').value = '';
     document.getElementById('new-desc').value = '';
+    document.getElementById('recur-on').checked = false;
+    document.getElementById('recur-options').classList.remove('visible');
     fetchAndBuild();
   }
 }
@@ -12840,6 +13086,23 @@ async function saveEdit(id) {
     currentDetailDay = null;
     fetchAndBuild();
   }
+}
+
+let groupingEnabled = true; // attivo di default
+
+function toggleGrouping() {
+  groupingEnabled = !groupingEnabled;
+  const btn = document.getElementById('group-toggle-btn');
+  if (btn) {
+    btn.classList.toggle('active', groupingEnabled);
+    btn.title = groupingEnabled ? 'Raggruppa eventi simili (attivo)' : 'Raggruppa eventi simili (disattivo)';
+  }
+  buildListView();
+}
+
+function initGroupBtn() {
+  const btn = document.getElementById('group-toggle-btn');
+  if (btn) btn.classList.toggle('active', groupingEnabled);
 }
 
 fetchAndBuild();
