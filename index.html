@@ -1816,7 +1816,7 @@ function renderStylizedMap() {
     tree:     isDark ? '#1e2f18' : '#d6e8c2',
     parkText: isDark ? '#7fae5a' : '#27500A',
     water:    isDark ? '#14232c' : '#d9e8ef',
-    waterText:isDark ? '#6b93a6' : '#4b7184',
+    waterText:isDark ? '#8fb3c4' : '#3f6577',
     marker:   '#993C1D',
     bus:      '#1F5FAD',   // linee bus GTT
     tram:     '#E07A1F',   // linee tram GTT
@@ -1828,7 +1828,7 @@ function renderStylizedMap() {
   const cw = container.clientWidth || 600, ch = container.clientHeight || 480;
   const narrow = cw < 560;
   // su mobile stessa mappa del desktop, solo un po' più larga per includere Corso Principe Oddone
-  const VB = narrow ? { x: -380, y: -520, w: 975, h: 900 } : { x: -380, y: -470, w: 1060, h: 870 };
+  const VB = narrow ? { x: -380, y: -520, w: 975, h: 900 } : { x: -380, y: -600, w: 1060, h: 920 };
   const u = (1 / Math.min(cw / VB.w, ch / VB.h)) * (narrow ? 0.84 : 1);       // metri per pixel
   const px = n => +(n * u).toFixed(2);                 // px a schermo → metri
   const mono = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
@@ -1879,14 +1879,19 @@ function renderStylizedMap() {
     return d + (close ? 'Z' : '');
   };
 
-  // Dora: tracciato reale semplificato (con l'ansa a ovest)
-  const river = smooth([[-1100,-560],[-800,-430],[-720,-200],[-600,-95],[-420,-70],[-290,-60],[-170,-120],
-    [-90,-220],[-120,-300],[-250,-345],[-300,-440],[-220,-525],[-40,-545],[160,-515],[360,-450],
-    [560,-370],[760,-260],[950,-80],[1250,200]]);
-  // Parco Dora: tutto il verde a nord del bordo, ansa compresa
-  const parkEdge = [[-1100,-110],[-760,-60],[-560,-35],[-400,-25],[-290,-20],[-190,-90],[-160,-200],[-160,-290],
-    [-60,-345],[70,-300],[200,-330],[330,-380],[450,-340],[600,-270],[760,-180],[900,-60],[1200,120]];
-  const park = smooth(parkEdge) + 'L1200 -2000L-1100 -2000Z';
+  // Dora e Parco Dora: punti in coordinate della mappa ruotata (x lungo Via Ceva, y verso Corso Regina).
+  // fromR li riporta nel sistema "reale" usato dentro il gruppo ruotato.
+  const fromR = p => [p[0]*dirP[0] + p[1]*nrmP[0], p[0]*dirP[1] + p[1]*nrmP[1]].map(v => Math.round(v));
+  // fiume: ansa a ovest, poi attraversa il parco in alto e scende verso destra fino al bordo
+  const RIVER_R = [[-1233,-64],[-906,-67],[-739,110],[-587,157],[-412,107],[-289,63],[-204,-40],[-172,-164],
+    [-232,-225],[-369,-213],[-453,-280],[-415,-390],[-258,-482],[-63,-536],[150,-548],[350,-530],[520,-470],
+    [640,-370],[730,-230],[820,-60],[950,120]];
+  const river = smooth(RIVER_R.map(fromR));
+  const RIVER_LABEL_AT = '65%';   // punto del fiume (in % della lunghezza) dove sta la scritta
+  // Parco Dora: tutto il verde a nord del bordo, ansa compresa; a destra scende insieme al fiume
+  const parkEdge = [[-1050,347],[-719,254],[-526,196],[-376,140],[-273,100],[-210,-5],[-228,-118],[-264,-200],
+    [-195,-291],[-58,-303],[48,-383],[147,-481],[290,-470],[440,-420],[560,-320],[650,-180],[730,-20],[850,160],[1000,400]].map(fromR);
+  const park = smooth(parkEdge) + `L${fromR([2500,400]).join(' ')}L${fromR([2500,-2500]).join(' ')}L${fromR([-1200,-2500]).join(' ')}L${fromR([-1200,347]).join(' ')}Z`;
   const trees = [[-560,-160],[-430,-140],[-330,-200],[-250,-250],[-300,-120],[-40,-420],[60,-380],[200,-420],
     [320,-560],[-140,-600],[470,-420],[600,-340],[700,-300],[-650,-230],[100,-620],[520,-560]]
     .map(([x,y]) => `<circle cx="${x}" cy="${y}" r="${px(7)}" fill="${C.tree}"/>`).join('');
@@ -1957,7 +1962,12 @@ function renderStylizedMap() {
     <!-- Parco Dora + fiume -->
     <path d="${park}" fill="${C.park}" stroke="${C.parkEdge}" stroke-width="${px(1)}"/>
     ${trees}
-    <path d="${river}" fill="none" stroke="${C.water}" stroke-width="${px(14)}" stroke-linecap="round"/>
+    <path id="s432-river" d="${river}" fill="none" stroke="${C.water}" stroke-width="${px(20)}" stroke-linecap="round"/>
+    <!-- "fiume dora" scritto lungo il fiume, sempre dentro il tracciato -->
+    <text font-family="${mono}" font-size="${px(10)}" font-weight="bold" font-style="italic" letter-spacing="${px(1.5)}"
+          fill="${C.waterText}">
+      <textPath href="#s432-river" startOffset="${RIVER_LABEL_AT}" text-anchor="middle"><tspan dy="0.35em">fiume dora</tspan></textPath>
+    </text>
 
     <!-- strade principali -->
     ${road(line(CRM0, dirP, -2000, 2000), 34)}
@@ -1967,7 +1977,6 @@ function renderStylizedMap() {
 
     <!-- etichette -->
     ${text([60, -400], 'PARCO DORA', { size: 15, color: C.parkText, halo: C.park, spacing: 2, rot: rotP })}
-    ${text([420, -360], 'fiume dora', { size: 10, color: C.waterText, weight: 'normal', italic: true, halo: C.park, rot: 22 })}
     ${text(along(CRM0, dirP, narrow ? 285 : 330), 'CORSO REGINA MARGHERITA', { size: 11, color: C.roadText, halo: null, rot: rotP })}
     ${text(along(X, nrmP, -250), 'CORSO PRINCIPE ODDONE', { size: 10, color: C.roadText, halo: null, rot: rotP - 90 })}
     ${text(along(CU0, dirU, tX * 0.55), 'CORSO UMBRIA', { size: 10, color: C.roadText, halo: null, rot: rotU })}
