@@ -5,12 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Finanze · spazio 432</title>
 <script>
-  // ── GUARD ACCESSO ─────────────────────────────────────────────
-  // Blocca la pagina se non si è passati dal login (login.html).
-  // Usa la stessa sessionStorage key impostata da login.html dopo la password.
-  if (sessionStorage.getItem('s432_auth') !== '1') {
-    location.replace('login.html');
-  }
+  // session guard: senza login si torna al portale
+  if (sessionStorage.getItem('s432_auth') !== '1') location.replace('login.html');
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
@@ -123,6 +119,7 @@
   .entry {
     display:flex; align-items:center; padding:9px 16px;
     border-bottom:1px solid var(--border-light); gap:8px; transition:background .1s;
+    cursor:pointer;
   }
   .entry:hover { background:var(--hover); }
   .entry:last-child { border-bottom:none; }
@@ -146,6 +143,26 @@
   .e-del:hover { color:#c00; }
   .empty { padding:28px 16px; font-size:12px; color:var(--fg-muted); font-style:italic; }
 
+  /* ── INLINE EDIT ── */
+  .entry.editing {
+    display:block; cursor:default; background:var(--hover);
+    padding:12px 16px; border-left:3px solid var(--fg);
+  }
+  .entry.editing.u { border-left-color:var(--c-u); }
+  .entry.editing.e { border-left-color:var(--c-e); }
+  .entry.editing.r { border-left-color:var(--c-r); }
+  .e-edit-form { display:flex; flex-direction:column; gap:7px; }
+  .e-edit-lbl { font-size:9px; font-weight:bold; text-transform:uppercase; letter-spacing:.6px; color:var(--fg-muted); }
+  .f-mese { flex:1; min-width:0; }
+  .e-edit-actions { display:flex; justify-content:space-between; align-items:center; gap:6px; }
+  .e-edit-actions .right { display:flex; gap:4px; align-items:center; }
+  .btn-del-inline {
+    font-size:11px; padding:6px 4px; background:none; border:none;
+    color:var(--fg-muted); cursor:pointer; font-family:var(--font);
+  }
+  .btn-del-inline:hover, .btn-del-inline.armed { color:#c00; }
+  .btn-del-inline.armed { font-weight:bold; }
+
   /* ── ADD AREA ── */
   .col-trigger { padding:8px 14px; border-top:1px solid var(--border-light); flex-shrink:0; }
   .add-pill {
@@ -161,7 +178,7 @@
   }
   .add-form.open { max-height:200px; opacity:1; border-top:1px solid var(--border); }
   .add-inner { padding:12px 16px; display:flex; flex-direction:column; gap:7px; }
-  .add-row { display:flex; gap:6px; }
+  .add-row { display:flex; gap:6px; align-items:center; }
   .f {
     font-size:12px; padding:6px 9px; border:1px solid var(--border);
     background:var(--input-bg); color:var(--input-fg); outline:none;
@@ -169,7 +186,7 @@
   }
   .f:focus { border-color:var(--fg); }
   .f.err { border-color:#c00 !important; }
-  .f-name { flex:1; } .f-amt { width:80px; } .f-note { flex:1; } .f-tgt { width:108px; }
+  .f-name { flex:1; min-width:0; } .f-amt { width:80px; } .f-note { flex:1; min-width:0; } .f-tgt { width:108px; }
   .add-actions { display:flex; justify-content:space-between; align-items:center; }
   .btn-save {
     font-size:11px; padding:6px 16px; background:var(--fg); color:var(--bg);
@@ -205,6 +222,7 @@
     border-radius:3px; opacity:0; pointer-events:none; transition:opacity .2s;
     z-index:999; white-space:nowrap; font-family:var(--font);
   }
+  .toast.ok { background:var(--c-e); }
   .toast.show { opacity:1; }
 
 
@@ -289,6 +307,9 @@
     .col:last-child { border-bottom:none; }
     .fin-footer { gap:10px; }
     .foot-addr { display:none; }
+    /* touch: niente hover → bottoni sempre visibili, input ≥16px contro lo zoom iOS */
+    .e-del, .e-pay { opacity:1; }
+    .f { font-size:16px; }
   }
 
   /* ── PAY SHEET ── */
@@ -377,6 +398,86 @@
     .chart-card { border-right:none; border-bottom:1px solid var(--border); }
     .chart-card:last-child { border-bottom:none; }
   }
+
+  /* ── DIVISIONE BOLLETTE ── */
+  .e-split {
+    font-size:10px; color:var(--c-u); cursor:pointer; white-space:nowrap;
+    padding:3px 9px; background:var(--pill-bg); border:1px solid var(--c-u); border-radius:10px;
+    font-family:var(--font); flex-shrink:0; transition:background .15s, color .15s;
+  }
+  .e-split:hover { background:var(--c-u); color:#fff; }
+  .e-split-info {
+    font-size:10px; color:var(--c-u); margin-top:3px; display:inline-block;
+    cursor:pointer; border-bottom:1px dotted currentColor;
+  }
+  .e-split-info.done { color:var(--c-e); }
+  .e-split-info .warn { color:#c00; }
+
+  .split-panel { display:grid; grid-template-columns:1fr 2fr; border:1px solid var(--border); border-top:none; }
+  .sp-col { padding:16px 20px; min-width:0; }
+  .sp-col:first-child { border-right:1px solid var(--border); }
+  .sp-title {
+    font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:.7px;
+    color:var(--fg-muted); margin-bottom:12px; display:flex; justify-content:space-between; gap:8px;
+  }
+  .sp-title .tot { color:var(--c-u); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .sp-col .chips { margin-bottom:10px; }
+  .chip {
+    font-size:12px; padding:4px 6px 4px 11px; border:1px solid var(--border); border-radius:14px;
+    display:inline-flex; align-items:center; gap:4px; background:var(--pill-bg);
+  }
+  .chip button { background:none; border:none; color:var(--fg-muted); cursor:pointer; font-family:var(--font); font-size:11px; padding:0 3px; }
+  .chip button:hover { color:#c00; }
+  .chip.sel { cursor:pointer; padding:5px 12px; user-select:none; color:var(--fg-muted); border-color:var(--border-light); }
+  .chip.sel.on { background:var(--fg); color:var(--bg); border-color:var(--fg); }
+  .sp-add { display:flex; gap:6px; }
+  .debt-group { margin-bottom:14px; }
+  .debt-group:last-child { margin-bottom:0; }
+  .debt-head {
+    display:flex; justify-content:space-between; font-size:13px; font-weight:bold;
+    padding-bottom:4px; border-bottom:1px solid var(--border-light); margin-bottom:2px;
+  }
+  .debt-head .amt { color:var(--c-u); }
+  .q-row { display:flex; align-items:center; gap:8px; font-size:12px; padding:5px 0; }
+  .q-lbl { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .q-sub { color:var(--fg-muted); font-size:10px; }
+  .q-amt { font-weight:bold; flex-shrink:0; }
+  .q-row.paid .q-lbl, .q-row.paid .q-amt { color:var(--fg-muted); text-decoration:line-through; }
+  .q-check { width:18px; height:18px; accent-color:var(--c-e); cursor:pointer; flex-shrink:0; }
+  .sp-empty { font-size:12px; color:var(--fg-muted); font-style:italic; }
+
+  .modal.wide { max-width:560px; max-height:calc(100vh - 32px); display:flex; flex-direction:column; }
+  .modal.wide .modal-body { overflow-y:auto; }
+  .sm-sec { display:flex; flex-direction:column; gap:6px; }
+  .sm-sec.hidden { display:none; }
+  .sm-lbl { font-size:9px; text-transform:uppercase; letter-spacing:.6px; color:var(--fg-muted); font-weight:bold; }
+  .sm-hint { font-size:10px; color:var(--fg-muted); line-height:1.5; }
+  .sm-head { display:flex; justify-content:space-between; gap:10px; font-size:15px; font-weight:bold; }
+  .sm-head .amt { color:var(--c-u); }
+  .ev-row {
+    display:flex; align-items:center; gap:8px; font-size:12px; padding:6px 0;
+    border-bottom:1px solid var(--border-light); cursor:pointer; user-select:none;
+  }
+  .ev-row:last-child { border-bottom:none; }
+  .ev-date { color:var(--fg-muted); width:42px; flex-shrink:0; }
+  .ev-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ev-tag { font-size:10px; padding:2px 8px; border-radius:10px; border:1px solid var(--border-light); color:var(--fg-muted); flex-shrink:0; }
+  .ev-row.ext .ev-tag { background:var(--c-u-bg); color:var(--c-u); border-color:var(--c-u); font-weight:bold; }
+  .ev-list { max-height:200px; overflow-y:auto; border-top:1px solid var(--border-light); border-bottom:1px solid var(--border-light); }
+  .sum-box { border:1px solid var(--border); padding:10px 12px; display:flex; flex-direction:column; gap:4px; font-size:12px; }
+  .sum-line { display:flex; justify-content:space-between; gap:8px; }
+  .sum-line .muted { color:var(--fg-muted); }
+  .sum-line.sub { padding-left:10px; color:var(--fg-muted); }
+  .sum-line.tot { font-weight:bold; border-top:1px solid var(--border-light); padding-top:5px; margin-top:3px; }
+  .sum-err { color:#c00; font-size:12px; }
+  .modal-foot .btn-save { flex:1; padding:9px 14px; font-size:12px; }
+  .btn-save:disabled { opacity:.35; cursor:not-allowed; }
+
+  @media (max-width:860px) {
+    .split-panel { grid-template-columns:1fr; }
+    .sp-col:first-child { border-right:none; border-bottom:1px solid var(--border); }
+  }
 </style>
 </head>
 <body>
@@ -417,6 +518,47 @@
 alter table finanze enable row level security;
 create policy "accesso totale" on finanze
   for all using (true) with check (true);</div>
+  </div>
+
+  <!-- Setup banner — divisione bollette -->
+  <div class="setup-banner" id="split-setup">
+    <div class="setup-head">
+      <span class="setup-title">⚠ Divisione bollette — servono due query su Supabase</span>
+      <button class="setup-close" onclick="document.getElementById('split-setup').classList.remove('show')">chiudi ✕</button>
+    </div>
+    <p class="setup-txt"><strong>1.</strong> Nel progetto <strong>finanze</strong> (rsgazxwkdyphdjogvbpe) → SQL Editor:</p>
+    <div class="setup-sql">alter table finanze add column if not exists periodo_dal date;
+alter table finanze add column if not exists periodo_al  date;
+
+create table if not exists partecipanti (
+  id          uuid default gen_random_uuid() primary key,
+  nome        text not null,
+  attivo      boolean default true,
+  created_at  timestamptz default now()
+);
+
+create table if not exists quote_bollette (
+  id               uuid default gen_random_uuid() primary key,
+  finanze_id       uuid not null references finanze(id) on delete cascade,
+  tipo             text not null check (tipo in ('persona','evento')),
+  nome             text not null,
+  partecipante_id  uuid references partecipanti(id),
+  evento_id        bigint,
+  importo          numeric(10,2) not null,
+  pagato           boolean default false,
+  pagato_il        timestamptz,
+  entrata_id       uuid,
+  created_at       timestamptz default now()
+);
+
+alter table partecipanti   enable row level security;
+alter table quote_bollette enable row level security;
+create policy "accesso totale" on partecipanti   for all using (true) with check (true);
+create policy "accesso totale" on quote_bollette for all using (true) with check (true);
+
+insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Alejandra');</div>
+    <p class="setup-txt" style="margin-top:12px"><strong>2.</strong> Nel progetto <strong>calendario</strong> (udaymqqytagtayviwolr) → SQL Editor:</p>
+    <div class="setup-sql">alter table events add column if not exists esterno boolean default false;</div>
   </div>
 
   <div class="status-bar">
@@ -524,6 +666,69 @@ create policy "accesso totale" on finanze
     </div>
     <div class="foot-addr">via ceva 47, torino</div>
   </div>
+
+  <!-- DIVISIONE BOLLETTE -->
+  <div class="split-panel" id="split-panel" style="display:none">
+    <div class="sp-col">
+      <div class="sp-title"><span>÷ Partecipanti bollette</span></div>
+      <div class="chips" id="pt-chips"></div>
+      <div class="sp-add">
+        <input class="f f-name" id="pt-new" type="text" placeholder="Aggiungi nome…" />
+        <button class="btn-save" onclick="addPartecipante()">+</button>
+      </div>
+    </div>
+    <div class="sp-col">
+      <div class="sp-title"><span>Quote da incassare</span><span class="tot" id="debt-tot"></span></div>
+      <div id="debt-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SPLIT MODAL -->
+<div class="modal-overlay" id="split-overlay" onclick="if(event.target===this) closeSplit()">
+  <div class="modal wide">
+    <div class="modal-head">
+      <span class="modal-title" style="color:var(--c-u)">÷ Dividi bolletta</span>
+      <button class="modal-close" onclick="closeSplit()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="sm-head"><span id="sm-nome">—</span><span class="amt" id="sm-imp">—</span></div>
+
+      <div class="sm-sec">
+        <span class="sm-lbl">Periodo coperto dalla bolletta</span>
+        <div class="add-row">
+          <input class="f f-mese" id="sm-dal" type="date" onchange="loadPeriodEvents()" />
+          <span>→</span>
+          <input class="f f-mese" id="sm-al"  type="date" onchange="loadPeriodEvents()" />
+        </div>
+      </div>
+
+      <div class="sm-sec">
+        <span class="sm-lbl">Chi divide (parti uguali)</span>
+        <div class="chips" id="sm-pt"></div>
+      </div>
+
+      <div class="sm-sec">
+        <span class="sm-lbl">Eventi nel periodo — tocca quelli esterni</span>
+        <div id="sm-ev"></div>
+        <span class="sm-hint">Un giorno con evento esterno conta come 2 giornate normali e lo paga l'evento. Cinema, serate e attività vostre lasciale non segnate.</span>
+      </div>
+
+      <div class="sm-sec">
+        <span class="sm-lbl">Riepilogo</span>
+        <div class="sum-box" id="sm-sum"></div>
+      </div>
+
+      <div class="sm-sec hidden" id="sm-saved-sec">
+        <span class="sm-lbl">Quote salvate — spunta chi ha pagato</span>
+        <div id="sm-saved"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeSplit()">chiudi</button>
+      <button class="btn-save" id="split-save" onclick="saveSplit()">salva divisione</button>
+    </div>
+  </div>
 </div>
 
 <!-- PAYMENT MODAL -->
@@ -588,6 +793,20 @@ const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
 let cur = new Date(); cur.setDate(1);
 let curEntries = [];
 let allRisparmio = [];
+let editingId = null;   // id della voce in modifica (null = nessuna)
+
+// ── DIVISIONE BOLLETTE: stato ─────────────────────────────────
+// Il calendario sta su un altro progetto Supabase → secondo client
+const cal = createClient(
+  'https://udaymqqytagtayviwolr.supabase.co',
+  'sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs'
+);
+const K_EVENTO = 2;       // un giorno con evento esterno = 2 giornate normali
+let partecipanti = [];    // attivi
+let allQuotes = [];       // tutte le quote, con join su finanze
+let splitReady = false;   // tabelle presenti?
+let calHasEsterno = true; // colonna events.esterno presente?
+let split = null;         // stato del modal aperto
 
 // ── SEED DATA ─────────────────────────────────────────────────
 const SEED = [
@@ -639,7 +858,7 @@ const SEED = [
 // ── HELPERS ───────────────────────────────────────────────────
 function fmt(n) {
   const s = Math.abs(n).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
-  return (n < 0 ? '−\u00a0' : '') + '€\u00a0' + s;
+  return (n < 0 ? '− ' : '') + '€ ' + s;
 }
 function sum(arr) { return arr.reduce((s,e) => s + (parseFloat(e.importo)||0), 0); }
 
@@ -651,9 +870,11 @@ function setStatus(state, txt) {
 }
 
 let toastTimer;
-function showToast(msg) {
+function showToast(msg, ok) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  t.textContent = msg;
+  t.classList.toggle('ok', !!ok);
+  t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
@@ -685,6 +906,7 @@ async function load() {
   // Also load all risparmio for cumulative goal tracking
   const { data: allR } = await db.from('finanze').select('nome,importo').eq('tipo','risparmio');
   allRisparmio = allR || [];
+  await loadSplitData();
 
   curEntries = data || [];
   document.getElementById('grid').classList.remove('loading');
@@ -703,6 +925,7 @@ function render() {
 
   renderList('u', u); renderList('e', e); renderList('r', r);
   renderCharts(u, e, r);
+  renderSplitPanel();
 
   const tU = sum(u), tE = sum(e), tR = sum(r);
   document.getElementById('tot-u').textContent = fmt(tU);
@@ -727,8 +950,13 @@ function renderList(tipo, entries) {
   }
   list.innerHTML = '';
   entries.forEach(e => {
+    // voce in modifica → form inline al posto della riga
+    if (e.id === editingId) { list.appendChild(buildEditRow(tipo, e)); return; }
+
     const row = document.createElement('div');
     row.className = 'entry';
+    row.title = 'Tocca per modificare';
+    row.onclick = () => startEdit(e.id);
 
     const info = document.createElement('div'); info.className = 'e-info';
     const nm = document.createElement('div'); nm.className = 'e-name'; nm.textContent = e.nome;
@@ -745,33 +973,136 @@ function renderList(tipo, entries) {
         + `<div class="e-goal-lbl">${fmt(cum)} su ${fmt(e.target)} — ${pct.toFixed(0)}%</div>`;
       info.appendChild(g);
     }
+    // stato divisione (solo uscite)
+    if (tipo === 'u') {
+      const qs = allQuotes.filter(q => q.finanze_id === e.id);
+      if (qs.length) {
+        const paid = qs.filter(q => q.pagato).length;
+        const tot  = round2(qs.reduce((s,q) => s + parseFloat(q.importo), 0));
+        const s = document.createElement('span');
+        s.className = 'e-split-info' + (paid === qs.length ? ' done' : '');
+        s.textContent = `÷ ${qs.length} quote · ${paid}/${qs.length} pagate`;
+        if (Math.abs(tot - parseFloat(e.importo)) > 0.009) {
+          const w = document.createElement('span'); w.className = 'warn';
+          w.textContent = ' · importo cambiato, ridividi'; s.appendChild(w);
+        }
+        s.onclick = ev => { ev.stopPropagation(); openSplit(e); };
+        info.appendChild(s);
+      }
+    }
 
     const amt = document.createElement('div');
     amt.className = 'e-amt ' + tipo;
     amt.textContent = fmt(e.importo);
-
-    // Pay button (only on uscite)
-    if (tipo === 'u') {
-      const pay = document.createElement('button');
-      pay.className = 'e-pay'; pay.textContent = '↗'; pay.title = 'Prepara bonifico';
-      pay.onclick = ev => { ev.stopPropagation(); openPay({...e, mese: cur.getMonth()+1, anno: cur.getFullYear()}); };
-      row.appendChild(pay);
-    }
 
     const del = document.createElement('button');
     del.className = 'e-del'; del.textContent = '✕'; del.title = 'Elimina';
     del.onclick = ev => { ev.stopPropagation(); deleteEntry(e.id); };
 
     if (tipo === 'u') {
-      const pay = document.createElement('button');
-      pay.className = 'e-pay'; pay.textContent = '→ paga'; pay.title = 'Prepara bonifico';
-      pay.onclick = ev => { ev.stopPropagation(); openPagamento(e); };
-      row.appendChild(info); row.appendChild(amt); row.appendChild(pay); row.appendChild(del);
+      const sp = document.createElement('button');
+      sp.className = 'e-split'; sp.textContent = '÷ dividi'; sp.title = 'Dividi bolletta';
+      sp.onclick = ev => { ev.stopPropagation(); openSplit(e); };
+      row.appendChild(info); row.appendChild(amt); row.appendChild(sp); row.appendChild(del);
     } else {
       row.appendChild(info); row.appendChild(amt); row.appendChild(del);
     }
     list.appendChild(row);
   });
+}
+
+// ── INLINE EDIT ───────────────────────────────────────────────
+function startEdit(id) {
+  editingId = id;
+  closeAllForms();
+  render();
+  const first = document.querySelector('.entry.editing [data-k="nome"]');
+  if (first) setTimeout(() => first.focus(), 30);
+}
+function cancelEdit() { editingId = null; render(); }
+
+function buildEditRow(tipo, e) {
+  const row = document.createElement('div');
+  row.className = 'entry editing ' + tipo;
+  row.onclick = ev => ev.stopPropagation();
+  row.innerHTML = `
+    <div class="e-edit-form">
+      <div class="add-row">
+        <input class="f f-name" data-k="nome" type="text" placeholder="Nome" />
+        <input class="f f-amt"  data-k="importo" type="number" min="0" step="0.01" placeholder="€" />
+      </div>
+      <div class="add-row">
+        ${tipo === 'r' ? '<input class="f f-tgt" data-k="target" type="number" min="0" placeholder="Target totale €" />' : ''}
+        <input class="f f-note" data-k="nota" type="text" placeholder="Nota…" />
+      </div>
+      <div class="add-row">
+        <span class="e-edit-lbl">Mese</span>
+        <input class="f f-mese" data-k="mese" type="month" />
+      </div>
+      <div class="e-edit-actions">
+        <button class="btn-del-inline" data-a="del">elimina</button>
+        <div class="right">
+          <button class="btn-cancel" data-a="cancel">annulla</button>
+          <button class="btn-save"   data-a="save">salva</button>
+        </div>
+      </div>
+    </div>`;
+
+  const q = k => row.querySelector(`[data-k="${k}"]`);
+  q('nome').value    = e.nome || '';
+  q('importo').value = e.importo ?? '';
+  q('nota').value    = e.nota || '';
+  q('mese').value    = `${e.anno}-${String(e.mese).padStart(2,'0')}`;
+  if (tipo === 'r') q('target').value = e.target ?? '';
+
+  row.querySelector('[data-a="save"]').onclick   = () => updateEntry(e, tipo, row);
+  row.querySelector('[data-a="cancel"]').onclick = cancelEdit;
+
+  // elimina in due tempi: primo tocco arma, secondo conferma
+  const delBtn = row.querySelector('[data-a="del"]');
+  delBtn.onclick = () => {
+    if (delBtn.classList.contains('armed')) { editingId = null; deleteEntry(e.id); return; }
+    delBtn.classList.add('armed'); delBtn.textContent = 'conferma eliminazione';
+    setTimeout(() => { delBtn.classList.remove('armed'); delBtn.textContent = 'elimina'; }, 3000);
+  };
+
+  row.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter')  updateEntry(e, tipo, row);
+      if (ev.key === 'Escape') cancelEdit();
+    });
+  });
+  return row;
+}
+
+async function updateEntry(orig, tipo, row) {
+  const q = k => row.querySelector(`[data-k="${k}"]`);
+  const nome    = q('nome').value.trim();
+  const importo = parseFloat(q('importo').value);
+  if (!nome) { flagErr(q('nome')); return; }
+  if (isNaN(importo) || importo < 0) { flagErr(q('importo')); return; }
+
+  const patch = { nome, importo, nota: q('nota').value.trim() || null };
+  if (tipo === 'r') {
+    const t = parseFloat(q('target').value);
+    patch.target = t > 0 ? t : null;
+  }
+  const [y, m] = (q('mese').value || '').split('-').map(Number);
+  if (y && m) { patch.anno = y; patch.mese = m; }
+
+  setStatus('load', 'salvataggio…');
+  const { error } = await db.from('finanze').update(patch).eq('id', orig.id);
+  if (error) { setStatus('error', error.message); showToast('Errore: ' + error.message); return; }
+
+  editingId = null;
+  const moved = patch.anno && (patch.anno !== orig.anno || patch.mese !== orig.mese);
+  showToast(moved ? `Spostata a ${MONTHS[patch.mese-1]} ${patch.anno}` : 'Voce aggiornata', true);
+  await load();
+}
+
+function flagErr(el) {
+  el.classList.add('err'); el.focus();
+  setTimeout(() => el.classList.remove('err'), 1400);
 }
 
 // ── CRUD ──────────────────────────────────────────────────────
@@ -810,6 +1141,344 @@ async function deleteEntry(id) {
   const { error } = await db.from('finanze').delete().eq('id', id);
   if (error) { setStatus('error', error.message); showToast('Errore: ' + error.message); return; }
   await load();
+}
+
+// ── DIVISIONE BOLLETTE ────────────────────────────────────────
+const MONTHS_SHORT = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+const CAT_LBL = { music:'musica', film:'cinema', lab:'laboratorio', art:'arte', meet:'riunione' };
+const round2 = x => Math.round(x * 100) / 100;
+const pad    = n => String(n).padStart(2, '0');
+const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseISO = s => { if (!s) return null; const [y,m,d] = s.split('-').map(Number); return (y&&m&&d) ? new Date(y, m-1, d) : null; };
+const ddmm = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+async function loadSplitData() {
+  const [p, q] = await Promise.all([
+    db.from('partecipanti').select('*').eq('attivo', true).order('created_at'),
+    db.from('quote_bollette').select('*, finanze(nome,anno,mese,importo)').order('created_at')
+  ]);
+  const banner = document.getElementById('split-setup');
+  if (p.error || q.error) {
+    splitReady = false; partecipanti = []; allQuotes = [];
+    banner.classList.add('show');
+    return;
+  }
+  splitReady = true; banner.classList.remove('show');
+  partecipanti = p.data || [];
+  allQuotes    = q.data || [];
+}
+
+// ── pannello sotto il footer ──
+function renderSplitPanel() {
+  const panel = document.getElementById('split-panel');
+  panel.style.display = splitReady ? '' : 'none';
+  if (!splitReady) return;
+
+  // partecipanti
+  const chips = document.getElementById('pt-chips');
+  chips.innerHTML = '';
+  if (!partecipanti.length) chips.innerHTML = '<span class="sp-empty">Nessun partecipante</span>';
+  partecipanti.forEach(p => {
+    const c = document.createElement('span'); c.className = 'chip';
+    c.appendChild(document.createTextNode(p.nome));
+    const x = document.createElement('button'); x.textContent = '✕'; x.title = 'Togli dalle prossime divisioni';
+    x.onclick = () => removePartecipante(p.id);
+    c.appendChild(x); chips.appendChild(c);
+  });
+
+  // quote da incassare, raggruppate per persona (eventi in fondo)
+  const list = document.getElementById('debt-list');
+  const open = allQuotes.filter(q => !q.pagato);
+  document.getElementById('debt-tot').textContent = open.length ? fmt(open.reduce((s,q)=>s+parseFloat(q.importo),0)) : '';
+  if (!open.length) { list.innerHTML = '<span class="sp-empty">Nessuna quota da incassare ✓</span>'; return; }
+
+  const groups = {};
+  open.forEach(q => { const k = q.tipo === 'evento' ? '◆ Eventi esterni' : q.nome; (groups[k] ||= []).push(q); });
+  const keys = Object.keys(groups).sort((a,b) => (a.startsWith('◆') - b.startsWith('◆')) || a.localeCompare(b));
+
+  list.innerHTML = '';
+  keys.forEach(k => {
+    const g = document.createElement('div'); g.className = 'debt-group';
+    const tot = groups[k].reduce((s,q)=>s+parseFloat(q.importo),0);
+    g.innerHTML = `<div class="debt-head"><span>${esc(k)}</span><span class="amt">${fmt(tot)}</span></div>`;
+    groups[k].forEach(q => g.appendChild(quotaRow(q, q.tipo === 'evento')));
+    list.appendChild(g);
+  });
+}
+
+// riga quota con spunta "pagato"
+function quotaRow(q, showName) {
+  const f = q.finanze || {};
+  const row = document.createElement('div');
+  row.className = 'q-row' + (q.pagato ? ' paid' : '');
+  const cb = document.createElement('input');
+  cb.type = 'checkbox'; cb.className = 'q-check'; cb.checked = !!q.pagato; cb.title = 'Pagato';
+  cb.onchange = () => { cb.disabled = true; togglePaid(q, cb.checked); };
+  const lbl = document.createElement('div'); lbl.className = 'q-lbl';
+  const bill = `${f.nome || 'bolletta'} · ${MONTHS_SHORT[(f.mese||1)-1]} ${f.anno || ''}`;
+  lbl.innerHTML = showName
+    ? `${esc(q.nome)} <span class="q-sub">${esc(bill)}</span>`
+    : esc(bill);
+  const amt = document.createElement('div'); amt.className = 'q-amt'; amt.textContent = fmt(parseFloat(q.importo));
+  row.appendChild(cb); row.appendChild(lbl); row.appendChild(amt);
+  return row;
+}
+
+async function addPartecipante() {
+  const inp = document.getElementById('pt-new');
+  const nome = inp.value.trim();
+  if (!nome) { flagErr(inp); return; }
+  const { error } = await db.from('partecipanti').insert({ nome });
+  if (error) { showToast('Errore: ' + error.message); return; }
+  inp.value = '';
+  await load();
+}
+
+async function removePartecipante(id) {
+  // non si cancella: si disattiva, così le quote passate restano intatte
+  const { error } = await db.from('partecipanti').update({ attivo: false }).eq('id', id);
+  if (error) { showToast('Errore: ' + error.message); return; }
+  await load();
+}
+
+// ── modal ──
+function getPeriod() {
+  return { dal: parseISO(document.getElementById('sm-dal').value),
+           al:  parseISO(document.getElementById('sm-al').value) };
+}
+
+async function openSplit(entry) {
+  if (!splitReady) {
+    document.getElementById('split-setup').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast('Prima esegui lo SQL del banner in alto');
+    return;
+  }
+  closeAllForms();
+  const saved   = allQuotes.filter(q => q.finanze_id === entry.id);
+  const savedPt = saved.filter(q => q.tipo === 'persona').map(q => q.partecipante_id);
+  split = {
+    entry,
+    sel: new Set(savedPt.length ? savedPt : partecipanti.map(p => p.id)),
+    events: [], loading: true
+  };
+  document.getElementById('sm-nome').textContent = entry.nome;
+  document.getElementById('sm-imp').textContent  = fmt(parseFloat(entry.importo));
+  document.getElementById('sm-dal').value = entry.periodo_dal || `${entry.anno}-${pad(entry.mese)}-01`;
+  document.getElementById('sm-al').value  = entry.periodo_al  || isoDate(new Date(entry.anno, entry.mese, 0));
+  document.getElementById('split-overlay').classList.add('show');
+  renderSplitModal();
+  await loadPeriodEvents();
+}
+
+function closeSplit() {
+  document.getElementById('split-overlay').classList.remove('show');
+  split = null;
+}
+
+async function loadPeriodEvents() {
+  if (!split) return;
+  const { dal, al } = getPeriod();
+  if (!dal || !al || al < dal) { split.events = []; split.loading = false; renderSplitModal(); return; }
+  split.loading = true; split.calError = null; renderSplitModal();
+
+  const { data, error } = await cal.from('events').select('*')
+    .gte('year', dal.getFullYear()).lte('year', al.getFullYear());
+  if (!split) return;
+  split.loading = false;
+  if (error) { split.events = []; split.calError = error.message; renderSplitModal(); return; }
+
+  const rows = data || [];
+  calHasEsterno = !rows.length || ('esterno' in rows[0]);
+  split.events = rows
+    .map(ev => ({ ...ev, _d: new Date(ev.year, ev.month, ev.day) }))   // month nel calendario è 0-based
+    .filter(ev => ev._d >= dal && ev._d <= al)
+    .sort((a,b) => a._d - b._d || String(a.time||'').localeCompare(String(b.time||'')));
+  renderSplitModal();
+}
+
+async function toggleEsterno(ev) {
+  if (!calHasEsterno) { showToast('Manca la colonna "esterno" sul calendario (query 2 del banner)'); return; }
+  const val = !ev.esterno;
+  ev.esterno = val; renderSplitModal();
+  const { error } = await cal.from('events').update({ esterno: val }).eq('id', ev.id);
+  if (error) { ev.esterno = !val; renderSplitModal(); showToast('Errore: ' + error.message); }
+}
+
+// calcolo: un giorno con evento esterno pesa K_EVENTO giornate; il resto in parti uguali
+function computeSplit() {
+  const B = parseFloat(split.entry.importo) || 0;
+  const { dal, al } = getPeriod();
+  if (!dal || !al || al < dal) return { err: 'Periodo non valido' };
+  const members = partecipanti.filter(p => split.sel.has(p.id));
+  if (!members.length) return { err: 'Seleziona almeno un partecipante' };
+
+  const D = Math.round((al - dal) / 864e5) + 1;
+  const byDay = {};
+  split.events.filter(e => e.esterno).forEach(e => (byDay[isoDate(e._d)] ||= []).push(e));
+  const E = Object.keys(byDay).length;               // giorni distinti con eventi esterni
+  const unit = B / (D + (K_EVENTO - 1) * E);         // costo giornata normale
+  const dayQuota = K_EVENTO * unit;                  // costo giornata con evento
+
+  const evQuotes = [];
+  Object.values(byDay).forEach(list => {             // due eventi nello stesso giorno si dividono la giornata
+    list.forEach(e => evQuotes.push({
+      tipo: 'evento', nome: `${e.name} · ${ddmm(e._d)}`, evento_id: e.id,
+      importo: round2(dayQuota / list.length)
+    }));
+  });
+  const totEv = round2(evQuotes.reduce((s,q) => s + q.importo, 0));
+  const rest  = round2(B - totEv);
+
+  // parti uguali al centesimo: gli eventuali centesimi avanzati ai primi
+  const cents = Math.round(rest * 100), n = members.length;
+  const base = Math.floor(cents / n), extra = cents - base * n;
+  const pQuotes = members.map((p, i) => ({
+    tipo: 'persona', nome: p.nome, partecipante_id: p.id,
+    importo: (base + (i < extra ? 1 : 0)) / 100
+  }));
+  return { B, D, E, unit, dayQuota, evQuotes, pQuotes, totEv, rest, n };
+}
+
+function renderSplitModal() {
+  if (!split) return;
+
+  // chi divide
+  const pt = document.getElementById('sm-pt');
+  pt.innerHTML = '';
+  if (!partecipanti.length) pt.innerHTML = '<span class="sm-hint">Nessun partecipante: aggiungili nel pannello sotto il footer.</span>';
+  partecipanti.forEach(p => {
+    const c = document.createElement('span');
+    c.className = 'chip sel' + (split.sel.has(p.id) ? ' on' : '');
+    c.textContent = p.nome;
+    c.onclick = () => { split.sel.has(p.id) ? split.sel.delete(p.id) : split.sel.add(p.id); renderSplitModal(); };
+    pt.appendChild(c);
+  });
+
+  // eventi
+  const evBox = document.getElementById('sm-ev');
+  if (split.loading) evBox.innerHTML = '<span class="sm-hint">carico eventi dal calendario…</span>';
+  else if (split.calError) evBox.innerHTML = `<span class="sum-err">Calendario non raggiungibile: ${esc(split.calError)}</span>`;
+  else if (!split.events.length) evBox.innerHTML = '<span class="sm-hint">Nessun evento in calendario in questo periodo.</span>';
+  else {
+    evBox.innerHTML = '';
+    if (!calHasEsterno) {
+      const w = document.createElement('div'); w.className = 'sum-err';
+      w.textContent = 'Manca la colonna "esterno" sul calendario: esegui la query 2 del banner in alto.';
+      evBox.appendChild(w);
+    }
+    const listEl = document.createElement('div'); listEl.className = 'ev-list';
+    split.events.forEach(ev => {
+      const r = document.createElement('div');
+      r.className = 'ev-row' + (ev.esterno ? ' ext' : '');
+      r.innerHTML = `<span class="ev-date">${ddmm(ev._d)}</span><span class="ev-name">${esc(ev.name)}</span>`
+        + `<span class="ev-tag">${ev.esterno ? 'esterno' : esc(CAT_LBL[ev.cat] || ev.cat || 'nostro')}</span>`;
+      r.onclick = () => toggleEsterno(ev);
+      listEl.appendChild(r);
+    });
+    evBox.appendChild(listEl);
+  }
+
+  // riepilogo
+  const sum = document.getElementById('sm-sum');
+  const r = computeSplit();
+  const saveBtn = document.getElementById('split-save');
+  const saved = allQuotes.filter(q => q.finanze_id === split.entry.id);
+  const anyPaid = saved.some(q => q.pagato);
+
+  if (r.err) { sum.innerHTML = `<span class="sum-err">${esc(r.err)}</span>`; }
+  else {
+    let h = `<div class="sum-line"><span class="muted">${r.D} giorni · ${r.E} con eventi esterni</span><span></span></div>`
+      + `<div class="sum-line"><span>Giornata normale</span><span>${fmt(r.unit)}</span></div>`;
+    if (r.E) {
+      h += `<div class="sum-line"><span>Giornata con evento (×${K_EVENTO})</span><span>${fmt(r.dayQuota)}</span></div>`;
+      r.evQuotes.forEach(q => h += `<div class="sum-line sub"><span>${esc(q.nome)}</span><span>${fmt(q.importo)}</span></div>`);
+      h += `<div class="sum-line tot"><span>Paga eventi esterni</span><span>${fmt(r.totEv)}</span></div>`;
+    }
+    h += `<div class="sum-line tot"><span>Resto ÷ ${r.n}</span><span>${fmt(r.rest)}</span></div>`;
+    r.pQuotes.forEach(q => h += `<div class="sum-line sub"><span>${esc(q.nome)}</span><span>${fmt(q.importo)}</span></div>`);
+    sum.innerHTML = h;
+  }
+
+  // quote già salvate
+  const savedSec = document.getElementById('sm-saved-sec');
+  const savedBox = document.getElementById('sm-saved');
+  savedSec.classList.toggle('hidden', !saved.length);
+  savedBox.innerHTML = '';
+  [...saved].sort((a,b) => (a.tipo > b.tipo) - (a.tipo < b.tipo))
+    .forEach(q => {
+      const row = quotaRow(q, true);
+      row.querySelector('.q-lbl').innerHTML = esc(q.nome) + (q.tipo === 'evento' ? ' <span class="q-sub">evento</span>' : '');
+      savedBox.appendChild(row);
+    });
+  if (anyPaid) {
+    const h = document.createElement('span'); h.className = 'sm-hint';
+    h.textContent = 'Per ridividere togli prima tutte le spunte di pagamento.';
+    savedBox.appendChild(h);
+  }
+
+  saveBtn.textContent = saved.length ? 'ridividi e salva' : 'salva divisione';
+  saveBtn.disabled = !!r.err || anyPaid || split.loading;
+}
+
+async function saveSplit() {
+  if (!split) return;
+  const r = computeSplit();
+  if (r.err) { showToast(r.err); return; }
+  const id = split.entry.id;
+  const saved = allQuotes.filter(q => q.finanze_id === id);
+  if (saved.some(q => q.pagato)) { showToast('Togli prima le spunte di pagamento'); return; }
+  const { dal, al } = getPeriod();
+  const btn = document.getElementById('split-save'); btn.disabled = true;
+  setStatus('load', 'salvataggio divisione…');
+
+  if (saved.length) {
+    const { error } = await db.from('quote_bollette').delete().eq('finanze_id', id);
+    if (error) { btn.disabled = false; setStatus('error', error.message); showToast('Errore: ' + error.message); return; }
+  }
+  const rows = [...r.pQuotes, ...r.evQuotes].map(q => ({
+    finanze_id: id, tipo: q.tipo, nome: q.nome,
+    partecipante_id: q.partecipante_id || null, evento_id: q.evento_id || null,
+    importo: q.importo
+  }));
+  const { error } = await db.from('quote_bollette').insert(rows);
+  if (error) { btn.disabled = false; setStatus('error', error.message); showToast('Errore: ' + error.message); return; }
+  await db.from('finanze').update({ periodo_dal: isoDate(dal), periodo_al: isoDate(al) }).eq('id', id);
+
+  closeSplit();
+  showToast('Bolletta divisa', true);
+  await load();
+}
+
+// spunta pagato → crea/cancella l'entrata collegata, nel mese della bolletta
+async function togglePaid(q, on) {
+  const f = q.finanze || {};
+  const fail = err => { setStatus('error', err.message); showToast('Errore: ' + err.message); load().then(renderSplitModal); };
+  setStatus('load', 'salvataggio…');
+
+  if (on) {
+    const nome = q.tipo === 'evento'
+      ? `Utenze evento — ${q.nome}`
+      : `Rimborso ${(f.nome || 'bolletta').toLowerCase()} — ${q.nome}`;
+    const { data, error } = await db.from('finanze')
+      .insert({ anno: f.anno, mese: f.mese, tipo: 'entrata', nome, importo: q.importo, nota: 'quota bolletta' })
+      .select('id').single();
+    if (error) return fail(error);
+    const { error: e2 } = await db.from('quote_bollette')
+      .update({ pagato: true, pagato_il: new Date().toISOString(), entrata_id: data.id }).eq('id', q.id);
+    if (e2) return fail(e2);
+  } else {
+    if (q.entrata_id) {
+      const { error } = await db.from('finanze').delete().eq('id', q.entrata_id);
+      if (error) return fail(error);
+    }
+    const { error } = await db.from('quote_bollette')
+      .update({ pagato: false, pagato_il: null, entrata_id: null }).eq('id', q.id);
+    if (error) return fail(error);
+  }
+  await load();
+  renderSplitModal();
 }
 
 // ── SEED ─────────────────────────────────────────────────────
@@ -991,7 +1660,7 @@ function copyPay() {
 // Close sheet on backdrop click (outside the sheet)
 document.addEventListener('click', e => {
   const sheet = document.getElementById('pay-sheet');
-  if (sheet.classList.contains('open') && !sheet.contains(e.target) && !e.target.classList.contains('e-pay')) {
+  if (sheet && sheet.classList.contains('open') && !sheet.contains(e.target) && !e.target.classList.contains('e-pay')) {
     closePay();
   }
 });
@@ -1005,6 +1674,7 @@ function toggleForm(tipo) {
   const wasOpen = f.classList.contains('open');
   closeAllForms();
   if (!wasOpen) {
+    if (editingId) { editingId = null; render(); }
     f.classList.add('open');
     setTimeout(() => document.getElementById('n-' + tipo).focus(), 60);
   }
@@ -1012,8 +1682,8 @@ function toggleForm(tipo) {
 function closeAllForms() {
   ['u','e','r'].forEach(t => document.getElementById('form-' + t).classList.remove('open'));
 }
-function changeMonth(d) { cur.setMonth(cur.getMonth() + d); closeAllForms(); load(); }
-function goToToday()    { cur = new Date(); cur.setDate(1); closeAllForms(); load(); }
+function changeMonth(d) { cur.setMonth(cur.getMonth() + d); editingId = null; closeAllForms(); load(); }
+function goToToday()    { cur = new Date(); cur.setDate(1); editingId = null; closeAllForms(); load(); }
 
 // keyboard shortcuts
 ['u','e','r'].forEach(t => {
@@ -1026,6 +1696,9 @@ function goToToday()    { cur = new Date(); cur.setDate(1); closeAllForms(); loa
     });
   });
 });
+
+document.getElementById('pt-new').addEventListener('keydown', e => { if (e.key === 'Enter') addPartecipante(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && split) closeSplit(); });
 
 // ── DARK MODE ─────────────────────────────────────────────────
 function toggleTheme() {
