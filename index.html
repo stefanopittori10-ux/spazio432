@@ -1218,6 +1218,97 @@
     .hb-mini span { width: 9px; height: 9px; }
   }
   @media (prefers-reduced-motion: reduce) { .home-btn, .hb-arrow { transition: none; } }
+
+  /* ── HOME MOBILE: tutto in uno schermo ───────────────────── */
+  .desc-short, .lbl-short { display: none; }
+  @media (max-width: 768px) {
+    .hb-br { display: none; }
+    body.is-home { height: 100vh; height: 100svh; display: flex; flex-direction: column; }
+    body.is-home > #home { flex: 1 1 auto; min-height: 0; width: 100%; display: flex; flex-direction: column; }
+    body.is-home .home-tagline { display: none; }
+    body.is-home .home-top { padding: 10px 14px; flex: none; }
+    body.is-home .home-top .logo-spazio, body.is-home .home-top .logo-num { font-size: 22px; }
+    body.is-home .home-top .logo-subtitle { margin-top: 2px; }
+    body.is-home .home-grid { flex: 1 1 auto; min-height: 0; grid-template-rows: 1fr 1fr; gap: 14px; margin: 14px 0 6px; }
+    body.is-home .home-btn { min-height: 0; padding: 14px 16px; gap: 6px; }
+    body.is-home .hb-title { font-size: 36px; letter-spacing: -1px; }
+    body.is-home .hb-arrow { font-size: 24px; }
+    body.is-home .hb-next-row { font-size: 12px; padding-top: 5px; }
+    body.is-home .s432-cta-wrap { flex: none; width: 100%; margin-top: 12px; padding-bottom: 6px; }
+    body.is-home .s432-cta { padding: 14px 16px; gap: 10px; }
+    body.is-home .s432-cta-tag { display: none; }
+    body.is-home .s432-cta-title { font-size: 20px; margin-bottom: 4px; }
+    body.is-home .s432-cta-desc { font-size: 12px; line-height: 1.4; }
+    body.is-home .desc-long, body.is-home .lbl-long { display: none; }
+    body.is-home .desc-short, body.is-home .lbl-short { display: inline; }
+    body.is-home .s432-cta-side { width: calc(100% - 52px); gap: 6px; }
+    body.is-home .s432-cta-btn { padding: 9px 12px; font-size: 12.5px; }
+    body.is-home .s432-cta-mail { font-size: 10.5px; }
+    body.is-home .dia-mascot { width: 50px; height: 64px; right: 10px; bottom: 10px; }
+  }
+  /* schermi bassi (iPhone SE e simili) */
+  @media (max-width: 768px) and (max-height: 640px) {
+    body.is-home .hb-next-row:nth-child(2) { display: none; }
+    body.is-home .hb-title { font-size: 30px; }
+    body.is-home .s432-cta-mail { display: none; }
+    body.is-home .home-grid { gap: 12px; margin-top: 10px; }
+    body.is-home .hb-mini { grid-template-columns: repeat(7, 6px); gap: 2px; }
+    body.is-home .hb-mini span { width: 6px; height: 6px; }
+    body.is-home .hb-mini span.today { outline-width: 1px; }
+  }
+
+  /* ── CALENDARIO: niente blocco proposte, spazio per Dia ───── */
+  body:not(.is-home) .s432-cta-wrap { display: none; }
+  body:not(.is-home) { padding-bottom: 96px; }
+
+  /* ── ICONA CASA ──────────────────────────────────────────── */
+  .home-toolbtn { color: var(--fg); overflow: visible; }
+  .home-toolbtn .house-ico { width: 18px; height: 18px; display: block; overflow: visible; }
+  .home-toolbtn .house-smoke circle { fill: var(--fg-muted); opacity: 0; }
+  .home-toolbtn:hover .house-smoke circle { animation: house-puff 1.2s ease-out infinite; }
+  .home-toolbtn:hover .house-smoke circle:nth-child(2) { animation-delay: .4s; }
+  .home-toolbtn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .home-toolbtn:hover .house-ico rect[fill^="var"] { fill: var(--fg); }
+  @keyframes house-puff { 0% { opacity: 0; transform: translateY(2px); } 40% { opacity: .9; } 100% { opacity: 0; transform: translateY(-3px); } }
+
+  /* ── LISTA EVENTI ORDINATA ───────────────────────────────── */
+  .recap-row.ev-row, .recap-group-header {
+    display: grid; grid-template-columns: 58px 1fr auto; gap: 16px; align-items: start;
+  }
+  .recap-row.ev-row { padding: 16px 20px 16px 16px; border-left: 5px solid var(--c) !important; flex-direction: unset; }
+  .ev-date {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 1px solid var(--fg); padding: 6px 0 5px; background: var(--card-bg); line-height: 1;
+  }
+  .ev-dow, .ev-mon { font-size: 9.5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-muted); }
+  .ev-day { font-size: 24px; font-weight: 900; color: var(--c); margin: 3px 0 2px; }
+  .ev-body, .recap-group-left { min-width: 0; grid-column: 2 / 4; }
+  .ev-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .ev-cat { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--c); }
+  .ev-time { font-size: 11px; font-weight: bold; color: var(--fg); padding: 2px 8px; border: 1px solid var(--border-light); border-radius: 20px; }
+  .ev-name { font-size: 16px; font-weight: bold; color: var(--recap-name); line-height: 1.25; }
+  .ev-desc { font-size: 13px; font-style: normal; color: var(--det-desc); line-height: 1.55; margin-top: 6px; max-width: 62ch; }
+  .ev-row .recap-booking-sep, .recap-group-item .recap-booking-sep { border-top: none; margin-top: 10px; padding-top: 0; }
+  .recap-desc { font-style: normal; }
+
+  .recap-group { border: none; border-bottom: 1px solid var(--border-light); border-left: 5px solid var(--c) !important; }
+  .recap-group-header { padding: 16px 20px 16px 16px; }
+  .recap-group-header .recap-group-left { grid-column: 2 / 3; }
+  .recap-group-header .ev-dow { letter-spacing: .5px; }
+  .recap-group-arrow { align-self: center; font-size: 20px; font-weight: bold; color: var(--fg-muted); }
+  .recap-group-body { margin: 0 20px 14px 90px; border: 1px solid var(--border-light); border-top: 1px solid var(--border-light); }
+  .recap-group-item { align-items: flex-start; padding: 10px 14px; flex-wrap: wrap; }
+  .recap-group-item-when { min-width: 120px; }
+  .recap-group-item-date { font-size: 13px; text-transform: lowercase; }
+  .recap-group-item-time { font-size: 11px; margin-top: 2px; }
+  .recap-group-item .recap-booking-sep { margin-top: 0; }
+
+  @media (max-width: 768px) {
+    .recap-row.ev-row, .recap-group-header { grid-template-columns: 50px 1fr auto; gap: 12px; padding: 14px 14px 14px 12px; }
+    .ev-day { font-size: 21px; }
+    .ev-name { font-size: 15px; }
+    .recap-group-body { margin: 0 12px 12px 12px; }
+  }
 </style>
 </head>
 <body class="is-home">
@@ -1245,7 +1336,7 @@
     </a>
     <a class="home-btn cal" id="home-btn-cal" href="#calendario">
       <div class="hb-top"><span class="hb-kicker">02 / il mese</span><span class="hb-arrow">→</span></div>
-      <div class="hb-title">CALEN<br>DARIO</div>
+      <div class="hb-title">CALEN<br class="hb-br">DARIO</div>
       <div class="hb-cal-body">
         <div class="hb-sub" id="home-month"></div>
         <div class="hb-mini" id="home-mini"></div>
@@ -1316,7 +1407,15 @@
     </div>
     <!-- Riga 2 (mobile): navigazione mesi + azioni + dark toggle -->
     <div class="toolbar-actions">
-      <button class="theme-toggle home-toolbtn" id="home-toolbtn" onclick="goHome()" title="Home">⌂</button>
+      <button class="theme-toggle home-toolbtn" id="home-toolbtn" onclick="goHome()" title="Torna alla home" aria-label="Home">
+        <svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true">
+          <g class="house-smoke"><circle cx="15" cy="2.6" r="1.1"/><circle cx="16.4" cy="0.8" r="0.8"/></g>
+          <rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/>
+          <path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/>
+          <rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/>
+          <rect x="5.2" y="10.6" width="2.2" height="2.2" fill="var(--pill-bg)"/>
+        </svg>
+      </button>
       <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
       <div class="nav">
         <button class="pill" onclick="changeMonth(-1)">&lt;</button>
@@ -1336,10 +1435,6 @@
       </div>
       <div class="header-right">
         <button class="group-toggle-btn" id="group-toggle-btn" onclick="toggleGrouping()" title="Raggruppa eventi simili">⊞</button>
-          <button class="view-switch-btn" id="view-switch-btn" onclick="toggleListView()" title="Cambia vista">
-          <svg id="view-icon-grid" width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="6" fill="currentColor"/><rect x="8" y="0" width="6" height="6" fill="currentColor"/><rect x="0" y="8" width="6" height="6" fill="currentColor"/><rect x="8" y="8" width="6" height="6" fill="currentColor"/></svg>
-          <svg id="view-icon-list" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:none"><rect x="0" y="1" width="14" height="2" fill="currentColor"/><rect x="0" y="6" width="14" height="2" fill="currentColor"/><rect x="0" y="11" width="14" height="2" fill="currentColor"/></svg>
-        </button>
         <div class="month-display">
           <span class="month-label" id="month-lbl">MAGGIO</span>
           <span class="year-label" id="year-lbl">2026</span>
@@ -1361,7 +1456,7 @@
         <span>Data: <span id="det-date"></span></span>
         <span>Ora: <span id="det-time"></span></span>
       </div>
-      <div id="det-desc" style="font-size:12px;color:#444;font-style:italic;margin-top:8px;line-height:1.5;display:none;"></div>
+      <div id="det-desc" style="font-size:13px;color:var(--det-desc);margin-top:8px;line-height:1.55;display:none;"></div>
     </div>
 
     <div class="booking-panel" id="booking-panel"></div>
@@ -1431,12 +1526,12 @@
       <div class="s432-cta-text">
         <div class="s432-cta-tag">collabora con noi</div>
         <h2 class="s432-cta-title">Hai un progetto?</h2>
-        <p class="s432-cta-desc">Concerti, mostre, workshop, proiezioni, laboratori: lo spazio è aperto a chi ha qualcosa da far succedere. Raccontaci la tua idea e troviamo una data insieme.</p>
+        <p class="s432-cta-desc"><span class="desc-long">Concerti, mostre, workshop, proiezioni, laboratori: lo spazio è aperto a chi ha qualcosa da far succedere. Raccontaci la tua idea e troviamo una data insieme.</span><span class="desc-short">Concerti, mostre, workshop: raccontaci la tua idea.</span></p>
       </div>
       <div class="s432-cta-side">
         <div class="s432-cta-actions">
           <a class="s432-cta-btn primary" id="s432-cta-mail" href="mailto:spazioquattrotredue@gmail.com?subject=Proposta%20per%20spazio432">Scrivici →</a>
-          <button class="s432-cta-btn" id="s432-cta-copy" type="button">copia indirizzo</button>
+          <button class="s432-cta-btn" id="s432-cta-copy" type="button"><span class="lbl-long">copia indirizzo</span><span class="lbl-short">copia mail</span></button>
         </div>
         <div class="s432-cta-mail">spazioquattrotredue@gmail.com</div>
       </div>
@@ -1458,6 +1553,7 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 const CAT_LABELS={music:'Musica',film:'Cinema',lab:'Laboratorio',art:'Arte',meet:'Riunioni'};
 const CAT_COLORS={music:'#534AB7',film:'#993C1D',lab:'#3B6D11',art:'#854F0B',meet:'#4B5563'};
+const EV_DOW=['dom','lun','mar','mer','gio','ven','sab'];
 
 let cur = new Date(); 
 let activeFilter='all';
@@ -1650,27 +1746,28 @@ function buildListView() {
     const isGroup = evts.length > 1;
 
     if (!isGroup) {
+      const c = CAT_COLORS[first.cat];
       const row = document.createElement('div');
-      row.className = 'recap-row';
-      row.style.borderLeft = `5px solid ${CAT_COLORS[first.cat]}`;
-      const cat = document.createElement('div');
-      cat.className = 'recap-cat';
-      cat.textContent = CAT_LABELS[first.cat].toUpperCase();
-      cat.style.color = CAT_COLORS[first.cat];
-      const name = document.createElement('div');
-      name.className = 'recap-name';
-      name.textContent = first.name;
-      const meta = document.createElement('div');
-      meta.className = 'recap-meta';
-      let t = first.time; if (first.endTime) t += ' - ' + first.endTime;
-      meta.innerHTML = `<span>Data: ${first.day} ${MONTHS[first.month]} ${first.year}</span> <span>Ora: ${t}</span>`;
-      row.appendChild(cat);
-      row.appendChild(name);
-      row.appendChild(meta);
+      row.className = 'recap-row ev-row';
+      row.style.setProperty('--c', c);
+      const wd = new Date(first.year, first.month, first.day).getDay();
+      let t = first.time || ''; if (first.endTime) t += ' – ' + first.endTime;
+      row.innerHTML = `
+        <div class="ev-date">
+          <span class="ev-dow">${EV_DOW[wd]}</span>
+          <span class="ev-day">${first.day}</span>
+          <span class="ev-mon">${MONTHS[first.month].slice(0, 3)}</span>
+        </div>
+        <div class="ev-body">
+          <div class="ev-top"><span class="ev-cat">${CAT_LABELS[first.cat]}</span>${t ? `<span class="ev-time">${t}</span>` : ''}</div>
+          <div class="ev-name"></div>
+        </div>`;
+      const bodyEl = row.querySelector('.ev-body');
+      bodyEl.querySelector('.ev-name').textContent = first.name;
       if (first.description) {
-        const d = document.createElement('div'); d.className = 'recap-desc'; d.textContent = first.description; row.appendChild(d);
+        const d = document.createElement('p'); d.className = 'ev-desc'; d.textContent = first.description; bodyEl.appendChild(d);
       }
-      row.appendChild(buildRecapBookingBlock(first));
+      bodyEl.appendChild(buildRecapBookingBlock(first));
       recapContainer.appendChild(row);
 
     } else {
@@ -1678,19 +1775,21 @@ function buildListView() {
       const groupEl = document.createElement('div');
       groupEl.className = 'recap-group';
       groupEl.style.setProperty('--cat-color', CAT_COLORS[first.cat]);
+      groupEl.style.setProperty('--c', CAT_COLORS[first.cat]);
 
       const header = document.createElement('div');
       header.className = 'recap-group-header';
       header.innerHTML = `
+        <div class="ev-date"><span class="ev-dow">serie</span><span class="ev-day">${evts.length}</span><span class="ev-mon">date</span></div>
         <div class="recap-group-left">
-          <div class="recap-group-cat" style="color:${CAT_COLORS[first.cat]}">${CAT_LABELS[first.cat].toUpperCase()}</div>
-          <div class="recap-group-name">${first.name}</div>
+          <div class="ev-top"><span class="ev-cat">${CAT_LABELS[first.cat]}</span></div>
+          <div class="ev-name"></div>
+          ${first.description ? '<p class="ev-desc"></p>' : ''}
         </div>
-        <div class="recap-group-count">
-          <span>${evts.length} date</span>
-          <span class="recap-group-arrow">›</span>
-        </div>
+        <span class="recap-group-arrow">›</span>
       `;
+      header.querySelector('.ev-name').textContent = first.name;
+      if (first.description) header.querySelector('.ev-desc').textContent = first.description;
 
       const body = document.createElement('div');
       body.className = 'recap-group-body';
@@ -1700,7 +1799,8 @@ function buildListView() {
         item.className = 'recap-group-item';
         const t = ev.time + (ev.endTime ? ' - ' + ev.endTime : '');
         const dateDiv = document.createElement('div');
-        dateDiv.innerHTML = `<div class="recap-group-item-date">${ev.day} ${MONTHS[ev.month]}</div><div class="recap-group-item-time">ore ${t}</div>`;
+        dateDiv.className = 'recap-group-item-when';
+        dateDiv.innerHTML = `<div class="recap-group-item-date">${EV_DOW[new Date(ev.year, ev.month, ev.day).getDay()]} ${ev.day} ${MONTHS[ev.month].slice(0, 3).toLowerCase()}</div><div class="recap-group-item-time">${t}</div>`;
         item.appendChild(dateDiv);
         item.appendChild(buildRecapBookingBlock(ev));
         body.appendChild(item);
@@ -1804,7 +1904,7 @@ function showDetail(ev) {
 
     if (evt.description) {
       const desc = document.createElement('div');
-      desc.style.cssText = 'font-size:12px;color:var(--det-desc);font-style:italic;margin-top:8px;line-height:1.5;';
+      desc.style.cssText = 'font-size:13px;color:var(--det-desc);margin-top:8px;line-height:1.55;max-width:62ch;';
       desc.textContent = evt.description;
       evBlock.appendChild(desc);
     }
@@ -2807,9 +2907,9 @@ fetchAndBuild();
       try { ok = document.execCommand('copy'); } catch {}
       t.remove();
     }
-    const old = copyBtn.textContent;
+    const old = copyBtn.innerHTML;
     copyBtn.textContent = ok ? 'copiato ✓' : MAIL;
-    setTimeout(() => { copyBtn.textContent = old; }, 2000);
+    setTimeout(() => { copyBtn.innerHTML = old; }, 2000);
   });
 
   // ── DIA ──
@@ -2865,8 +2965,6 @@ fetchAndBuild();
         : 'Da qui <b>filtri per tipo</b>: musica, cinema, laboratori, arte.' },
     { el: () => document.querySelector('.toolbar .nav'),
       text: 'Con queste <b>frecce</b> sfogli i mesi, avanti e indietro.' },
-    { el: () => document.getElementById('view-switch-btn'),
-      text: 'Qui passi dalla <b>lista</b> alla <b>griglia</b> del mese, e viceversa.' },
     { el: () => firstVisible('.btn-prenota'), optional: true,
       text: 'Ogni evento ha il suo <b>Prenotami</b>: lasci nome ed email e ricevi il biglietto con il QR.' },
     { el: () => firstVisible('.theme-toggle:not(.home-toolbtn)'),
@@ -2948,6 +3046,7 @@ fetchAndBuild();
     bubble.querySelector('[data-a="map"]').onclick = () => { closeAll(); if (typeof openLocation === 'function') openLocation(); };
     bubble.querySelector('[data-a="cta"]').onclick = () => {
       closeAll();
+      if (!document.body.classList.contains('is-home')) goHome();
       const c = document.getElementById('s432-cta');
       if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
@@ -3025,6 +3124,8 @@ fetchAndBuild();
     if (h === '#eventi' || h === '#calendario') {
       document.body.classList.remove('is-home');
       setView(h === '#eventi');
+      // il carosello filtri va ricostruito ora che è visibile (da nascosto misura 0px)
+      if (window.innerWidth <= 768 && typeof carouselBuild === 'function') carouselBuild();
       window.scrollTo(0, 0);
     } else {
       document.body.classList.add('is-home');
