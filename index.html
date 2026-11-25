@@ -1309,6 +1309,38 @@
     .ev-name { font-size: 15px; }
     .recap-group-body { margin: 0 12px 12px 12px; }
   }
+
+  /* ── LISTA EVENTI: vengo! a destra + dettagli ─────────────── */
+  .recap-row.ev-row { grid-template-columns: 58px 1fr auto; row-gap: 0; }
+  .ev-row .ev-body { grid-column: 2 / 3; }
+  .ev-action { grid-column: 3 / 4; grid-row: 1; align-self: center; }
+  .ev-row .ev-details, .ev-row .ev-form { grid-column: 2 / 4; }
+  .ev-name { all: unset; display: block; cursor: pointer; font-family: var(--font-mono); font-size: 16px; font-weight: bold;
+    color: var(--recap-name); line-height: 1.25; text-decoration: underline; text-decoration-color: transparent;
+    text-underline-offset: 3px; transition: text-decoration-color .15s; }
+  .ev-name:hover, .ev-name:focus-visible { text-decoration-color: var(--c); }
+  .ev-more { all: unset; cursor: pointer; font-family: var(--font-mono); font-size: 11px; font-weight: bold; color: var(--c);
+    margin-top: 6px; display: inline-block; letter-spacing: .3px; }
+  .ev-more:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .ev-details { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .35s cubic-bezier(.4,0,.2,1), opacity .25s; }
+  .ev-row.det-open .ev-details { grid-template-rows: 1fr; opacity: 1; }
+  .ev-details-inner { overflow: hidden; }
+  .ev-details-inner > :first-child { margin-top: 12px; }
+  .ev-details .ev-desc { margin-top: 0; }
+  .ev-facts { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--fg-dim); margin-top: 10px; }
+  .ev-facts b { display: inline-block; min-width: 56px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-muted); }
+  .ev-facts a { color: var(--fg); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+  .ev-links { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 2px; }
+  .ev-link { font-family: var(--font-mono); font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--fg); color: var(--fg); background: var(--pill-bg); text-decoration: none; transition: all .12s; }
+  .ev-link:hover { background: var(--fg); color: var(--bg); }
+  .ev-row .btn-prenota { white-space: nowrap; }
+  .ev-row .recap-booking-form-inner { padding-top: 12px; }
+  @media (max-width: 768px) {
+    .recap-row.ev-row { grid-template-columns: 50px 1fr auto; }
+    .ev-name { font-size: 15px; }
+    .ev-row .btn-prenota { padding: 7px 12px; }
+  }
 </style>
 </head>
 <body class="is-home">
@@ -1434,7 +1466,6 @@
         </div>
       </div>
       <div class="header-right">
-        <button class="group-toggle-btn" id="group-toggle-btn" onclick="toggleGrouping()" title="Raggruppa eventi simili">⊞</button>
         <div class="month-display">
           <span class="month-label" id="month-lbl">MAGGIO</span>
           <span class="year-label" id="year-lbl">2026</span>
@@ -1714,6 +1745,49 @@ function buildGrid(date) {
   }
 }
 
+// Dettagli evento (lista): descrizione, data completa, aggiungi al calendario, condividi
+function fillEventDetails(box, ev) {
+  const pad = n => String(n).padStart(2, '0');
+  const dateLong = `${EV_DOW[new Date(ev.year, ev.month, ev.day).getDay()]} ${ev.day} ${MONTHS[ev.month].toLowerCase()} ${ev.year}`;
+  let gcal = '';
+  const tm = /^(\d{1,2}):(\d{2})/.exec(ev.time || '');
+  if (tm) {
+    const st = new Date(ev.year, ev.month, ev.day, +tm[1], +tm[2]);
+    const te = /^(\d{1,2}):(\d{2})/.exec(ev.endTime || '');
+    let en = te ? new Date(ev.year, ev.month, ev.day, +te[1], +te[2]) : new Date(st.getTime() + 2 * 3600e3);
+    if (en <= st) en = new Date(en.getTime() + 24 * 3600e3);   // finisce dopo mezzanotte
+    const f = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+    gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+      + '&text=' + encodeURIComponent(ev.name + ' · spazio432')
+      + '&dates=' + f(st) + '/' + f(en) + '&ctz=Europe/Rome'
+      + '&location=' + encodeURIComponent('Spazio 432, Via Ceva 47, Torino')
+      + '&details=' + encodeURIComponent((ev.description ? ev.description + '\n\n' : '') + 'https://spazio432.org/#eventi');
+  }
+  box.innerHTML = `
+    ${ev.description ? '<p class="ev-desc"></p>' : ''}
+    <div class="ev-facts">
+      <span><b>quando</b> ${dateLong}${ev.time ? ' · ' + ev.time + (ev.endTime ? ' – ' + ev.endTime : '') : ''}</span>
+      <span><b>dove</b> <a href="#" class="ev-map">via ceva 47, torino ↗</a></span>
+    </div>
+    <div class="ev-links">
+      ${gcal ? `<a class="ev-link" href="${gcal}" target="_blank" rel="noopener">+ al mio calendario</a>` : ''}
+      <button class="ev-link ev-share" type="button">condividi</button>
+    </div>`;
+  if (ev.description) box.querySelector('.ev-desc').textContent = ev.description;
+  box.querySelector('.ev-map').onclick = e => { e.preventDefault(); openLocation(); };
+  const sh = box.querySelector('.ev-share');
+  sh.onclick = async () => {
+    const url = 'https://spazio432.org/#eventi';
+    const text = `${ev.name} · ${dateLong}${ev.time ? ' ore ' + ev.time : ''} · spazio432, via ceva 47`;
+    try {
+      if (navigator.share) { await navigator.share({ title: ev.name, text, url }); return; }
+      await navigator.clipboard.writeText(text + '\n' + url);
+      sh.textContent = 'copiato ✓';
+    } catch { return; }
+    setTimeout(() => { sh.textContent = 'condividi'; }, 2000);
+  };
+}
+
 function buildListView() {
   const recapContainer = document.getElementById('recap-list');
   recapContainer.innerHTML = '';
@@ -1760,14 +1834,25 @@ function buildListView() {
         </div>
         <div class="ev-body">
           <div class="ev-top"><span class="ev-cat">${CAT_LABELS[first.cat]}</span>${t ? `<span class="ev-time">${t}</span>` : ''}</div>
-          <div class="ev-name"></div>
-        </div>`;
-      const bodyEl = row.querySelector('.ev-body');
-      bodyEl.querySelector('.ev-name').textContent = first.name;
-      if (first.description) {
-        const d = document.createElement('p'); d.className = 'ev-desc'; d.textContent = first.description; bodyEl.appendChild(d);
-      }
-      bodyEl.appendChild(buildRecapBookingBlock(first));
+          <button class="ev-name" type="button" aria-expanded="false"></button>
+          <button class="ev-more" type="button">dimmi di + !</button>
+        </div>
+        <div class="ev-details"><div class="ev-details-inner"></div></div>`;
+      row.querySelector('.ev-name').textContent = first.name;
+      fillEventDetails(row.querySelector('.ev-details-inner'), first);
+      const toggleDet = () => {
+        const open = row.classList.toggle('det-open');
+        row.querySelector('.ev-name').setAttribute('aria-expanded', open);
+        row.querySelector('.ev-more').textContent = open ? 'ok, chiaro ↑' : 'dimmi di + !';
+      };
+      row.querySelector('.ev-name').onclick = toggleDet;
+      row.querySelector('.ev-more').onclick = toggleDet;
+      // vengo! a destra, il modulo di prenotazione si apre sotto a tutta larghezza
+      const bk = buildRecapBookingBlock(first);
+      const action = bk.firstElementChild; action.className = 'ev-action';
+      const form = bk.lastElementChild; form.classList.add('ev-form');
+      row.appendChild(action);
+      row.appendChild(form);
       recapContainer.appendChild(row);
 
     } else {
@@ -2438,7 +2523,7 @@ function buildDetailBookingTrigger(evt) {
   const btn = document.createElement('button');
   btn.className = 'btn-prenota ' + evt.cat;
   btn.id = 'btn-' + uid;
-  btn.innerHTML = '<span class="bk-arrow">→</span> Prenotami';
+  btn.innerHTML = '<span class="bk-arrow">→</span> vengo!';
   const counter = document.createElement('span');
   counter.className = 'booking-count';
   counter.id = 'cnt-' + uid;
@@ -2497,7 +2582,7 @@ function buildRecapBookingBlock(evt) {
   const btn = document.createElement('button');
   btn.className = 'btn-prenota ' + evt.cat;
   btn.id = 'btn-' + uid;
-  btn.innerHTML = '<span class="bk-arrow">→</span> Prenotami';
+  btn.innerHTML = '<span class="bk-arrow">→</span> vengo!';
   const counter = document.createElement('span');
   counter.className = 'booking-count';
   counter.id = 'cnt-' + uid;
@@ -2566,7 +2651,7 @@ async function submitBooking(uid, eventId) {
   msgEl.textContent = `Prenotazione confermata per ${name}!`; msgEl.className = 'bk-message ok';
   document.querySelectorAll(`[id^="cnt-bk-${eventId}"],[id^="cnt-rbk-${eventId}"]`).forEach(el => loadBookingCount(eventId, el));
   const trigBtn = document.getElementById('btn-' + uid);
-  if (trigBtn) { trigBtn.innerHTML = 'Prenotato ✓'; trigBtn.classList.add('done'); trigBtn.classList.remove('open'); trigBtn.disabled = true; }
+  if (trigBtn) { trigBtn.innerHTML = 'ci sei'; trigBtn.classList.add('done'); trigBtn.classList.remove('open'); trigBtn.disabled = true; }
 
   // Prepara dati biglietto
   const MONTHS_TICK = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
@@ -2966,7 +3051,7 @@ fetchAndBuild();
     { el: () => document.querySelector('.toolbar .nav'),
       text: 'Con queste <b>frecce</b> sfogli i mesi, avanti e indietro.' },
     { el: () => firstVisible('.btn-prenota'), optional: true,
-      text: 'Ogni evento ha il suo <b>Prenotami</b>: lasci nome ed email e ricevi il biglietto con il QR.' },
+      text: 'Tocca il <b>titolo</b> per i dettagli, e <b>vengo!</b> per prenotarti: lasci nome ed email e ricevi il biglietto con il QR.' },
     { el: () => firstVisible('.theme-toggle:not(.home-toolbtn)'),
       text: 'Modalità <b>notte</b>, per chi ci legge alle tre.' },
     { el: () => document.getElementById('s432-cta'),
