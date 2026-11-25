@@ -1163,9 +1163,96 @@
     .dia-mascot, .dia-mascot .dia-eyes, .dia-mascot.talking .dia-prongs, .logo-subtitle .loc-pin { animation: none !important; }
     .dia-ring { transition: opacity .2s; }
   }
+
+  /* ── HOME ────────────────────────────────────────────────── */
+  body.is-home .root, body.is-home #main-footer { display: none !important; }
+  body:not(.is-home) #home { display: none; }
+  #home { max-width: 1200px; margin: 0 auto; }
+  .home-top { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    border: 1px solid var(--border); background: var(--card-bg); padding: 20px; }
+  .home-top .logo-spazio, .home-top .logo-num { font-size: 30px; }
+  .home-top .logo-subtitle { font-size: 11px; margin-top: 4px; }
+  .home-tagline { font-size: 11px; color: var(--fg-muted); letter-spacing: .4px; padding: 12px 2px 0; }
+
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 26px; }
+  .home-btn {
+    position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    min-height: 280px; padding: 24px; text-decoration: none; color: #fff;
+    border: 2px solid var(--fg); box-shadow: 8px 8px 0 var(--fg);
+    transition: transform .12s ease, box-shadow .12s ease;
+    -webkit-tap-highlight-color: transparent; overflow: hidden;
+  }
+  .home-btn.ev  { background: #534AB7; }
+  .home-btn.cal { background: #3B6D11; }
+  .home-btn:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--fg); }
+  .home-btn:active, .home-btn.pressed { transform: translate(8px, 8px); box-shadow: 0 0 0 var(--fg); }
+  .hb-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .hb-kicker { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; opacity: .8; }
+  .hb-arrow { font-size: 30px; line-height: .8; font-weight: bold; transition: transform .15s; }
+  .home-btn:hover .hb-arrow { transform: translateX(5px); }
+  .hb-title { font-size: clamp(38px, 6vw, 64px); font-weight: 900; line-height: .9; letter-spacing: -1.5px; }
+  .hb-sub { font-size: 12px; line-height: 1.5; opacity: .95; min-height: 18px; }
+  .hb-next { display: flex; flex-direction: column; gap: 6px; }
+  .hb-next-row { display: flex; gap: 10px; align-items: baseline; font-size: 12.5px; border-top: 1px solid rgba(255,255,255,.35); padding-top: 6px; }
+  .hb-next-date { font-weight: bold; white-space: nowrap; min-width: 62px; }
+  .hb-next-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .hb-cal-body { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+  .hb-mini { display: grid; grid-template-columns: repeat(7, 11px); gap: 4px; flex-shrink: 0; }
+  .hb-mini span { width: 11px; height: 11px; border: 1px solid rgba(255,255,255,.55); }
+  .hb-mini span.blank { border-color: transparent; }
+  .hb-mini span.has { background: #fff; border-color: #fff; }
+  .hb-mini span.today { outline: 2px solid #fff; outline-offset: 1px; }
+
+  .home-toolbtn { font-size: 15px; }
+
+  @media (max-width: 768px) {
+    .home-top { padding: 16px; }
+    .home-top .logo-spazio, .home-top .logo-num { font-size: 24px; }
+    .home-grid { grid-template-columns: 1fr; gap: 18px; margin-top: 18px; }
+    .home-btn { min-height: 178px; padding: 18px; box-shadow: 6px 6px 0 var(--fg); }
+    .home-btn:hover { transform: none; box-shadow: 6px 6px 0 var(--fg); }
+    .home-btn:active, .home-btn.pressed { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--fg); }
+    .hb-title { font-size: 42px; }
+    .hb-mini { grid-template-columns: repeat(7, 9px); gap: 3px; }
+    .hb-mini span { width: 9px; height: 9px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .home-btn, .hb-arrow { transition: none; } }
 </style>
 </head>
-<body>
+<body class="is-home">
+
+<!-- HOME -->
+<div id="home">
+  <header class="home-top">
+    <div class="logo-area" onclick="openLocation()" title="Dove siamo">
+      <div class="logo-text-group">
+        <div><span class="logo-spazio">spazio</span><span class="logo-num">432</span></div>
+        <div class="logo-subtitle"><svg class="loc-pin" viewBox="0 0 10 13" aria-hidden="true"><path d="M5 12.5S1 7.8 1 4.8A4 4 0 0 1 9 4.8C9 7.8 5 12.5 5 12.5Z" fill="currentColor"/><circle cx="5" cy="4.8" r="1.5" fill="#fff"/></svg>via ceva 47 · <span class="loc-link">mappa</span> ↗</div>
+      </div>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
+  </header>
+  <div class="home-tagline">spazio culturale a torino · musica, cinema, laboratori, arte</div>
+
+  <nav class="home-grid">
+    <a class="home-btn ev" id="home-btn-eventi" href="#eventi">
+      <div class="hb-top"><span class="hb-kicker">01 / in programma</span><span class="hb-arrow">→</span></div>
+      <div>
+        <div class="hb-title">EVENTI</div>
+      </div>
+      <div class="hb-next" id="home-next"><div class="hb-sub">carico il programma…</div></div>
+    </a>
+    <a class="home-btn cal" id="home-btn-cal" href="#calendario">
+      <div class="hb-top"><span class="hb-kicker">02 / il mese</span><span class="hb-arrow">→</span></div>
+      <div class="hb-title">CALEN<br>DARIO</div>
+      <div class="hb-cal-body">
+        <div class="hb-sub" id="home-month"></div>
+        <div class="hb-mini" id="home-mini"></div>
+      </div>
+    </a>
+  </nav>
+</div>
 
 <div class="root">
 
@@ -1229,6 +1316,7 @@
     </div>
     <!-- Riga 2 (mobile): navigazione mesi + azioni + dark toggle -->
     <div class="toolbar-actions">
+      <button class="theme-toggle home-toolbtn" id="home-toolbtn" onclick="goHome()" title="Home">⌂</button>
       <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
       <div class="nav">
         <button class="pill" onclick="changeMonth(-1)">&lt;</button>
@@ -1392,6 +1480,7 @@ async function fetchAndBuild() {
   updateViewIcons();
   const carousel = document.getElementById("filter-carousel");
   if (carousel && window.getComputedStyle(carousel).display !== "none") carouselBuild();
+  if (typeof updateHome === 'function') updateHome();
   
   // NIENTE altro qui: la visibilità è gestita dal click di toggleListView
 }
@@ -1894,8 +1983,15 @@ function exportInstagramPNG() {
 }
 
 // Ascolta il ridimensionamento della finestra per ricalcolare il layout
+// Cambia vista solo quando si attraversa il breakpoint: su telefono la barra
+// degli indirizzi che compare/sparisce genera resize e non deve resettare la scelta.
+let wasMobile = window.innerWidth <= 768;
 window.addEventListener('resize', () => {
-  isListView = window.innerWidth <= 768;
+  const nowMobile = window.innerWidth <= 768;
+  if (nowMobile !== wasMobile) {
+    wasMobile = nowMobile;
+    if (!/^#(eventi|calendario)$/.test(location.hash)) isListView = nowMobile;
+  }
   buildGrid(cur);
 });
 
@@ -1903,7 +1999,7 @@ window.addEventListener('resize', () => {
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('theme-toggle').textContent = isDark ? '☾' : '☀';
+  document.querySelectorAll('.theme-toggle:not(.home-toolbtn)').forEach(b => b.textContent = isDark ? '☾' : '☀');
   localStorage.setItem('s432-theme', isDark ? 'light' : 'dark');
 }
 (function initTheme() {
@@ -1911,8 +2007,7 @@ function toggleTheme() {
   if (saved === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
     window.addEventListener('DOMContentLoaded', () => {
-      const btn = document.getElementById('theme-toggle');
-      if (btn) btn.textContent = '☀';
+      document.querySelectorAll('.theme-toggle:not(.home-toolbtn)').forEach(b => b.textContent = '☀');
     });
   }
 })();
@@ -2756,8 +2851,14 @@ fetchAndBuild();
   const firstVisible = sel => [...document.querySelectorAll(sel)].find(visible) || null;
 
   const STEPS = [
-    { el: () => document.querySelector('.card-header .logo-area'),
+    { el: () => firstVisible('#home .logo-area, .card-header .logo-area'),
       text: 'Tocca il <b>logo</b> e si apre la <b>mappa</b>: ti mostro dove siamo e le fermate GTT più vicine.' },
+    { el: () => document.getElementById('home-btn-eventi'),
+      text: '<b>Eventi</b>: tutto quello che succede, in lista, con il tasto per prenotarti.' },
+    { el: () => document.getElementById('home-btn-cal'),
+      text: '<b>Calendario</b>: il mese intero a colpo d\'occhio. I quadratini pieni sono i giorni con qualcosa in programma.' },
+    { el: () => document.getElementById('home-toolbtn'),
+      text: 'Da qui torni alla <b>home</b> quando vuoi.' },
     { el: () => isMobile() ? document.getElementById('filter-carousel') : document.getElementById('filter-drawer'),
       text: () => isMobile()
         ? 'Con le <b>frecce</b> scegli cosa vedere: musica, cinema, laboratori, arte.'
@@ -2768,7 +2869,7 @@ fetchAndBuild();
       text: 'Qui passi dalla <b>lista</b> alla <b>griglia</b> del mese, e viceversa.' },
     { el: () => firstVisible('.btn-prenota'), optional: true,
       text: 'Ogni evento ha il suo <b>Prenotami</b>: lasci nome ed email e ricevi il biglietto con il QR.' },
-    { el: () => document.getElementById('theme-toggle'),
+    { el: () => firstVisible('.theme-toggle:not(.home-toolbtn)'),
       text: 'Modalità <b>notte</b>, per chi ci legge alle tre.' },
     { el: () => document.getElementById('s432-cta'),
       text: 'E se hai un <b>progetto</b> (un concerto, una mostra, un workshop), scrivici da qui. Leggiamo tutto.' }
@@ -2840,6 +2941,7 @@ fetchAndBuild();
       <button class="dia-btn" data-a="tour">→ fammi fare il giro del sito</button>
       <button class="dia-btn" data-a="map">→ dove siete? come arrivo?</button>
       <button class="dia-btn" data-a="cta">→ voglio proporre un progetto</button>
+      ${document.body.classList.contains('is-home') ? '' : '<button class="dia-btn" data-a="home">→ torna alla home</button>'}
       <button class="dia-btn ghost" data-a="hide">nasconditi per ora</button>
     </div>`);
     bubble.querySelector('[data-a="tour"]').onclick = startTour;
@@ -2849,6 +2951,7 @@ fetchAndBuild();
       const c = document.getElementById('s432-cta');
       if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
+    const hb = bubble.querySelector('[data-a="home"]'); if (hb) hb.onclick = () => { closeAll(); goHome(); };
     bubble.querySelector('[data-a="hide"]').onclick = () => { closeAll(); mascot.classList.add('hidden'); store.set('s432-dia-hidden', '1', true); };
   }
 
@@ -2879,6 +2982,72 @@ fetchAndBuild();
       };
     }, 700);
   }, 1500);
+})();
+</script>
+<script>
+// ── HOME + ROUTING (#eventi = lista, #calendario = griglia) ─────
+(function () {
+  const DOW = ['dom','lun','mar','mer','gio','ven','sab'];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  window.updateHome = function () {
+    const now = new Date();
+    const y = cur.getFullYear(), m = cur.getMonth();
+    const sameMonth = y === now.getFullYear() && m === now.getMonth();
+    const fromDay = sameMonth ? now.getDate() : 1;
+
+    // EVENTI: prossimi due appuntamenti (riunioni escluse)
+    const upcoming = events.filter(e => e.day >= fromDay && e.cat !== 'meet').slice(0, 2);
+    const nextEl = document.getElementById('home-next');
+    if (nextEl) nextEl.innerHTML = upcoming.length
+      ? upcoming.map(e => `<div class="hb-next-row"><span class="hb-next-date">${DOW[new Date(y, m, e.day).getDay()]} ${e.day}</span><span class="hb-next-name">${esc(e.name)}</span></div>`).join('')
+      : '<div class="hb-sub">il programma del mese è in arrivo</div>';
+
+    // CALENDARIO: mini griglia del mese con i giorni pieni
+    const mini = document.getElementById('home-mini');
+    if (mini) {
+      const offset = (new Date(y, m, 1).getDay() + 6) % 7;
+      const dim = new Date(y, m + 1, 0).getDate();
+      const busy = new Set(events.map(e => e.day));
+      let h = '<span class="blank"></span>'.repeat(offset);
+      for (let d = 1; d <= dim; d++) h += `<span class="${busy.has(d) ? 'has' : ''}${sameMonth && d === now.getDate() ? ' today' : ''}"></span>`;
+      mini.innerHTML = h;
+    }
+    const lbl = document.getElementById('home-month');
+    if (lbl) {
+      const n = new Set(events.filter(e => e.cat !== 'meet').map(e => e.day)).size;
+      lbl.textContent = `${MONTHS[m].toLowerCase()} ${y} · ${n === 0 ? 'nessuna data' : n === 1 ? '1 data' : n + ' date'}`;
+    }
+  };
+
+  function route() {
+    const h = location.hash;
+    if (h === '#eventi' || h === '#calendario') {
+      document.body.classList.remove('is-home');
+      setView(h === '#eventi');
+      window.scrollTo(0, 0);
+    } else {
+      document.body.classList.add('is-home');
+      const now = new Date();
+      if (cur.getMonth() !== now.getMonth() || cur.getFullYear() !== now.getFullYear()) { cur = new Date(); fetchAndBuild(); }
+      else updateHome();
+      window.scrollTo(0, 0);
+    }
+  }
+  window.goHome = () => { if (location.hash) history.pushState(null, '', location.pathname + location.search); route(); };
+  window.addEventListener('hashchange', route);
+  window.addEventListener('popstate', route);
+
+  // effetto "pressione" visibile anche col tap veloce su telefono
+  document.querySelectorAll('.home-btn').forEach(b => b.addEventListener('click', e => {
+    if (b.classList.contains('pressed')) return;
+    e.preventDefault();
+    b.classList.add('pressed');
+    setTimeout(() => { b.classList.remove('pressed'); location.hash = b.getAttribute('href'); }, 140);
+  }));
+
+  route();
+  updateHome();
 })();
 </script>
 </body>
