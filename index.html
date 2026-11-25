@@ -791,9 +791,12 @@
 
   @media (min-width: 769px) {
     .location-body { flex-direction: row; }
-    .map-container { flex: 1; min-height: unset; }
+    /* Mappa: larghezza massima ≈ 1,7 × l'altezza disponibile, così sugli schermi molto larghi
+       non si allarga oltre; lo spazio in più va alla scheda indirizzo a destra */
+    .map-container { flex: 0 1 calc((100vh - 66px) * 1.7); min-width: 0; min-height: unset; }
     .location-card {
-      width: 320px;
+      flex: 1 0 320px;
+      padding: 20px 40px;
       border-top: none;
       border-left: 1px solid var(--border);
       justify-content: center;
@@ -1820,6 +1823,7 @@ function renderStylizedMap() {
     marker:   '#993C1D',
     bus:      '#1F5FAD',   // linee bus GTT
     tram:     '#E07A1F',   // linee tram GTT
+    bike:     isDark ? '#7fae5a' : '#3B6D11',   // bici
     boxBg:    isDark ? '#1a1a1a' : '#ffffff',
     boxEdge:  isDark ? '#e8e8e8' : '#000000',
   };
@@ -1828,9 +1832,11 @@ function renderStylizedMap() {
   const cw = container.clientWidth || 600, ch = container.clientHeight || 480;
   const narrow = cw < 560;
   // su mobile stessa mappa del desktop, solo un po' più larga per includere Corso Principe Oddone
-  const VB = narrow ? { x: -380, y: -520, w: 975, h: 900 } : { x: -380, y: -600, w: 1060, h: 920 };
-  const u = (1 / Math.min(cw / VB.w, ch / VB.h)) * (narrow ? 0.84 : 1);       // metri per pixel
-  const px = n => +(n * u).toFixed(2);                 // px a schermo → metri
+  const VB = narrow ? { x: -280, y: -650, w: 1150, h: 900 } : { x: -260, y: -600, w: 1130, h: 920 };
+  const u = (1 / Math.min(cw / VB.w, ch / VB.h)) * (narrow ? 0.8 : 1);       // metri per pixel
+  const px = n => +(n * u).toFixed(2);
+  // bordo destro realmente visibile (la mappa è centrata e può mostrare più del viewBox)
+  const VIS_RIGHT = VB.x + VB.w / 2 + (cw / Math.min(cw / VB.w, ch / VB.h)) / 2;                 // px a schermo → metri
   const mono = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
 
   // ── geometria ──
@@ -1862,9 +1868,22 @@ function renderStylizedMap() {
   // Rr porta un punto dalle coordinate reali a quelle ruotate (per pin, fermate, etichette dritte).
   const Rr = p => [p[0]*dirP[0] + p[1]*dirP[1], p[0]*nrmP[0] + p[1]*nrmP[1]];
 
+  // Piazza della Repubblica (Balon): mezzo ottagono sopra Corso Regina, a est dell'incrocio
+  const CPO_X = Rr(X)[0];   // Corso Principe Oddone (x nella mappa ruotata)
+  const PIAZZA = narrow ? { x: 722, y: CRM_OFF, r: 92 } : { x: 810, y: CRM_OFF, r: 105 };   // centrata sulla via verticale x = 810
+  const BIKE_MIN = 7;
+  const octagon = (() => {
+    const { x, y, r } = PIAZZA;
+    return Array.from({ length: 8 }, (_, i) => {
+      const a = Math.PI / 8 + i * Math.PI / 4;
+      return [x + r * Math.cos(a), y + r * Math.sin(a)];
+    });
+  })();
+  const PIAZZA_TOP = PIAZZA.y - PIAZZA.r * Math.cos(Math.PI / 8);
+
   // Fermate GTT
   const STOP_U = along(CEVA0, dirP, 270);          // Umbria (Via Ceva / C.so Umbria / Via Livorno)
-  const STOP_A = along(CRM0, dirP, -180);          // Avellino (C.so Regina Margherita), al centro dell'isolato
+  const STOP_A = along(CRM0, dirP, narrow ? -55 : -180);   // su mobile un isolato più a destra          // Avellino (C.so Regina Margherita), al centro dell'isolato
 
   // curva morbida (Catmull-Rom → Bézier)
   const smooth = (pts, close) => {
@@ -1885,13 +1904,13 @@ function renderStylizedMap() {
   // fiume: ansa a ovest, poi attraversa il parco in alto e scende verso destra fino al bordo
   const RIVER_R = [[-1233,-64],[-906,-67],[-739,110],[-587,157],[-412,107],[-289,63],[-204,-40],[-172,-164],
     [-232,-225],[-369,-213],[-453,-280],[-415,-390],[-258,-482],[-63,-536],[150,-548],[350,-530],[520,-470],
-    [640,-370],[730,-230],[820,-60],[950,120]];
+    [650,-360],[780,-280],[920,-220],[1100,-170],[1400,-120]];
   const river = smooth(RIVER_R.map(fromR));
   const RIVER_LABEL_AT = '65%';   // punto del fiume (in % della lunghezza) dove sta la scritta
   // Parco Dora: tutto il verde a nord del bordo, ansa compresa; a destra scende insieme al fiume
   const parkEdge = [[-1050,347],[-719,254],[-526,196],[-376,140],[-273,100],[-210,-5],[-228,-118],[-264,-200],
-    [-195,-291],[-58,-303],[48,-383],[147,-481],[290,-470],[440,-420],[560,-320],[650,-180],[730,-20],[850,160],[1000,400]].map(fromR);
-  const park = smooth(parkEdge) + `L${fromR([2500,400]).join(' ')}L${fromR([2500,-2500]).join(' ')}L${fromR([-1200,-2500]).join(' ')}L${fromR([-1200,347]).join(' ')}Z`;
+    [-195,-291],[-58,-303],[48,-383],[147,-481],[290,-470],[440,-420],[570,-300],[690,-190],[840,-110],[1050,-50],[1400,0]].map(fromR);
+  const park = smooth(parkEdge) + `L${fromR([2500,0]).join(' ')}L${fromR([2500,-2500]).join(' ')}L${fromR([-1200,-2500]).join(' ')}L${fromR([-1200,347]).join(' ')}Z`;
   const trees = [[-560,-160],[-430,-140],[-330,-200],[-250,-250],[-300,-120],[-40,-420],[60,-380],[200,-420],
     [320,-560],[-140,-600],[470,-420],[600,-340],[700,-300],[-650,-230],[100,-620],[520,-560]]
     .map(([x,y]) => `<circle cx="${x}" cy="${y}" r="${px(7)}" fill="${C.tree}"/>`).join('');
@@ -1947,6 +1966,8 @@ function renderStylizedMap() {
       <circle cx="0" cy="0" r="2" fill="${C.boxEdge}"/>
     </g>`;
   };
+  // etichetta spazio432 (px): distanza dal pin, larghezza, altezza, corpo del testo
+  const LB = narrow ? { x: 146, w: 128, h: 46, f: 18 } : { x: 172, w: 148, h: 50, f: 20 };
   const rotP = A_PAR / deg, rotU = A_CU / deg;
 
   const svg = `<svg viewBox="${VB.x} ${VB.y} ${VB.w} ${VB.h}" preserveAspectRatio="xMidYMid meet"
@@ -1956,12 +1977,21 @@ function renderStylizedMap() {
     <path d="${grid}" fill="none" stroke="${C.grid}" stroke-width="${px(4)}"/>
 
     <!-- Via Ceva e Corso Umbria disegnati prima del parco: Corso Umbria si interrompe dove inizia il verde -->
-    ${road(line(CEVA0, dirP, -90, tCeva), 16)}
-    ${road(line(CU0, dirU, -2000, 2000), 20)}
+    <!-- prima i bordi neri di entrambe, poi i riempimenti: l'incrocio Via Ceva / Corso Umbria resta pulito -->
+    <path d="${line(CEVA0, dirP, -90, tCeva)}" fill="none" stroke="${C.roadEdge}" stroke-width="${px(18)}" stroke-opacity="${isDark ? 1 : 0.85}"/>
+    <path d="${line(CU0, dirU, -2000, tX)}" fill="none" stroke="${C.roadEdge}" stroke-width="${px(22)}" stroke-opacity="${isDark ? 1 : 0.85}"/>
+    <path d="${line(CEVA0, dirP, -90, tCeva)}" fill="none" stroke="${C.road}" stroke-width="${px(16)}"/>
+    <path d="${line(CU0, dirU, -2000, tX)}" fill="none" stroke="${C.road}" stroke-width="${px(20)}"/>
 
     <!-- Parco Dora + fiume -->
-    <path d="${park}" fill="${C.park}" stroke="${C.parkEdge}" stroke-width="${px(1)}"/>
-    ${trees}
+    <!-- il verde del parco si ferma a Corso Principe Oddone: a destra solo isolati -->
+    <clipPath id="s432-park-clip" clipPathUnits="userSpaceOnUse">
+      <path d="M${[[-3000,-3000],[CPO_X,-3000],[CPO_X,3000],[-3000,3000]].map(p => fromR(p).join(' ')).join('L')}Z"/>
+    </clipPath>
+    <g clip-path="url(#s432-park-clip)">
+      <path d="${park}" fill="${C.park}" stroke="${C.parkEdge}" stroke-width="${px(1)}"/>
+      ${trees}
+    </g>
     <path id="s432-river" d="${river}" fill="none" stroke="${C.water}" stroke-width="${px(20)}" stroke-linecap="round"/>
     <!-- "fiume dora" scritto lungo il fiume, sempre dentro il tracciato -->
     <text font-family="${mono}" font-size="${px(10)}" font-weight="bold" font-style="italic" letter-spacing="${px(1.5)}"
@@ -1970,23 +2000,55 @@ function renderStylizedMap() {
     </text>
 
     <!-- strade principali -->
-    ${road(line(CRM0, dirP, -2000, 2000), 34)}
+    <path d="M${octagon.map(p => fromR(p).join(' ')).join('L')}Z" fill="${C.road}" stroke="${C.roadEdge}" stroke-width="${px(1.5)}" stroke-linejoin="miter"/>
+    ${road(line(CRM0, dirP, -2000, 2000), narrow ? 28 : 34)}
     ${road(line(X, nrmP, -2000, 2000), 20)}
+    <!-- Corso Umbria ripassato sopra: nessun bordo di Corso Regina/Principe Oddone lo attraversa -->
+    <path d="${line(CU0, dirU, tX - 160, tX)}" fill="none" stroke="${C.road}" stroke-width="${px(20)}"/>
     <circle cx="${X[0].toFixed(1)}" cy="${X[1].toFixed(1)}" r="${px(22)}" fill="${C.road}" stroke="${C.roadEdge}" stroke-width="${px(1.5)}"/>
     <circle cx="${X[0].toFixed(1)}" cy="${X[1].toFixed(1)}" r="${px(7)}" fill="none" stroke="${C.roadEdge}" stroke-width="${px(1.5)}"/>
 
     <!-- etichette -->
     ${text([60, -400], 'PARCO DORA', { size: 15, color: C.parkText, halo: C.park, spacing: 2, rot: rotP })}
-    ${text(along(CRM0, dirP, narrow ? 285 : 330), 'CORSO REGINA MARGHERITA', { size: 11, color: C.roadText, halo: null, rot: rotP })}
+    ${text(along(CRM0, dirP, narrow ? 262 : 330), 'CORSO REGINA MARGHERITA', { size: narrow ? 10 : 11, color: C.roadText, halo: null, rot: rotP })}
     ${text(along(X, nrmP, -250), 'CORSO PRINCIPE ODDONE', { size: 10, color: C.roadText, halo: null, rot: rotP - 90 })}
     ${text(along(CU0, dirU, tX * 0.55), 'CORSO UMBRIA', { size: 10, color: C.roadText, halo: null, rot: rotU })}
     ${text(along(CEVA0, dirP, tCeva * 0.5), 'VIA CEVA', { size: 10, color: C.roadText, halo: null, rot: rotP })}
 
     </g>
 
+    <!-- Piazza della Repubblica: nome e tempo in bici -->
+    ${!narrow ? `<g transform="translate(${Math.min(PIAZZA.x, VIS_RIGHT - 82 * STOP_K * u)} ${PIAZZA_TOP}) scale(${(u * STOP_K).toFixed(3)})">
+      <text x="0" y="-22" text-anchor="middle" font-family="${mono}" font-size="9" font-weight="bold" letter-spacing="0.8"
+            fill="${C.label}" paint-order="stroke" stroke="${C.ground}" stroke-width="3" stroke-linejoin="round">P.ZZA DELLA REPUBBLICA</text>
+      <text x="0" y="-10" text-anchor="middle" font-family="${mono}" font-size="8.5" letter-spacing="0.6"
+            fill="${C.muted}" paint-order="stroke" stroke="${C.ground}" stroke-width="3" stroke-linejoin="round">balon · porta palazzo</text>
+      <g transform="translate(0 -46)">
+        <rect x="-34" y="-10" width="70" height="20" rx="10" fill="${C.boxBg}" stroke="${C.bike}" stroke-width="1.2"/>
+        <g transform="translate(-27 -6)" fill="none" stroke="${C.bike}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="3.5" cy="8" r="3"/><circle cx="14.5" cy="8" r="3"/>
+          <path d="M3.5 8L6.5 2.5H11.5L14.5 8M6.5 2.5L9 8L11.5 2.5M5.5 1H8"/>
+        </g>
+        <text x="11" y="0.5" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="10" font-weight="bold" fill="${C.bike}">${BIKE_MIN} min</text>
+      </g>
+    </g>` : `<g transform="translate(${Math.min(PIAZZA.x, VB.x + VB.w - 46 * u)} ${PIAZZA_TOP}) scale(${u.toFixed(3)})">
+      <text x="0" y="-20" text-anchor="middle" font-family="${mono}" font-size="8.5" font-weight="bold" letter-spacing="0.5"
+            fill="${C.label}" paint-order="stroke" stroke="${C.ground}" stroke-width="3" stroke-linejoin="round">P.ZA REPUBBLICA</text>
+      <text x="0" y="-9" text-anchor="middle" font-family="${mono}" font-size="8" letter-spacing="0.5"
+            fill="${C.muted}" paint-order="stroke" stroke="${C.ground}" stroke-width="3" stroke-linejoin="round">balon</text>
+      <g transform="translate(0 -42)">
+        <rect x="-34" y="-10" width="70" height="20" rx="10" fill="${C.boxBg}" stroke="${C.bike}" stroke-width="1.2"/>
+        <g transform="translate(-27 -6)" fill="none" stroke="${C.bike}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="3.5" cy="8" r="3"/><circle cx="14.5" cy="8" r="3"/>
+          <path d="M3.5 8L6.5 2.5H11.5L14.5 8M6.5 2.5L9 8L11.5 2.5M5.5 1H8"/>
+        </g>
+        <text x="11" y="0.5" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="10" font-weight="bold" fill="${C.bike}">${BIKE_MIN} min</text>
+      </g>
+    </g>`}
+
     <!-- fermate GTT con tempo a piedi -->
     ${stop(Rr(STOP_U), 'Umbria', ['52','60','67','72'], -30, -64, C.bus, '4 min')}
-    ${stop(Rr(STOP_A), 'Avellino', ['3','16CS'], 'center', -76, C.tram, '6 min')}
+    ${stop(Rr(STOP_A), 'Avellino', ['3','16CS'], 'center', narrow ? -66 : -76, C.tram, '6 min')}
 
     <!-- Spazio 432 -->
     <g transform="translate(0 0) scale(${u.toFixed(3)})">
@@ -1998,15 +2060,18 @@ function renderStylizedMap() {
             fill="${C.marker}" stroke="${C.boxEdge}" stroke-width="1"/>
       <circle cx="0" cy="-26" r="5" fill="#fff"/>
       <!-- etichetta principale: a sinistra del pin, sopra Via Ceva, con linguetta orizzontale -->
-      <g transform="translate(-172 -68)">
-        <rect x="4" y="4" width="148" height="50" fill="${C.boxEdge}"/>
-        <rect x="0" y="0" width="148" height="50" fill="${C.boxBg}" stroke="${C.boxEdge}" stroke-width="1.5"/>
-        <text x="74" y="20" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="20" font-weight="bold"
+      <g transform="translate(${narrow ? -LB.w / 2 : -LB.x} ${narrow ? -(LB.h + 54) : -68})">
+        <rect x="4" y="4" width="${LB.w}" height="${LB.h}" fill="${C.boxEdge}"/>
+        <rect x="0" y="0" width="${LB.w}" height="${LB.h}" fill="${C.boxBg}" stroke="${C.boxEdge}" stroke-width="1.5"/>
+        <text x="${LB.w / 2}" y="${LB.h * 0.4}" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="${LB.f}" font-weight="bold"
               fill="${C.label}">spazio<tspan fill="${C.muted}" dx="5">432</tspan></text>
-        <text x="74" y="39" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="9.5"
+        <text x="${LB.w / 2}" y="${LB.h * 0.78}" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="9.5"
               letter-spacing="0.6" fill="${C.muted}">via ceva 47</text>
-        <path d="M148 26 L158 34 L148 42" fill="${C.boxBg}" stroke="${C.boxEdge}" stroke-width="1.5" stroke-linejoin="miter"/>
-        <line x1="148" y1="27" x2="148" y2="41" stroke="${C.boxBg}" stroke-width="2"/>
+        ${narrow
+          ? `<path d="M${LB.w / 2 - 8} ${LB.h} L${LB.w / 2} ${LB.h + 10} L${LB.w / 2 + 8} ${LB.h}" fill="${C.boxBg}" stroke="${C.boxEdge}" stroke-width="1.5" stroke-linejoin="miter"/>
+             <line x1="${LB.w / 2 - 7}" y1="${LB.h}" x2="${LB.w / 2 + 7}" y2="${LB.h}" stroke="${C.boxBg}" stroke-width="2"/>`
+          : `<path d="M${LB.w} ${LB.h / 2 - 8} L${LB.w + 10} ${LB.h / 2} L${LB.w} ${LB.h / 2 + 8}" fill="${C.boxBg}" stroke="${C.boxEdge}" stroke-width="1.5" stroke-linejoin="miter"/>
+             <line x1="${LB.w}" y1="${LB.h / 2 - 7}" x2="${LB.w}" y2="${LB.h / 2 + 7}" stroke="${C.boxBg}" stroke-width="2"/>`}
       </g>
     </g>
 
