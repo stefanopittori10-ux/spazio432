@@ -2351,11 +2351,12 @@ function renderStylizedMap() {
   const cw = container.clientWidth || 600, ch = container.clientHeight || 480;
   const narrow = cw < 560;
   // su mobile stessa mappa del desktop, solo un po' più larga per includere Corso Principe Oddone
-  const VB = narrow ? { x: -280, y: -650, w: 1150, h: 900 } : { x: -260, y: -600, w: 1130, h: 920 };
+  const VB = narrow ? { x: -280, y: -650, w: 1150, h: 900 } : { x: -305, y: -600, w: 1220, h: 920 };
   const u = (1 / Math.min(cw / VB.w, ch / VB.h)) * (narrow ? 0.8 : 1);       // metri per pixel
   const px = n => +(n * u).toFixed(2);
   // bordo destro realmente visibile (la mappa è centrata e può mostrare più del viewBox)
-  const VIS_RIGHT = VB.x + VB.w / 2 + (cw / Math.min(cw / VB.w, ch / VB.h)) / 2;                 // px a schermo → metri
+  const VIS_RIGHT = VB.x + VB.w / 2 + (cw / Math.min(cw / VB.w, ch / VB.h)) / 2;
+  const VIS_LEFT  = VB.x + VB.w / 2 - (cw / Math.min(cw / VB.w, ch / VB.h)) / 2;   // bordo sinistro visibile                 // px a schermo → metri
   const mono = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
 
   // ── geometria ──
@@ -2447,7 +2448,7 @@ function renderStylizedMap() {
   const text = (p, txt, o = {}) => {
     const { size = 11, color = C.label, weight = 'bold', rot = 0, halo = C.ground, italic = false, spacing = 1 } = o;
     const [x, y] = p.map(v => v.toFixed(1));
-    return `<text x="${x}" y="${y}" transform="rotate(${rot} ${x} ${y})" text-anchor="middle" dominant-baseline="central"
+    return `<text x="${x}" y="${y}" transform="rotate(${rot} ${x} ${y})" text-anchor="middle" dy="0.35em"
       font-family="${mono}" font-size="${px(size)}" font-weight="${weight}" letter-spacing="${px(spacing)}"
       ${italic ? 'font-style="italic"' : ''} fill="${color}"
       ${halo ? `paint-order="stroke" stroke="${halo}" stroke-width="${px(3)}" stroke-linejoin="round"` : ''}>${txt}</text>`;
@@ -2459,24 +2460,28 @@ function renderStylizedMap() {
         <circle cx="0.6" cy="-5.4" r="1.7" fill="${col}" stroke="none"/>
         <path d="M0.2 -2.8L-0.8 1.6L-3.2 5.6M-0.8 1.6L1.6 5.6M-0.2 -1.6L-3 0.4M-0.2 -1.6L2.6 0"/>
       </g>
-      <text x="6" y="0.5" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="10" font-weight="bold" fill="${col}">${txt}</text>
+      <text x="6" y="0.5" text-anchor="middle" dy="0.35em" font-family="${mono}" font-size="10" font-weight="bold" fill="${col}">${txt}</text>
     </g>`;
   // box fermata: dx/dy = posizione del box rispetto al punto (px)
   const STOP_K = narrow ? 1 : 1.3;   // su desktop i riquadri delle fermate sono più grandi
   const stop = (p, name, lines, dx, dy, badgeBg, walk, pillSide = 'out') => {
     const w = Math.max((name.length + 4) * 6.2 + 18, lines.reduce((a, l) => a + Math.max(22, l.length * 6.2 + 9) + 4, 12));
     if (dx === 'center') dx = -w / 2;
+    // il riquadro non esce mai dai bordi visibili (tablet, finestre strette)
+    const sc = u * STOP_K, M = 10;
+    dx = Math.max(dx, (VIS_LEFT - p[0]) / sc + M);
+    dx = Math.min(dx, (VIS_RIGHT - p[0]) / sc - w - M);
     let bx = 8;
     const badges = lines.map(l => {
       const bw = Math.max(22, l.length * 6.2 + 9), x0 = bx; bx += bw + 4;
       return `<rect x="${x0}" y="24" width="${bw}" height="15" fill="${badgeBg}"/>
-        <text x="${x0 + bw/2}" y="32" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="9" font-weight="bold" fill="#fff">${l}</text>`;
+        <text x="${x0 + bw/2}" y="32" text-anchor="middle" dy="0.35em" font-family="${mono}" font-size="9" font-weight="bold" fill="#fff">${l}</text>`;
     }).join('');
     return `<g transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)}) scale(${(u * STOP_K).toFixed(3)})">
       <line x1="0" y1="0" x2="${Math.min(Math.max(0, dx), dx + w)}" y2="${dy + (dy < 0 ? 46 : 0)}" stroke="${C.boxEdge}" stroke-width="1"/>
       <g transform="translate(${dx} ${dy})">
         <rect x="0" y="0" width="${w}" height="46" fill="${C.boxBg}" stroke="${C.boxEdge}" stroke-width="1"/>
-        <text x="8" y="12" dominant-baseline="central" font-family="${mono}" font-size="10" font-weight="bold" fill="${C.label}">
+        <text x="8" y="12" dy="0.35em" font-family="${mono}" font-size="10" font-weight="bold" fill="${C.label}">
           <tspan fill="${C.muted}">GTT</tspan> ${name}</text>
         ${badges}
       </g>
@@ -2548,7 +2553,7 @@ function renderStylizedMap() {
           <circle cx="3.5" cy="8" r="3"/><circle cx="14.5" cy="8" r="3"/>
           <path d="M3.5 8L6.5 2.5H11.5L14.5 8M6.5 2.5L9 8L11.5 2.5M5.5 1H8"/>
         </g>
-        <text x="11" y="0.5" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="10" font-weight="bold" fill="${C.bike}">${BIKE_MIN} min</text>
+        <text x="11" y="0.5" text-anchor="middle" dy="0.35em" font-family="${mono}" font-size="10" font-weight="bold" fill="${C.bike}">${BIKE_MIN} min</text>
       </g>
     </g>` : `<g transform="translate(${Math.min(PIAZZA.x, VB.x + VB.w - 46 * u)} ${PIAZZA_TOP}) scale(${u.toFixed(3)})">
       <text x="0" y="-20" text-anchor="middle" font-family="${mono}" font-size="8.5" font-weight="bold" letter-spacing="0.5"
@@ -2561,7 +2566,7 @@ function renderStylizedMap() {
           <circle cx="3.5" cy="8" r="3"/><circle cx="14.5" cy="8" r="3"/>
           <path d="M3.5 8L6.5 2.5H11.5L14.5 8M6.5 2.5L9 8L11.5 2.5M5.5 1H8"/>
         </g>
-        <text x="11" y="0.5" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="10" font-weight="bold" fill="${C.bike}">${BIKE_MIN} min</text>
+        <text x="11" y="0.5" text-anchor="middle" dy="0.35em" font-family="${mono}" font-size="10" font-weight="bold" fill="${C.bike}">${BIKE_MIN} min</text>
       </g>
     </g>`}
 
@@ -2582,9 +2587,9 @@ function renderStylizedMap() {
       <g transform="translate(${narrow ? -LB.w / 2 : -LB.x} ${narrow ? -(LB.h + 54) : -68})">
         <rect x="4" y="4" width="${LB.w}" height="${LB.h}" fill="${C.boxEdge}"/>
         <rect x="0" y="0" width="${LB.w}" height="${LB.h}" fill="${C.boxBg}" stroke="${C.boxEdge}" stroke-width="1.5"/>
-        <text x="${LB.w / 2}" y="${LB.h * 0.4}" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="${LB.f}" font-weight="bold"
+        <text x="${LB.w / 2}" y="${LB.h * 0.4}" text-anchor="middle" dy="0.35em" font-family="${mono}" font-size="${LB.f}" font-weight="bold"
               fill="${C.label}">spazio<tspan fill="${C.muted}" dx="5">432</tspan></text>
-        <text x="${LB.w / 2}" y="${LB.h * 0.78}" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-size="9.5"
+        <text x="${LB.w / 2}" y="${LB.h * 0.78}" text-anchor="middle" dy="0.35em" font-family="${mono}" font-size="9.5"
               letter-spacing="0.6" fill="${C.muted}">via ceva 47</text>
         ${narrow
           ? `<path d="M${LB.w / 2 - 8} ${LB.h} L${LB.w / 2} ${LB.h + 10} L${LB.w / 2 + 8} ${LB.h}" fill="${C.boxBg}" stroke="${C.boxEdge}" stroke-width="1.5" stroke-linejoin="miter"/>
