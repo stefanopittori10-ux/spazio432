@@ -1341,9 +1341,56 @@
     .ev-name { font-size: 15px; }
     .ev-row .btn-prenota { padding: 7px 12px; }
   }
+
+  /* ── MAPPA: bottone home ─────────────────────────────────── */
+  .loc-home { display: inline-flex; align-items: center; gap: 8px; font-weight: bold; }
+  .loc-home .house-ico { width: 16px; height: 16px; display: block; }
+  /* ── HOME MOBILE: spazio a destra del blocco proposte per Dia */
+  @media (max-width: 768px) {
+    body.is-home .s432-cta-text { padding-right: 46px; }
+  }
+
+  /* niente zoom da doppio tap su bottoni e link */
+  a, button, .logo-area, .home-btn { touch-action: manipulation; }
+
+  /* ── MAPPA: un solo bottone ──────────────────────────────── */
+  .loc-go { font-size: 14px; font-weight: bold; padding: 13px 22px; display: inline-flex; align-items: center; gap: 10px;
+    border: 2px solid var(--fg); border-radius: 30px; box-shadow: 4px 4px 0 #993C1D;
+    transition: transform .12s, box-shadow .12s, opacity .12s; }
+  .loc-go span { transition: transform .15s; }
+  .loc-go:hover { opacity: 1 !important; transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #993C1D; }
+  .loc-go:hover span { transform: translateX(4px); }
+  .loc-go:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #993C1D; }
+  @media (max-width: 768px) { .location-actions .loc-go { width: 100%; justify-content: center; } }
 </style>
 </head>
 <body class="is-home">
+
+  <!-- LOCATION OVERLAY -->
+  <div class="location-overlay" id="location-overlay">
+    <div class="location-header">
+      <div class="logo-area">
+        <span class="logo-spazio">spazio</span><span class="logo-num">432</span>
+      </div>
+      <button class="location-close loc-home" onclick="closeLocation(); goHome();" aria-label="Torna alla home"><svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/><path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/><rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/></svg><span>home</span></button>
+    </div>
+    <div class="location-body">
+      <div class="map-container" id="map-container">
+        <!-- SVG mappa stilizzata generata da JS -->
+      </div>
+      <div class="location-card">
+        <div class="location-title">Dove siamo</div>
+        <div class="location-address">
+          Via Ceva, 47
+          <span>Torino, TO — 10144</span>
+        </div>
+        <div class="location-actions">
+          <a class="loc-btn primary loc-go" href="https://www.google.com/maps/dir/?api=1&destination=Via+Ceva+47%2C+10144+Torino" target="_blank" rel="noopener">portami al 432 <span>→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 <!-- HOME -->
 <div id="home">
@@ -1356,7 +1403,7 @@
     </div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
   </header>
-  <div class="home-tagline">spazio culturale a torino · musica, cinema, laboratori, arte</div>
+  <div class="home-tagline">spazio culturale a torino · musica, cineforum, laboratori, arte</div>
 
   <nav class="home-grid">
     <a class="home-btn ev" id="home-btn-eventi" href="#eventi">
@@ -1379,32 +1426,6 @@
 
 <div class="root">
 
-  <!-- LOCATION OVERLAY -->
-  <div class="location-overlay" id="location-overlay">
-    <div class="location-header">
-      <div class="logo-area">
-        <span class="logo-spazio">spazio</span><span class="logo-num">432</span>
-      </div>
-      <button class="location-close" onclick="closeLocation()">← torna al calendario</button>
-    </div>
-    <div class="location-body">
-      <div class="map-container" id="map-container">
-        <!-- SVG mappa stilizzata generata da JS -->
-      </div>
-      <div class="location-card">
-        <div class="location-title">Dove siamo</div>
-        <div class="location-address">
-          Via Ceva, 47
-          <span>Torino, TO — 10144</span>
-        </div>
-        <div class="location-actions">
-          <a class="loc-btn primary" href="https://maps.google.com/?q=Via+Ceva+47+Torino" target="_blank">Apri in Maps</a>
-          <a class="loc-btn" href="https://www.google.com/maps/dir/?api=1&destination=Via+Ceva+47+Torino" target="_blank">Indicazioni</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="toolbar">
     <!-- Riga 1 (mobile): hamburger + drawer filtri -->
     <div class="toolbar-filters">
@@ -1416,7 +1437,7 @@
       <div class="filter-drawer" id="filter-drawer">
         <button class="pill active" data-cat="all" onclick="filterEvt(this,'all')">Tutto</button>
         <button class="pill" data-cat="music" onclick="filterEvt(this,'music')">Musica</button>
-        <button class="pill" data-cat="film" onclick="filterEvt(this,'film')">Cinema</button>
+        <button class="pill" data-cat="film" onclick="filterEvt(this,'film')">Cineforum</button>
         <button class="pill" data-cat="lab" onclick="filterEvt(this,'lab')">Laboratorio</button>
         <button class="pill" data-cat="art" onclick="filterEvt(this,'art')">Arte</button>
         <button class="pill" data-cat="meet" onclick="filterEvt(this,'meet')">Riunioni</button>
@@ -1428,7 +1449,7 @@
           <div class="carousel-pill-wrap" id="carousel-pills">
             <button class="pill active" data-cat="all" onclick="carouselFilter(this,'all')">Tutto</button>
             <button class="pill" data-cat="music" onclick="carouselFilter(this,'music')">Musica</button>
-            <button class="pill" data-cat="film" onclick="carouselFilter(this,'film')">Cinema</button>
+            <button class="pill" data-cat="film" onclick="carouselFilter(this,'film')">Cineforum</button>
             <button class="pill" data-cat="lab" onclick="carouselFilter(this,'lab')">Laboratorio</button>
             <button class="pill" data-cat="art" onclick="carouselFilter(this,'art')">Arte</button>
             <button class="pill" data-cat="meet" onclick="carouselFilter(this,'meet')">Riunioni</button>
@@ -1543,7 +1564,7 @@
     <div class="footer" id="main-footer">
       <div class="legend">
         <div class="li"><div class="ld" style="background:#534AB7"></div>Musica</div>
-        <div class="li"><div class="ld" style="background:#993C1D"></div>Cinema</div>
+        <div class="li"><div class="ld" style="background:#993C1D"></div>Cineforum</div>
         <div class="li"><div class="ld" style="background:#3B6D11"></div>Laboratorio</div>
         <div class="li"><div class="ld" style="background:#854F0B"></div>Arte</div>
         <div class="li"><div class="ld" style="background:#4B5563"></div>Riunioni</div>
@@ -1582,7 +1603,7 @@ const SUPABASE_KEY = "sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs";
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-const CAT_LABELS={music:'Musica',film:'Cinema',lab:'Laboratorio',art:'Arte',meet:'Riunioni'};
+const CAT_LABELS={music:'Musica',film:'Cineforum',lab:'Laboratorio',art:'Arte',meet:'Riunioni'};
 const CAT_COLORS={music:'#534AB7',film:'#993C1D',lab:'#3B6D11',art:'#854F0B',meet:'#4B5563'};
 const EV_DOW=['dom','lun','mar','mer','gio','ven','sab'];
 
@@ -2499,12 +2520,7 @@ function renderStylizedMap() {
     </g>
   </svg>`;
 
-  const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Via Ceva 47, 10144 Torino');
-  container.innerHTML = `<a href="${mapsUrl}" target="_blank" rel="noopener" aria-label="Apri Via Ceva 47 in Google Maps"
-      style="position:absolute;inset:0;display:block;cursor:pointer;text-decoration:none;">${svg}
-    <span style="position:absolute;left:12px;bottom:12px;font-family:${mono};font-size:11px;font-weight:bold;
-      padding:6px 12px;border-radius:20px;border:1px solid ${C.boxEdge};background:${C.boxBg};color:${C.label};">apri in maps &#8599;</span>
-  </a>`;
+  container.innerHTML = svg;
 }
 
 // ridisegna se cambia la dimensione mentre la mappa è aperta
@@ -2698,7 +2714,7 @@ function carouselBuild() {
   // Usa sempre la lista fissa per non dipendere dal DOM
   const items = CAROUSEL_CATS.map((cat, i) => ({
     cat,
-    label: {all:'Tutto',music:'Musica',film:'Cinema',lab:'Laboratorio',art:'Arte',meet:'Riunioni'}[cat]
+    label: {all:'Tutto',music:'Musica',film:'Cineforum',lab:'Laboratorio',art:'Arte',meet:'Riunioni'}[cat]
   }));
 
   // Ricostruisce: clone-last + originali + clone-first
@@ -2818,7 +2834,7 @@ window.addEventListener('resize', () => { if (window.innerWidth <= 768) carousel
 
 // ── TICKET OVERLAY ────────────────────────────────────────────
 const T_CAT_COLORS = { music:'#534AB7', film:'#993C1D', lab:'#3B6D11', art:'#854F0B', meet:'#4B5563' };
-const T_CAT_LABELS = { music:'Musica', film:'Cinema', lab:'Laboratorio', art:'Arte', meet:'Riunioni' };
+const T_CAT_LABELS = { music:'Musica', film:'Cineforum', lab:'Laboratorio', art:'Arte', meet:'Riunioni' };
 
 function genTicketCode(name, event, date) {
   const str = name + event + date;
@@ -3046,8 +3062,8 @@ fetchAndBuild();
       text: 'Da qui torni alla <b>home</b> quando vuoi.' },
     { el: () => isMobile() ? document.getElementById('filter-carousel') : document.getElementById('filter-drawer'),
       text: () => isMobile()
-        ? 'Con le <b>frecce</b> scegli cosa vedere: musica, cinema, laboratori, arte.'
-        : 'Da qui <b>filtri per tipo</b>: musica, cinema, laboratori, arte.' },
+        ? 'Con le <b>frecce</b> scegli cosa vedere: musica, cineforum, laboratori, arte.'
+        : 'Da qui <b>filtri per tipo</b>: musica, cineforum, laboratori, arte.' },
     { el: () => document.querySelector('.toolbar .nav'),
       text: 'Con queste <b>frecce</b> sfogli i mesi, avanti e indietro.' },
     { el: () => firstVisible('.btn-prenota'), optional: true,
@@ -3139,6 +3155,27 @@ fetchAndBuild();
     bubble.querySelector('[data-a="hide"]').onclick = () => { closeAll(); mascot.classList.add('hidden'); store.set('s432-dia-hidden', '1', true); };
   }
 
+  // Su telefono, in home, Dia si allinea al centro del blocco proposte
+  function placeDia() {
+    const cta = document.getElementById('s432-cta');
+    const onHome = document.body.classList.contains('is-home') && window.innerWidth <= 768;
+    if (onHome && cta && visible(cta)) {
+      const r = cta.getBoundingClientRect();
+      const h = mascot.offsetHeight || 64;
+      const bottom = Math.max(10, Math.round(window.innerHeight - (r.top + r.height / 2) - h / 2));
+      mascot.style.bottom = bottom + 'px';
+      bubble.style.bottom = (bottom + h + 22) + 'px';
+    } else {
+      mascot.style.bottom = '';
+      bubble.style.bottom = '';
+    }
+  }
+  window.diaPlace = placeDia;
+  window.addEventListener('resize', placeDia);
+  window.addEventListener('hashchange', () => setTimeout(placeDia, 0));
+  window.addEventListener('popstate', () => setTimeout(placeDia, 0));
+  window.addEventListener('load', placeDia);
+
   mascot.addEventListener('click', () => {
     if (bubble.classList.contains('open') && idx === -1) return closeAll();
     if (idx >= 0) return; // durante il giro si usano i bottoni del fumetto
@@ -3149,6 +3186,7 @@ fetchAndBuild();
   // Avvio: Dia compare dopo poco; alla prima visita saluta e propone il giro
   if (store.get('s432-dia-hidden', true) === '1') return;
   setTimeout(() => {
+    placeDia();
     mascot.classList.remove('hidden');
     const overlayOpen = document.getElementById('location-overlay')?.classList.contains('open');
     if (store.get('s432-dia-seen') === '1' || overlayOpen) return;
@@ -3204,8 +3242,16 @@ fetchAndBuild();
     }
   };
 
+  // Dopo un cambio di pagina ignoriamo i tocchi per un attimo: un doppio tap sul
+  // bottone EVENTI finiva sul logo del calendario (stessa posizione) e apriva la mappa.
+  let tapShieldUntil = 0;
+  document.addEventListener('click', e => {
+    if (Date.now() < tapShieldUntil) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
+
   function route() {
     const h = location.hash;
+    tapShieldUntil = Date.now() + 500;
     if (h === '#eventi' || h === '#calendario') {
       document.body.classList.remove('is-home');
       setView(h === '#eventi');
@@ -3219,6 +3265,7 @@ fetchAndBuild();
       else updateHome();
       window.scrollTo(0, 0);
     }
+    if (window.diaPlace) requestAnimationFrame(diaPlace);
   }
   window.goHome = () => { if (location.hash) history.pushState(null, '', location.pathname + location.search); route(); };
   window.addEventListener('hashchange', route);
@@ -3226,14 +3273,15 @@ fetchAndBuild();
 
   // effetto "pressione" visibile anche col tap veloce su telefono
   document.querySelectorAll('.home-btn').forEach(b => b.addEventListener('click', e => {
-    if (b.classList.contains('pressed')) return;
     e.preventDefault();
+    if (b.classList.contains('pressed')) return;
     b.classList.add('pressed');
     setTimeout(() => { b.classList.remove('pressed'); location.hash = b.getAttribute('href'); }, 140);
   }));
 
   route();
   updateHome();
+  if (window.diaPlace) diaPlace();
 })();
 </script>
 </body>
