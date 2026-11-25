@@ -1050,6 +1050,119 @@
     .stub-logo  { font-size: 17px; }
     .ticket-wrap { width: 170mm; max-width: 170mm; }
   }
+
+  /* ── INDICATORE MAPPA NEL LOGO ───────────────────────────── */
+  .logo-subtitle { display: inline-flex; align-items: center; gap: 4px; }
+  .logo-subtitle .loc-pin { width: 9px; height: 12px; flex-shrink: 0; color: #993C1D; transform-origin: 50% 100%;
+    animation: s432-pin-hop 1.6s ease-in-out 1.2s 3; }
+  .logo-subtitle .loc-link { text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; color: var(--fg); }
+  @keyframes s432-pin-hop {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-3px); }
+  }
+
+  /* ── CTA COLLABORAZIONI ──────────────────────────────────── */
+  .s432-cta-wrap { max-width: 1200px; margin: 24px auto 0; padding-bottom: 90px; }
+  .s432-cta {
+    background: #993C1D; color: #fff;
+    border: 1px solid var(--fg);
+    box-shadow: 6px 6px 0 var(--fg);
+    padding: 26px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  }
+  .s432-cta-text { flex: 1 1 340px; min-width: 0; }
+  .s432-cta-tag { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; opacity: .8; margin-bottom: 8px; }
+  .s432-cta-title { font-size: 26px; font-weight: bold; line-height: 1.1; margin-bottom: 10px; }
+  .s432-cta-desc { font-size: 13px; line-height: 1.55; opacity: .92; max-width: 560px; }
+  .s432-cta-side { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .s432-cta-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .s432-cta-btn {
+    font-family: var(--font-mono); font-size: 13px; font-weight: bold;
+    padding: 11px 20px; border-radius: 20px; cursor: pointer; text-decoration: none;
+    border: 1px solid #fff; background: transparent; color: #fff;
+    transition: background .15s, color .15s, transform .1s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .s432-cta-btn:active { transform: scale(.97); }
+  .s432-cta-btn.primary { background: #fff; color: #000; }
+  .s432-cta-btn.primary:hover { background: #000; color: #fff; border-color: #000; }
+  .s432-cta-btn:not(.primary):hover { background: #fff; color: #993C1D; }
+  .s432-cta-mail { font-size: 11px; opacity: .8; letter-spacing: .3px; word-break: break-all; }
+  @media (max-width: 768px) {
+    .s432-cta-wrap { margin-top: 16px; }
+    .s432-cta { padding: 22px 18px; box-shadow: 4px 4px 0 var(--fg); }
+    .s432-cta-title { font-size: 22px; }
+    .s432-cta-side, .s432-cta-actions { width: 100%; }
+    .s432-cta-btn { flex: 1; justify-content: center; }
+  }
+
+  /* ── DIA: ASSISTENTE DIAPASON ────────────────────────────── */
+  .dia-mascot {
+    position: fixed; right: 14px; bottom: 14px; z-index: 900;
+    width: 58px; height: 74px; padding: 0; border: none; background: none; cursor: pointer;
+    filter: drop-shadow(3px 3px 0 var(--fg));
+    animation: dia-bob 3.2s ease-in-out infinite;
+    transition: opacity .3s, transform .3s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dia-mascot.hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
+  .dia-mascot svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .dia-mascot .dia-prongs { transform-origin: 30px 50px; }
+  .dia-mascot.talking .dia-prongs { animation: dia-buzz .09s linear infinite; }
+  .dia-mascot .dia-waves path { opacity: 0; }
+  .dia-mascot.talking .dia-waves path { animation: dia-wave 1.1s ease-out infinite; }
+  .dia-mascot.talking .dia-waves path:nth-child(2), .dia-mascot.talking .dia-waves path:nth-child(4) { animation-delay: .35s; }
+  .dia-mascot .dia-eyes { transform-origin: 30px 14px; animation: dia-blink 5s infinite; }
+  @keyframes dia-bob { 0%,100% { translate: 0 0; } 50% { translate: 0 -3px; } }
+  @keyframes dia-buzz { 0% { transform: translateX(-.5px); } 50% { transform: translateX(.5px); } 100% { transform: translateX(-.5px); } }
+  @keyframes dia-wave { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes dia-blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+
+  .dia-bubble {
+    position: fixed; right: 14px; bottom: 100px; z-index: 901;
+    width: min(310px, calc(100vw - 28px));
+    background: var(--card-bg); color: var(--fg);
+    border: 1px solid var(--fg); box-shadow: 4px 4px 0 var(--fg);
+    padding: 14px 14px 12px; font-size: 12.5px; line-height: 1.5;
+    opacity: 0; transform: translateY(8px); pointer-events: none;
+    transition: opacity .2s, transform .2s;
+  }
+  .dia-bubble.open { opacity: 1; transform: none; pointer-events: auto; }
+  .dia-bubble.top { bottom: auto; top: 14px; }
+  .dia-bubble::after {
+    content: ''; position: absolute; right: 26px; bottom: -9px; width: 14px; height: 14px;
+    background: var(--card-bg); border-right: 1px solid var(--fg); border-bottom: 1px solid var(--fg);
+    transform: rotate(45deg);
+  }
+  .dia-bubble.top::after { display: none; }
+  .dia-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    font-size: 9.5px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; color: var(--fg-muted); }
+  .dia-x { background: none; border: none; color: var(--fg-muted); cursor: pointer; font-family: var(--font-mono); font-size: 13px; padding: 0 2px; }
+  .dia-x:hover { color: var(--fg); }
+  .dia-text b { color: #993C1D; }
+  [data-theme="dark"] .dia-text b { color: #d4825e; }
+  .dia-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .dia-btn { font-family: var(--font-mono); font-size: 11px; font-weight: bold; padding: 7px 13px; border-radius: 20px;
+    border: 1px solid var(--fg); background: var(--pill-bg); color: var(--fg); cursor: pointer; transition: all .12s; }
+  .dia-btn:hover { background: var(--surface-hover); }
+  .dia-btn.primary { background: var(--fg); color: var(--bg); }
+  .dia-btn.primary:hover { opacity: .85; }
+  .dia-btn.ghost { border-color: transparent; color: var(--fg-muted); padding-left: 6px; padding-right: 6px; }
+  .dia-menu { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .dia-menu .dia-btn { text-align: left; border-radius: 4px; }
+
+  .dia-ring {
+    position: fixed; z-index: 899; pointer-events: none;
+    border: 2px solid #993C1D; border-radius: 8px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,.42);
+    opacity: 0; transition: opacity .25s, left .3s, top .3s, width .3s, height .3s;
+  }
+  .dia-ring.on { opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dia-mascot, .dia-mascot .dia-eyes, .dia-mascot.talking .dia-prongs, .logo-subtitle .loc-pin { animation: none !important; }
+    .dia-ring { transition: opacity .2s; }
+  }
 </style>
 </head>
 <body>
@@ -1130,7 +1243,7 @@
       <div class="logo-area" onclick="openLocation()" title="Dove siamo">
         <div class="logo-text-group">
           <div><span class="logo-spazio">spazio</span><span class="logo-num">432</span></div>
-          <div class="logo-subtitle">via ceva 47, torino ↗</div>
+          <div class="logo-subtitle"><svg class="loc-pin" viewBox="0 0 10 13" aria-hidden="true"><path d="M5 12.5S1 7.8 1 4.8A4 4 0 0 1 9 4.8C9 7.8 5 12.5 5 12.5Z" fill="currentColor"/><circle cx="5" cy="4.8" r="1.5" fill="#fff"/></svg>via ceva 47 · <span class="loc-link">mappa</span> ↗</div>
         </div>
       </div>
       <div class="header-right">
@@ -1223,6 +1336,24 @@
       </div>
       <div class="footer-url">spazio432.org</div>
     </div>
+
+  <!-- CTA COLLABORAZIONI -->
+  <div class="s432-cta-wrap">
+    <section class="s432-cta" id="s432-cta">
+      <div class="s432-cta-text">
+        <div class="s432-cta-tag">collabora con noi</div>
+        <h2 class="s432-cta-title">Hai un progetto?</h2>
+        <p class="s432-cta-desc">Concerti, mostre, workshop, proiezioni, laboratori: lo spazio è aperto a chi ha qualcosa da far succedere. Raccontaci la tua idea e troviamo una data insieme.</p>
+      </div>
+      <div class="s432-cta-side">
+        <div class="s432-cta-actions">
+          <a class="s432-cta-btn primary" id="s432-cta-mail" href="mailto:spazioquattrotredue@gmail.com?subject=Proposta%20per%20spazio432">Scrivici →</a>
+          <button class="s432-cta-btn" id="s432-cta-copy" type="button">copia indirizzo</button>
+        </div>
+        <div class="s432-cta-mail">spazioquattrotredue@gmail.com</div>
+      </div>
+    </section>
+  </div>
   
 <!-- TICKET OVERLAY -->
 
@@ -2549,6 +2680,206 @@ function initGroupBtn() {
 }
 
 fetchAndBuild();
+</script>
+<script>
+// ── CTA COLLABORAZIONI + DIA (assistente diapason) ───────────────
+(function () {
+  const MAIL = 'spazioquattrotredue@gmail.com';
+  const store = {
+    get(k, s) { try { return (s ? sessionStorage : localStorage).getItem(k); } catch { return null; } },
+    set(k, v, s) { try { (s ? sessionStorage : localStorage).setItem(k, v); } catch {} }
+  };
+
+  // ── CTA: mailto precompilato + copia indirizzo ──
+  const body = [
+    'Ciao spazio432!', '',
+    'Mi chiamo: ',
+    'Cosa vorrei proporre (concerto, mostra, workshop, proiezione, laboratorio…): ',
+    'Date o periodo indicativo: ',
+    'Link / portfolio / social: ', '',
+    'Due righe sul progetto:', ''
+  ].join('\n');
+  const mailBtn = document.getElementById('s432-cta-mail');
+  if (mailBtn) mailBtn.href = `mailto:${MAIL}?subject=${encodeURIComponent('Proposta per spazio432')}&body=${encodeURIComponent(body)}`;
+
+  const copyBtn = document.getElementById('s432-cta-copy');
+  if (copyBtn) copyBtn.addEventListener('click', async () => {
+    let ok = false;
+    try { await navigator.clipboard.writeText(MAIL); ok = true; } catch {
+      const t = document.createElement('textarea');
+      t.value = MAIL; t.setAttribute('readonly', ''); t.style.cssText = 'position:fixed;opacity:0;';
+      document.body.appendChild(t); t.select();
+      try { ok = document.execCommand('copy'); } catch {}
+      t.remove();
+    }
+    const old = copyBtn.textContent;
+    copyBtn.textContent = ok ? 'copiato ✓' : MAIL;
+    setTimeout(() => { copyBtn.textContent = old; }, 2000);
+  });
+
+  // ── DIA ──
+  const SVG = `<svg viewBox="0 0 60 80" aria-hidden="true">
+    <g class="dia-waves" fill="none" stroke="#993C1D" stroke-width="2" stroke-linecap="round">
+      <path d="M8 12 Q3 20 8 28"/><path d="M3 8 Q-4 20 3 32"/>
+      <path d="M52 12 Q57 20 52 28"/><path d="M57 8 Q64 20 57 32"/>
+    </g>
+    <g class="dia-prongs">
+      <path d="M14 4 H22 V36 A8 8 0 0 0 38 36 V4 H46 V36 A16 16 0 0 1 14 36 Z"
+            fill="#993C1D" stroke="var(--fg)" stroke-width="1.6" stroke-linejoin="round"/>
+      <g class="dia-eyes">
+        <circle cx="18" cy="15" r="3.4" fill="#fff" stroke="var(--fg)" stroke-width="1"/>
+        <circle cx="42" cy="15" r="3.4" fill="#fff" stroke="var(--fg)" stroke-width="1"/>
+        <circle cx="18.8" cy="15.6" r="1.6" fill="#000"/>
+        <circle cx="42.8" cy="15.6" r="1.6" fill="#000"/>
+      </g>
+      <path d="M17 8.5 L20.5 9.5 M43 8.5 L39.5 9.5" stroke="var(--fg)" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M25 46.5 Q30 50 35 46.5" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <rect x="27" y="51" width="6" height="18" fill="#993C1D" stroke="var(--fg)" stroke-width="1.6"/>
+    <circle cx="30" cy="72" r="5.5" fill="#993C1D" stroke="var(--fg)" stroke-width="1.6"/>
+  </svg>`;
+
+  const mascot = document.createElement('button');
+  mascot.className = 'dia-mascot hidden';
+  mascot.setAttribute('aria-label', 'Dia, la guida del sito');
+  mascot.innerHTML = SVG;
+  const bubble = document.createElement('div');
+  bubble.className = 'dia-bubble';
+  bubble.setAttribute('role', 'dialog');
+  bubble.setAttribute('aria-live', 'polite');
+  const ring = document.createElement('div');
+  ring.className = 'dia-ring';
+  document.body.append(ring, bubble, mascot);
+
+  const isMobile = () => window.innerWidth <= 768;
+  const visible = el => !!el && el.getClientRects().length > 0 && el.getBoundingClientRect().width > 0;
+  const firstVisible = sel => [...document.querySelectorAll(sel)].find(visible) || null;
+
+  const STEPS = [
+    { el: () => document.querySelector('.card-header .logo-area'),
+      text: 'Tocca il <b>logo</b> e si apre la <b>mappa</b>: ti mostro dove siamo e le fermate GTT più vicine.' },
+    { el: () => isMobile() ? document.getElementById('filter-carousel') : document.getElementById('filter-drawer'),
+      text: () => isMobile()
+        ? 'Con le <b>frecce</b> scegli cosa vedere: musica, cinema, laboratori, arte.'
+        : 'Da qui <b>filtri per tipo</b>: musica, cinema, laboratori, arte.' },
+    { el: () => document.querySelector('.toolbar .nav'),
+      text: 'Con queste <b>frecce</b> sfogli i mesi, avanti e indietro.' },
+    { el: () => document.getElementById('view-switch-btn'),
+      text: 'Qui passi dalla <b>lista</b> alla <b>griglia</b> del mese, e viceversa.' },
+    { el: () => firstVisible('.btn-prenota'), optional: true,
+      text: 'Ogni evento ha il suo <b>Prenotami</b>: lasci nome ed email e ricevi il biglietto con il QR.' },
+    { el: () => document.getElementById('theme-toggle'),
+      text: 'Modalità <b>notte</b>, per chi ci legge alle tre.' },
+    { el: () => document.getElementById('s432-cta'),
+      text: 'E se hai un <b>progetto</b> (un concerto, una mostra, un workshop), scrivici da qui. Leggiamo tutto.' }
+  ];
+
+  let steps = [], idx = -1, target = null, raf = 0;
+
+  function talk() { mascot.classList.add('talking'); clearTimeout(talk._t); talk._t = setTimeout(() => mascot.classList.remove('talking'), 1400); }
+
+  function say(html, actions, head) {
+    bubble.innerHTML = `<div class="dia-head"><span>${head || 'dia · 432 hz'}</span><button class="dia-x" aria-label="chiudi">✕</button></div>
+      <div class="dia-text">${html}</div>${actions || ''}`;
+    bubble.querySelector('.dia-x').onclick = closeAll;
+    bubble.classList.remove('top');
+    bubble.classList.add('open');
+    mascot.classList.remove('hidden');
+    talk();
+  }
+
+  function placeRing() {
+    if (!target || !visible(target)) { ring.classList.remove('on'); return; }
+    const r = target.getBoundingClientRect(), p = 6;
+    Object.assign(ring.style, { left: r.left - p + 'px', top: r.top - p + 'px', width: r.width + p * 2 + 'px', height: r.height + p * 2 + 'px' });
+    ring.classList.add('on');
+    bubble.classList.toggle('top', r.top + r.height / 2 > window.innerHeight * 0.52);
+  }
+  function loop() { placeRing(); raf = requestAnimationFrame(loop); }
+
+  function showStep(i) {
+    idx = i;
+    const s = steps[i];
+    target = s.el();
+    if (!visible(target)) { return i + 1 < steps.length ? showStep(i + 1) : endTour(); }
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const last = i === steps.length - 1;
+    say(typeof s.text === 'function' ? s.text() : s.text,
+      `<div class="dia-actions">
+        <button class="dia-btn primary" data-a="next">${last ? 'fine' : 'avanti →'}</button>
+        ${i > 0 ? '<button class="dia-btn" data-a="prev">← indietro</button>' : ''}
+        ${last ? '' : '<button class="dia-btn ghost" data-a="end">salta</button>'}
+      </div>`, `dia · ${i + 1}/${steps.length}`);
+    bubble.querySelector('[data-a="next"]').onclick = () => last ? endTour() : showStep(i + 1);
+    const prev = bubble.querySelector('[data-a="prev"]'); if (prev) prev.onclick = () => showStep(i - 1);
+    const end = bubble.querySelector('[data-a="end"]'); if (end) end.onclick = endTour;
+    cancelAnimationFrame(raf); loop();
+  }
+
+  function startTour() {
+    steps = STEPS.filter(s => !s.optional || visible(s.el()));
+    showStep(0);
+  }
+
+  function endTour() {
+    cancelAnimationFrame(raf); target = null; ring.classList.remove('on');
+    store.set('s432-dia-seen', '1');
+    say('Buon giro! Se ti perdi, <b>tocca me</b>.', '');
+    setTimeout(() => { if (idx === -2) bubble.classList.remove('open'); }, 2600);
+    idx = -2;
+  }
+
+  function closeAll() {
+    cancelAnimationFrame(raf); target = null; idx = -1;
+    ring.classList.remove('on'); bubble.classList.remove('open', 'top');
+    store.set('s432-dia-seen', '1');
+  }
+
+  function menu() {
+    say('Cosa ti serve?', `<div class="dia-menu">
+      <button class="dia-btn" data-a="tour">→ fammi fare il giro del sito</button>
+      <button class="dia-btn" data-a="map">→ dove siete? come arrivo?</button>
+      <button class="dia-btn" data-a="cta">→ voglio proporre un progetto</button>
+      <button class="dia-btn ghost" data-a="hide">nasconditi per ora</button>
+    </div>`);
+    bubble.querySelector('[data-a="tour"]').onclick = startTour;
+    bubble.querySelector('[data-a="map"]').onclick = () => { closeAll(); if (typeof openLocation === 'function') openLocation(); };
+    bubble.querySelector('[data-a="cta"]').onclick = () => {
+      closeAll();
+      const c = document.getElementById('s432-cta');
+      if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    bubble.querySelector('[data-a="hide"]').onclick = () => { closeAll(); mascot.classList.add('hidden'); store.set('s432-dia-hidden', '1', true); };
+  }
+
+  mascot.addEventListener('click', () => {
+    if (bubble.classList.contains('open') && idx === -1) return closeAll();
+    if (idx >= 0) return; // durante il giro si usano i bottoni del fumetto
+    menu();
+  });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape' && bubble.classList.contains('open')) closeAll(); });
+
+  // Avvio: Dia compare dopo poco; alla prima visita saluta e propone il giro
+  if (store.get('s432-dia-hidden', true) === '1') return;
+  setTimeout(() => {
+    mascot.classList.remove('hidden');
+    const overlayOpen = document.getElementById('location-overlay')?.classList.contains('open');
+    if (store.get('s432-dia-seen') === '1' || overlayOpen) return;
+    setTimeout(() => {
+      say('Ciao! Sono <b>Dia</b>, il diapason di spazio432 (accordato a 432 Hz, ovvio). Ti faccio vedere come funziona il sito?',
+        `<div class="dia-actions">
+          <button class="dia-btn primary" data-a="yes">sì, dai</button>
+          <button class="dia-btn" data-a="no">no grazie</button>
+        </div>`);
+      bubble.querySelector('[data-a="yes"]').onclick = startTour;
+      bubble.querySelector('[data-a="no"]').onclick = () => {
+        say('Ok! Se ti serve, <b>tocca me</b> qui in basso.', '');
+        store.set('s432-dia-seen', '1');
+        setTimeout(() => { if (idx === -1) bubble.classList.remove('open'); }, 2400);
+      };
+    }, 700);
+  }, 1500);
+})();
 </script>
 </body>
 </html>
