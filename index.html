@@ -699,7 +699,7 @@
     justify-content: space-between;
     background: var(--card-bg);
   }
-  .location-header .logo-area { cursor: default; }
+  .location-header .logo-area { cursor: pointer; }
   .location-close {
     font-size: 13px;
     padding: 8px 16px;
@@ -1362,6 +1362,56 @@
   .loc-go:hover span { transform: translateX(4px); }
   .loc-go:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #993C1D; }
   @media (max-width: 768px) { .location-actions .loc-go { width: 100%; justify-content: center; } }
+
+  /* ── TOOLBAR: solo home ──────────────────────────────────── */
+  .toolbar .loc-home { flex-shrink: 0; padding: 8px 14px; font-size: 12px; }
+  .loc-home { transition: background .15s, color .15s; }
+  .loc-home:hover .house-ico rect[fill="#993C1D"] { fill: #993C1D; }
+
+  /* ── NAVIGAZIONE MESI ────────────────────────────────────── */
+  .month-nav { gap: 12px; }
+  .mkey {
+    position: relative; width: 38px; height: 38px; padding: 0; flex-shrink: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--fg); background: var(--card-bg); color: var(--fg);
+    box-shadow: 3px 3px 0 #993C1D; transition: transform .1s, box-shadow .1s, background .12s, color .12s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mkey svg { width: 15px; height: 15px; display: block; transition: transform .15s; }
+  @media (hover: hover) {
+    .mkey:hover { background: var(--fg); color: var(--bg); }
+    #mkey-prev:hover svg { transform: translateX(-2px); }
+    #mkey-next:hover svg { transform: translateX(2px); }
+  }
+  .mkey:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #993C1D; }
+  .mkey-tip {
+    position: absolute; top: calc(100% + 9px); left: 50%; transform: translate(-50%, -4px);
+    font-size: 10px; font-weight: bold; white-space: nowrap; letter-spacing: .5px; text-transform: lowercase;
+    background: var(--fg); color: var(--bg); padding: 3px 7px; pointer-events: none;
+    opacity: 0; transition: opacity .15s, transform .15s; z-index: 5;
+  }
+  @media (hover: hover) { .mkey:hover .mkey-tip { opacity: 1; transform: translate(-50%, 0); } }
+  .month-display { display: flex; flex-direction: column; align-items: center; min-width: 9.5ch; overflow: hidden; padding: 0; }
+  .month-slide { display: block; }
+  .month-slide.from-right { animation: month-in-r .32s cubic-bezier(.2,.8,.2,1); }
+  .month-slide.from-left  { animation: month-in-l .32s cubic-bezier(.2,.8,.2,1); }
+  @keyframes month-in-r { from { transform: translateX(40%); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes month-in-l { from { transform: translateX(-40%); opacity: 0; } to { transform: none; opacity: 1; } }
+  .month-display .month-label { font-size: 17px; letter-spacing: .5px; }
+  .month-sub { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+  .month-sub .year-label { margin-left: 0; font-size: 11px; letter-spacing: 1px; }
+  .month-today { font-family: var(--font-mono); font-size: 10px; font-weight: bold; color: #993C1D; background: none; border: none;
+    cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 2px; }
+  [data-theme="dark"] .month-today { color: #d4825e; }
+  [data-theme="dark"] .mkey { box-shadow: 3px 3px 0 #d4825e; }
+  @media (hover: none) { .mkey-tip { display: none; } }
+  @media (max-width: 768px) {
+    .month-nav { gap: 8px; }
+    .mkey { width: 34px; height: 34px; }
+    .month-display { min-width: 9ch; }
+    .month-display .month-label { font-size: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .month-slide.from-right, .month-slide.from-left { animation: none; } }
 </style>
 </head>
 <body class="is-home">
@@ -1369,7 +1419,7 @@
   <!-- LOCATION OVERLAY -->
   <div class="location-overlay" id="location-overlay">
     <div class="location-header">
-      <div class="logo-area">
+      <div class="logo-area" onclick="closeLocation(); goHome();" title="Torna alla home" role="button" tabindex="0">
         <span class="logo-spazio">spazio</span><span class="logo-num">432</span>
       </div>
       <button class="location-close loc-home" onclick="closeLocation(); goHome();" aria-label="Torna alla home"><svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/><path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/><rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/></svg><span>home</span></button>
@@ -1460,20 +1510,7 @@
     </div>
     <!-- Riga 2 (mobile): navigazione mesi + azioni + dark toggle -->
     <div class="toolbar-actions">
-      <button class="theme-toggle home-toolbtn" id="home-toolbtn" onclick="goHome()" title="Torna alla home" aria-label="Home">
-        <svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true">
-          <g class="house-smoke"><circle cx="15" cy="2.6" r="1.1"/><circle cx="16.4" cy="0.8" r="0.8"/></g>
-          <rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/>
-          <path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/>
-          <rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/>
-          <rect x="5.2" y="10.6" width="2.2" height="2.2" fill="var(--pill-bg)"/>
-        </svg>
-      </button>
-      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
-      <div class="nav">
-        <button class="pill" onclick="changeMonth(-1)">&lt;</button>
-        <button class="pill" onclick="changeMonth(1)">&gt;</button>
-      </div>
+      <button class="location-close loc-home" id="home-toolbtn" onclick="goHome()" aria-label="Torna alla home"><svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/><path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/><rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/></svg><span>home</span></button>
     </div>
   </div>
    
@@ -1486,11 +1523,13 @@
           <div class="logo-subtitle"><svg class="loc-pin" viewBox="0 0 10 13" aria-hidden="true"><path d="M5 12.5S1 7.8 1 4.8A4 4 0 0 1 9 4.8C9 7.8 5 12.5 5 12.5Z" fill="currentColor"/><circle cx="5" cy="4.8" r="1.5" fill="#fff"/></svg>via ceva 47 · <span class="loc-link">mappa</span> ↗</div>
         </div>
       </div>
-      <div class="header-right">
+      <div class="header-right month-nav">
+        <button class="mkey" id="mkey-prev" onclick="navMonth(-1)" aria-label="Mese precedente"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg><span class="mkey-tip" id="mkey-prev-tip"></span></button>
         <div class="month-display">
-          <span class="month-label" id="month-lbl">MAGGIO</span>
-          <span class="year-label" id="year-lbl">2026</span>
+          <div class="month-slide" id="month-slide"><span class="month-label" id="month-lbl">MAGGIO</span></div>
+          <div class="month-sub"><span class="year-label" id="year-lbl">2026</span><button class="month-today" id="month-today" onclick="navToday()" hidden>oggi ↺</button></div>
         </div>
+        <button class="mkey" id="mkey-next" onclick="navMonth(1)" aria-label="Mese successivo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg><span class="mkey-tip" id="mkey-next-tip"></span></button>
       </div>
     </div>
 
@@ -1629,6 +1668,7 @@ async function fetchAndBuild() {
   const carousel = document.getElementById("filter-carousel");
   if (carousel && window.getComputedStyle(carousel).display !== "none") carouselBuild();
   if (typeof updateHome === 'function') updateHome();
+  if (typeof updateMonthNav === 'function') updateMonthNav();
   
   // NIENTE altro qui: la visibilità è gestita dal click di toggleListView
 }
@@ -2201,6 +2241,63 @@ window.addEventListener('resize', () => {
   buildGrid(cur);
 });
 
+
+// ── NAVIGAZIONE MESI ───────────────────────────────────────────
+function updateMonthNav() {
+  const now = new Date();
+  const p = new Date(cur.getFullYear(), cur.getMonth() - 1, 1), n = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+  const short = d => MONTHS[d.getMonth()].slice(0, 3).toLowerCase();
+  const pt = document.getElementById('mkey-prev-tip'), nt = document.getElementById('mkey-next-tip');
+  if (pt) pt.textContent = '← ' + short(p);
+  if (nt) nt.textContent = short(n) + ' →';
+  const isNow = cur.getMonth() === now.getMonth() && cur.getFullYear() === now.getFullYear();
+  const t = document.getElementById('month-today'); if (t) t.hidden = isNow;
+  document.getElementById('month-lbl').textContent = MONTHS[cur.getMonth()].toUpperCase();
+  document.getElementById('year-lbl').textContent = cur.getFullYear();
+}
+function slideMonth(dir) {
+  const el = document.getElementById('month-slide');
+  if (!el) return;
+  el.classList.remove('from-left', 'from-right');
+  void el.offsetWidth;   // riavvia l'animazione
+  el.classList.add(dir > 0 ? 'from-right' : 'from-left');
+}
+function navMonth(dir) {
+  changeMonth(dir);
+  updateMonthNav();
+  slideMonth(dir);
+}
+function navToday() {
+  const now = new Date();
+  const dir = (now.getFullYear() * 12 + now.getMonth()) > (cur.getFullYear() * 12 + cur.getMonth()) ? 1 : -1;
+  cur = new Date();
+  fetchAndBuild();
+  updateMonthNav();
+  slideMonth(dir);
+}
+// swipe sul calendario (telefono) e frecce della tastiera (computer)
+(function () {
+  const card = document.getElementById('cal-card');
+  let sx = 0, sy = 0, st = 0;
+  card.addEventListener('touchstart', e => {
+    if (e.target.closest('input, textarea, select, .recap-booking-form')) { st = 0; return; }
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
+  }, { passive: true });
+  card.addEventListener('touchend', e => {
+    if (!st) return;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Date.now() - st < 600 && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8) navMonth(dx < 0 ? 1 : -1);
+    st = 0;
+  }, { passive: true });
+  window.addEventListener('keydown', e => {
+    if (document.body.classList.contains('is-home')) return;
+    if (document.getElementById('location-overlay')?.classList.contains('open')) return;
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    if (e.key === 'ArrowLeft') navMonth(-1);
+    if (e.key === 'ArrowRight') navMonth(1);
+  });
+})();
+
 // ── DARK MODE ──────────────────────────────────────────────
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -2564,16 +2661,16 @@ function openBookingPanel(evt, triggerBtn) {
       <button class="bk-panel-close" onclick="closeBookingPanel()">✕ chiudi</button>
     </div>
     <div class="bk-row">
-      <div class="bk-field"><label>Nome e cognome</label><input type="text" id="bk-name-${uid}" placeholder="es. Mario Rossi" autocomplete="name"></div>
-      <div class="bk-field"><label>Email</label><input type="email" id="bk-email-${uid}" placeholder="es. mario@email.it" autocomplete="email"></div>
-      <div class="bk-field narrow"><label>Posti</label><input type="number" id="bk-seats-${uid}" value="1" min="1" max="10"></div>
+      <div class="bk-field"><label>come ti chiami?</label><input type="text" id="bk-name-${uid}" placeholder="nome e cognome" autocomplete="name"></div>
+      <div class="bk-field"><label>la tua mail</label><input type="email" id="bk-email-${uid}" placeholder="ti mandiamo il biglietto qui" autocomplete="email"></div>
+      <div class="bk-field narrow"><label>in quanti siete?</label><input type="number" id="bk-seats-${uid}" value="1" min="1" max="10"></div>
     </div>
     <div class="bk-row">
-      <div class="bk-field"><label>Nota (facoltativa)</label><input type="text" id="bk-note-${uid}" placeholder="Accessibilità, domande…"></div>
+      <div class="bk-field"><label>vuoi dirci qualcosa? (facoltativo)</label><input type="text" id="bk-note-${uid}" placeholder="accessibilità, domande, saluti…"></div>
     </div>
     <div class="bk-actions">
       <div class="bk-message" id="bk-msg-${uid}"></div>
-      <button class="bk-submit" id="bk-sub-${uid}" onclick="submitBooking('${uid}','${evt.id}')">Conferma prenotazione</button>
+      <button class="bk-submit" id="bk-sub-${uid}" onclick="submitBooking('${uid}','${evt.id}')">ci sarò →</button>
     </div>`;
   panel.classList.add('open');
   setTimeout(() => {
@@ -2608,15 +2705,15 @@ function buildRecapBookingBlock(evt) {
   formWrap.id = 'form-' + uid;
   formWrap.innerHTML = `<div class="recap-booking-form-inner">
     <div class="bk-row">
-      <div class="bk-field"><label>Nome e cognome</label><input type="text" id="bk-name-${uid}" placeholder="es. Mario Rossi" autocomplete="name"></div>
-      <div class="bk-field"><label>Email</label><input type="email" id="bk-email-${uid}" placeholder="es. mario@email.it" autocomplete="email"></div>
-      <div class="bk-field narrow"><label>Posti</label><input type="number" id="bk-seats-${uid}" value="1" min="1" max="10"></div>
+      <div class="bk-field"><label>come ti chiami?</label><input type="text" id="bk-name-${uid}" placeholder="nome e cognome" autocomplete="name"></div>
+      <div class="bk-field"><label>la tua mail</label><input type="email" id="bk-email-${uid}" placeholder="ti mandiamo il biglietto qui" autocomplete="email"></div>
+      <div class="bk-field narrow"><label>in quanti siete?</label><input type="number" id="bk-seats-${uid}" value="1" min="1" max="10"></div>
     </div>
-    <div class="bk-row"><div class="bk-field"><label>Nota (facoltativa)</label><input type="text" id="bk-note-${uid}" placeholder="Accessibilità, domande…"></div></div>
+    <div class="bk-row"><div class="bk-field"><label>vuoi dirci qualcosa? (facoltativo)</label><input type="text" id="bk-note-${uid}" placeholder="accessibilità, domande, saluti…"></div></div>
     <div class="bk-actions">
       <button class="bk-panel-close" onclick="closeRecapForm('${uid}')">annulla</button>
       <div class="bk-message" id="bk-msg-${uid}"></div>
-      <button class="bk-submit" id="bk-sub-${uid}" onclick="submitBooking('${uid}','${evt.id}')">Conferma prenotazione</button>
+      <button class="bk-submit" id="bk-sub-${uid}" onclick="submitBooking('${uid}','${evt.id}')">ci sarò →</button>
     </div></div>`;
   btn.onclick = (e) => {
     e.stopPropagation();
@@ -2656,7 +2753,7 @@ async function submitBooking(uid, eventId) {
   if (!name) { nameEl.classList.add('err'); valid = false; }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { emailEl.classList.add('err'); valid = false; }
   if (!valid) {
-    msgEl.textContent = 'Compila nome e email validi.'; msgEl.className = 'bk-message fail';
+    msgEl.textContent = 'ci manca il tuo nome o una mail valida'; msgEl.className = 'bk-message fail';
     setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'bk-message'; }, 3000); return;
   }
   subBtn.disabled = true; msgEl.textContent = 'Invio…'; msgEl.className = 'bk-message';
@@ -3064,8 +3161,10 @@ fetchAndBuild();
       text: () => isMobile()
         ? 'Con le <b>frecce</b> scegli cosa vedere: musica, cineforum, laboratori, arte.'
         : 'Da qui <b>filtri per tipo</b>: musica, cineforum, laboratori, arte.' },
-    { el: () => document.querySelector('.toolbar .nav'),
-      text: 'Con queste <b>frecce</b> sfogli i mesi, avanti e indietro.' },
+    { el: () => document.querySelector('.month-nav'),
+      text: () => isMobile()
+        ? 'Con le <b>frecce</b> sfogli i mesi. Oppure fai <b>swipe</b> a destra e a sinistra sul calendario.'
+        : 'Con le <b>frecce</b> sfogli i mesi (vanno bene anche quelle della tastiera).' },
     { el: () => firstVisible('.btn-prenota'), optional: true,
       text: 'Tocca il <b>titolo</b> per i dettagli, e <b>vengo!</b> per prenotarti: lasci nome ed email e ricevi il biglietto con il QR.' },
     { el: () => firstVisible('.theme-toggle:not(.home-toolbtn)'),
