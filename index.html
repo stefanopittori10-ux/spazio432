@@ -1463,6 +1463,30 @@
   .theme-fab:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--fg); }
   body:not(.is-home) .theme-fab { display: none; }
   @media (max-width: 768px) { .theme-fab { display: none !important; } }
+  /* ── DETTAGLI APERTI: sfondo pieno del colore della categoria ── */
+  .recap-row.ev-row { transition: background-color .25s; }
+  .recap-row.ev-row.det-open { background: var(--c); border-left-color: var(--c) !important; }
+  .ev-row.det-open .ev-body, .ev-row.det-open .ev-details {
+    --fg: #fff; --recap-name: #fff; --det-desc: rgba(255,255,255,.92); --fg-dim: rgba(255,255,255,.88);
+    --fg-muted: rgba(255,255,255,.72); --pill-bg: transparent; color: #fff; }
+  .ev-row.det-open .ev-cat, .ev-row.det-open .ev-time { color: #fff !important; }
+  .ev-row.det-open .ev-more { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+  .ev-row.det-open .ev-name:hover, .ev-row.det-open .ev-name:focus-visible { text-decoration-color: #fff; }
+  .ev-row.det-open .ev-link { border-color: #fff; color: #fff; }
+  .ev-row.det-open .ev-link:hover { background: #fff; color: var(--c); }
+  .ev-row.det-open .ev-action .btn-prenota { background: #fff; color: var(--c); border-color: #fff; }
+  .ev-row.det-open .ev-action .btn-prenota:hover, .ev-row.det-open .ev-action .btn-prenota.open { background: #111; color: #fff; border-color: #111; }
+  .ev-row.det-open .ev-form .recap-booking-form-inner { background: var(--card-bg); border: 2px solid var(--fg); padding: 12px; margin-top: 12px; }
+
+  .det-block { --c: #534AB7; background: var(--c); color: #fff; padding: 16px 18px; border: 2px solid var(--fg);
+    box-shadow: 4px 4px 0 var(--fg); margin-bottom: 16px;
+    --det-desc: rgba(255,255,255,.92); --fg-dim: rgba(255,255,255,.88); --fg-muted: rgba(255,255,255,.72); }
+  .det-block:last-child { margin-bottom: 4px; }
+  .det-block .det-cat { color: rgba(255,255,255,.8) !important; }
+  .det-block .det-name { color: #fff; }
+  .det-block .btn-prenota { background: #fff; color: var(--c); border-color: #fff; margin-top: 12px; }
+  .det-block .btn-prenota:hover, .det-block .btn-prenota.open { background: #111; color: #fff; border-color: #111; }
+  .det-block .booking-count { color: rgba(255,255,255,.85); }
 </style>
 </head>
 <body class="is-home">
@@ -2083,9 +2107,8 @@ function showDetail(ev) {
 
   dayEvts.forEach((evt, idx) => {
     const evBlock = document.createElement('div');
-    evBlock.style.marginBottom = idx === dayEvts.length - 1 ? '0' : '20px';
-    evBlock.style.paddingBottom = idx === dayEvts.length - 1 ? '0' : '20px';
-    if (idx !== dayEvts.length - 1) evBlock.style.borderBottom = '1px dashed var(--border-light)';
+    evBlock.className = 'det-block';
+    evBlock.style.setProperty('--c', CAT_COLORS[evt.cat]);
 
     const cat = document.createElement('div');
     cat.className = 'det-cat';
