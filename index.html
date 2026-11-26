@@ -2,6 +2,10 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<script>
+// le pagine pubbliche stanno su spazio432.org (se aperte dall'indirizzo dello staff, si torna lì)
+(function () { if (location.hostname === 'staff.spazio432.org') location.replace('https://spazio432.org' + location.pathname + location.search + location.hash); })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">

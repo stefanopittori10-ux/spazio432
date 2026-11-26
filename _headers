@@ -33,3 +33,7 @@
   Cache-Control: no-cache
 /manifest-staff.webmanifest
   Cache-Control: no-cache
+
+# l'indirizzo dello staff non va su Google
+https://staff.spazio432.org/*
+  X-Robots-Tag: noindex

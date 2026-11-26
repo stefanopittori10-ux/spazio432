@@ -2,6 +2,10 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<script>
+// l'area staff vive su staff.spazio432.org: così su Android è un'app separata da quella pubblica
+(function () { var h = location.hostname; if (h === 'spazio432.org' || h === 'www.spazio432.org') location.replace('https://staff.spazio432.org' + location.pathname + location.search + location.hash); })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="icon" href="/staff-favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/staff-favicon-32.png">
