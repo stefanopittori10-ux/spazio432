@@ -25,3 +25,9 @@
 
 /finanze*
   X-Robots-Tag: noindex
+
+# app installabile: il service worker e il manifest si aggiornano subito
+/sw.js
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache

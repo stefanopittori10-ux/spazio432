@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/staff-favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/staff-favicon-32.png">
+<link rel="apple-touch-icon" href="/staff-apple-touch-icon.png">
 <title>spazio 432</title>
 <link rel="manifest" href="#" id="pwa-manifest">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBhMGEwYSIvPgogIDx0ZXh0IHg9Ijk2IiB5PSI3OCIgZm9udC1mYW1pbHk9InVpLW1vbm9zcGFjZSxtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMzIiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5zcGF6aW88L3RleHQ+CiAgPHRleHQgeD0iOTYiIHk9IjEyNiIgZm9udC1mYW1pbHk9InVpLW1vbm9zcGFjZSxtb25vc3BhY2UiIGZvbnQtc2l6ZT0iNTIiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj40MzI8L3RleHQ+Cjwvc3ZnPg==">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -387,15 +389,16 @@
 
 // PWA manifest inline
 const manifest = {
-  name: "spazio 432",
-  short_name: "spazio 432",
+  name: "spazio 432 · staff",
+  short_name: "432 staff",
   start_url: "/login.html",
   display: "standalone",
-  background_color: "#0a0a0a",
+  background_color: "#7C6CF2",
   theme_color: "#0a0a0a",
   icons: [
-    { src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBhMGEwYSIvPgogIDx0ZXh0IHg9Ijk2IiB5PSI3OCIgZm9udC1mYW1pbHk9InVpLW1vbm9zcGFjZSxtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMzIiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5zcGF6aW88L3RleHQ+CiAgPHRleHQgeD0iOTYiIHk9IjEyNiIgZm9udC1mYW1pbHk9InVpLW1vbm9zcGFjZSxtb25vc3BhY2UiIGZvbnQtc2l6ZT0iNTIiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj40MzI8L3RleHQ+Cjwvc3ZnPg==", sizes: "192x192", type: "image/svg+xml" },
-    { src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBhMGEwYSIvPgogIDx0ZXh0IHg9Ijk2IiB5PSI3OCIgZm9udC1mYW1pbHk9InVpLW1vbm9zcGFjZSxtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMzIiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5zcGF6aW88L3RleHQ+CiAgPHRleHQgeD0iOTYiIHk9IjEyNiIgZm9udC1mYW1pbHk9InVpLW1vbm9zcGFjZSxtb25vc3BhY2UiIGZvbnQtc2l6ZT0iNTIiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj40MzI8L3RleHQ+Cjwvc3ZnPg==", sizes: "512x512", type: "image/svg+xml" }
+    { src: "https://spazio432.org/staff-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+    { src: "https://spazio432.org/staff-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+    { src: "https://spazio432.org/staff-icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }
   ]
 };
 const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});

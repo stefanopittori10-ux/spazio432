@@ -1,0 +1,9 @@
+# spazio432.org
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /admin
+Disallow: /finanze
+Disallow: /prenotazioni
+
+Sitemap: https://spazio432.org/sitemap.xml
