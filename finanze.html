@@ -672,6 +672,94 @@
     .home-pill { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
     .home-pill .hp-lbl { display: none; }
   }
+
+  /* ═══ SPESE ANTICIPATE nelle uscite ═══ */
+  .who-row { align-items: center; }
+  .who-lbl { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-muted); white-space: nowrap; }
+  .f-who { flex: 1; min-width: 0; }
+  .e-who { display: inline-block; margin-top: 4px; font-size: 10px; font-weight: bold; padding: 2px 8px; cursor: pointer;
+    border: 1.5px solid var(--r-solid); color: var(--r-solid); background: var(--card-bg); }
+  .e-who.done { border-color: var(--e-solid); color: var(--e-solid); }
+  [data-theme="dark"] .e-who { color: var(--c-r); border-color: var(--c-r); }
+
+  /* ═══ PONTE DI COMANDO · v2 ═══ */
+  .bridge .bridge-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap;
+    background-image: repeating-linear-gradient(135deg, transparent 0 22px, rgba(255,255,255,.04) 22px 44px); }
+  .bh-right { text-align: right; }
+  .bh-lbl { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; opacity: .7; }
+  .bh-net { font-size: 44px; font-weight: 900; letter-spacing: -1.5px; line-height: 1; margin-top: 6px; }
+  .bh-net.pos { color: #8fd16a; } .bh-net.neg { color: #ff9b73; }
+  .bh-sub { font-size: 11px; opacity: .75; margin-top: 6px; max-width: 34ch; margin-left: auto; }
+
+  .radar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 2px solid var(--fg); box-shadow: 6px 6px 0 var(--sh); margin-bottom: 30px; background: var(--card-bg); }
+  .rd { display: flex; flex-direction: column; gap: 6px; padding: 16px 18px 18px; border-right: 2px solid var(--fg); min-width: 0; }
+  .rd:last-child { border-right: none; }
+  .rd-lbl { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .rd-lbl::before { content: ''; width: 10px; height: 10px; border: 2px solid var(--fg); }
+  .rd.in .rd-lbl::before { background: var(--u-solid); } .rd.out .rd-lbl::before { background: var(--r-solid); }
+  .rd.done .rd-lbl::before { background: var(--e-solid); } .rd.even .rd-lbl::before { background: var(--card-bg); }
+  .rd-val { font-size: 26px; font-weight: 900; letter-spacing: -1px; line-height: 1.05; overflow-wrap: anywhere; }
+  .rd-sub { font-size: 11px; color: var(--fg-muted); }
+
+  .bsec { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px solid var(--fg); }
+  .bsec-t { font-size: 13px; font-weight: 900; letter-spacing: 2px; }
+  .bsec-h { font-size: 11px; color: var(--fg-muted); }
+
+  .crew { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; margin-bottom: 34px; }
+  .crew-empty { grid-column: 1 / -1; border: 2px dashed var(--fg); padding: 22px; font-size: 13px; line-height: 1.5; }
+  .pc { border: 2px solid var(--fg); background: var(--card-bg); box-shadow: 6px 6px 0 var(--sh); display: flex; flex-direction: column; }
+  .pc.owes   { box-shadow: 6px 6px 0 var(--u-solid); }
+  .pc.credit { box-shadow: 6px 6px 0 var(--r-solid); }
+  .pc.both   { box-shadow: 6px 6px 0 var(--fg); }
+  .pc.even   { opacity: .75; box-shadow: 4px 4px 0 var(--border-light); }
+  .pc.ev     { box-shadow: 6px 6px 0 #854F0B; }
+  .pc-top { display: flex; align-items: center; gap: 12px; padding: 14px 16px 12px; border-bottom: 2px solid var(--fg); }
+  .pc-av { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    background: var(--fg); color: var(--bg); font-size: 17px; font-weight: 900; }
+  .pc.owes .pc-av { background: var(--u-solid); color: #fff; } .pc.credit .pc-av { background: var(--r-solid); color: #fff; }
+  .pc.ev .pc-av { background: #854F0B; color: #fff; }
+  .pc-name { font-size: 18px; font-weight: 900; letter-spacing: -.3px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .pc-tag { font-size: 9px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border: 1.5px solid var(--fg); padding: 2px 6px; }
+  .pc-scale { display: grid; grid-template-columns: 1fr 2px 1fr; gap: 0; padding: 14px 16px 4px; }
+  .pc-axis { background: var(--fg); }
+  .pc-side { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .pc-side.l { padding-right: 10px; align-items: flex-end; text-align: right; }
+  .pc-side.r { padding-left: 10px; }
+  .pc-side span { font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-muted); }
+  .pc-side b { font-size: 16px; font-weight: 900; }
+  .pc-side.l b { color: var(--c-u); } .pc-side.r b { color: var(--c-r); }
+  .pc-bar { width: 100%; height: 12px; display: flex; }
+  .pc-side.l .pc-bar { justify-content: flex-end; }
+  .pc-bar i { display: block; height: 100%; transition: width .5s cubic-bezier(.2,.8,.2,1); }
+  .pc-side.l .pc-bar i { background: var(--u-solid); } .pc-side.r .pc-bar i { background: var(--r-solid); }
+  .pc-verdict { padding: 12px 16px; font-size: 14px; font-weight: 900; }
+  .pc.even .pc-verdict { color: var(--e-solid); }
+  .pc-acts { display: flex; gap: 8px; padding: 0 16px 16px; flex-wrap: wrap; }
+  .pc-go { flex: 1; min-width: 150px; font-family: var(--font); font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: .6px;
+    padding: 10px 12px; cursor: pointer; background: var(--fg); color: var(--bg); border: 2px solid var(--fg); box-shadow: 3px 3px 0 var(--e-solid);
+    transition: transform .1s, box-shadow .1s, background .15s; }
+  .pc-go:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--e-solid); }
+  .pc-go.armed { background: var(--e-solid); border-color: var(--e-solid); color: #fff; text-transform: none; letter-spacing: 0; }
+  .pc-go:disabled { opacity: .5; }
+  .pc-more { font-family: var(--font); font-size: 11px; font-weight: bold; background: none; border: 2px solid var(--fg); color: var(--fg); padding: 8px 12px; cursor: pointer; }
+  .pc-det { border-top: 1px dashed var(--border-light); padding: 6px 16px 12px; }
+  .pc-det[hidden] { display: none; }
+  .pc.ev .pc-det { border-top: none; padding-top: 0; }
+  .q-row.rimb .q-amt { color: var(--c-r); }
+  .bridge .sp-col:nth-child(2) { display: none; }
+  .bridge .split-panel { grid-template-columns: 1fr; }
+
+  @media (max-width: 860px) {
+    .bh-right { text-align: left; }
+    .bh-sub { margin-left: 0; }
+    .bh-net { font-size: 34px; }
+    .radar { grid-template-columns: 1fr 1fr; }
+    .rd:nth-child(2) { border-right: none; }
+    .rd:nth-child(-n+2) { border-bottom: 2px solid var(--fg); }
+    .rd-val { font-size: 21px; }
+    .crew { grid-template-columns: 1fr; gap: 18px; }
+    .f-who { font-size: 16px; }
+  }
 </style>
 </head>
 <body>
@@ -715,6 +803,18 @@
 alter table finanze enable row level security;
 create policy "accesso totale" on finanze
   for all using (true) with check (true);</div>
+  </div>
+
+  <!-- Setup banner — spese anticipate -->
+  <div class="setup-banner" id="rimb-setup">
+    <div class="setup-head">
+      <span class="setup-title">⚠ Spese anticipate — serve una query su Supabase</span>
+      <button class="setup-close" onclick="document.getElementById('rimb-setup').classList.remove('show')">chiudi ✕</button>
+    </div>
+    <p class="setup-txt">Nel progetto <strong>finanze</strong> → SQL Editor, poi ricarica:</p>
+    <div class="setup-sql">alter table finanze add column if not exists pagato_da     text;
+alter table finanze add column if not exists rimborsato    boolean default false;
+alter table finanze add column if not exists rimborsato_il timestamptz;</div>
   </div>
 
   <!-- Setup banner — divisione bollette -->
@@ -780,6 +880,10 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
           </div>
           <div class="add-row">
             <input class="f f-note" id="o-u" type="text"   placeholder="Nota opzionale…" />
+          </div>
+          <div class="add-row who-row">
+            <span class="who-lbl">pagato da</span>
+            <input class="f f-who" id="w-u" type="text" list="pt-list" placeholder="cassa dello spazio" autocomplete="off" />
           </div>
           <div class="add-actions">
             <button class="btn-cancel" onclick="toggleForm('u')">annulla</button>
@@ -867,15 +971,28 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
   <!-- PONTE DI COMANDO: cruscotto bollette -->
   <section class="bridge" id="bridge" hidden>
     <div class="bridge-head">
-      <div><div class="bridge-kicker">bollette · quote · partecipanti</div><div class="bridge-title" id="bridge-title">PONTE DI COMANDO</div></div>
+      <div class="bh-left">
+        <div class="bridge-kicker">plancia · bollette · spese anticipate</div>
+        <div class="bridge-title" id="bridge-title">PONTE DI COMANDO</div>
+      </div>
+      <div class="bh-right">
+        <div class="bh-lbl">posizione netta dello spazio</div>
+        <div class="bh-net" id="bh-net">—</div>
+        <div class="bh-sub" id="bh-sub"></div>
+      </div>
     </div>
-    <div class="tiles">
-      <div class="tile u"><span class="tile-lbl">da incassare</span><span class="tile-val" id="t-open">—</span><span class="tile-sub" id="t-open-sub"></span></div>
-      <div class="tile e"><span class="tile-lbl">già incassato</span><span class="tile-val" id="t-paid">—</span><span class="tile-sub" id="t-paid-sub"></span></div>
-      <div class="tile r"><span class="tile-lbl">partecipanti</span><span class="tile-val" id="t-pt">—</span><span class="tile-sub">dividono le bollette</span></div>
-      <div class="tile k"><span class="tile-lbl">chi deve di più</span><span class="tile-val small" id="t-top">—</span><span class="tile-sub" id="t-top-sub"></span></div>
+
+    <div class="radar">
+      <div class="rd in"><span class="rd-lbl">deve entrare</span><span class="rd-val" id="rd-in">—</span><span class="rd-sub" id="rd-in-sub"></span></div>
+      <div class="rd out"><span class="rd-lbl">deve uscire</span><span class="rd-val" id="rd-out">—</span><span class="rd-sub" id="rd-out-sub"></span></div>
+      <div class="rd done"><span class="rd-lbl">già sistemato</span><span class="rd-val" id="rd-done">—</span><span class="rd-sub" id="rd-done-sub"></span></div>
+      <div class="rd even"><span class="rd-lbl">in pari</span><span class="rd-val" id="rd-even">—</span><span class="rd-sub" id="rd-even-sub"></span></div>
     </div>
-    <div class="bridge-progress"><div class="bp-bar"><div class="bp-fill" id="bp-fill"></div></div><span id="bp-lbl"></span></div>
+
+    <div class="bsec"><span class="bsec-t">CONTI CON L'EQUIPAGGIO</span><span class="bsec-h">a sinistra quello che devono allo spazio, a destra quello che hanno anticipato</span></div>
+    <div class="crew" id="crew"></div>
+
+    <div class="bsec"><span class="bsec-t">CHI DIVIDE LE BOLLETTE</span><span class="bsec-h">in parti uguali; un evento esterno paga la sua giornata</span></div>
 
   <!-- DIVISIONE BOLLETTE -->
   <div class="split-panel" id="split-panel" style="display:none">
@@ -990,6 +1107,7 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
 
 
 <div class="toast" id="toast"></div>
+<datalist id="pt-list"></datalist>
 
 <script>
 // ── SUPABASE ──────────────────────────────────────────────────
@@ -1122,6 +1240,7 @@ async function load() {
   const { data: allR } = await db.from('finanze').select('nome,importo').eq('tipo','risparmio');
   allRisparmio = allR || [];
   await loadSplitData();
+  await loadRimborsi();
 
   curEntries = data || [];
   document.getElementById('grid').classList.remove('loading');
@@ -1209,6 +1328,14 @@ function renderList(tipo, entries) {
       }
     }
 
+    if (tipo === 'u' && e.pagato_da) {
+      const b = document.createElement('span');
+      b.className = 'e-who' + (e.rimborsato ? ' done' : '');
+      b.textContent = e.rimborsato ? `anticipata da ${e.pagato_da} · rimborsata ✓` : `anticipata da ${e.pagato_da} · da rimborsare`;
+      b.onclick = ev => { ev.stopPropagation(); toggleBridge(true); };
+      info.appendChild(b);
+    }
+
     const amt = document.createElement('div');
     amt.className = 'e-amt ' + tipo;
     amt.textContent = fmt(e.importo);
@@ -1253,6 +1380,7 @@ function buildEditRow(tipo, e) {
         ${tipo === 'r' ? '<input class="f f-tgt" data-k="target" type="number" min="0" placeholder="Target totale €" />' : ''}
         <input class="f f-note" data-k="nota" type="text" placeholder="Nota…" />
       </div>
+      ${tipo === 'u' ? '<div class="add-row who-row"><span class="who-lbl">pagato da</span><input class="f f-who" data-k="pagato_da" type="text" list="pt-list" placeholder="cassa dello spazio" autocomplete="off" /></div>' : ''}
       <div class="add-row">
         <span class="e-edit-lbl">Mese</span>
         <input class="f f-mese" data-k="mese" type="month" />
@@ -1272,6 +1400,7 @@ function buildEditRow(tipo, e) {
   q('nota').value    = e.nota || '';
   q('mese').value    = `${e.anno}-${String(e.mese).padStart(2,'0')}`;
   if (tipo === 'r') q('target').value = e.target ?? '';
+  if (tipo === 'u') q('pagato_da').value = e.pagato_da || '';
 
   row.querySelector('[data-a="save"]').onclick   = () => updateEntry(e, tipo, row);
   row.querySelector('[data-a="cancel"]').onclick = cancelEdit;
@@ -1307,6 +1436,10 @@ async function updateEntry(orig, tipo, row) {
   }
   const [y, m] = (q('mese').value || '').split('-').map(Number);
   if (y && m) { patch.anno = y; patch.mese = m; }
+  if (tipo === 'u' && rimborsiReady) {
+    const who = cleanWho(q('pagato_da').value);
+    if ((who || null) !== (orig.pagato_da || null)) { patch.pagato_da = who; patch.rimborsato = false; patch.rimborsato_il = null; }
+  }
 
   setStatus('load', 'salvataggio…');
   const { error } = await db.from('finanze').update(patch).eq('id', orig.id);
@@ -1344,11 +1477,19 @@ async function saveEntry(tipo) {
     target: tEl && parseFloat(tEl.value) > 0 ? parseFloat(tEl.value) : null
   };
 
+  if (tipo === 'u') {
+    const who = cleanWho(document.getElementById('w-u').value);
+    if (who) {
+      if (!rimborsiReady) { document.getElementById('rimb-setup').classList.add('show'); window.scrollTo({ top: 0, behavior: 'smooth' }); showToast('Per le spese anticipate esegui prima lo SQL in alto'); return; }
+      row.pagato_da = who;
+    }
+  }
   setStatus('load', 'salvataggio…');
   const { error } = await db.from('finanze').insert(row);
   if (error) { setStatus('error', error.message); showToast('Errore: ' + error.message); return; }
 
   nEl.value = ''; aEl.value = '';
+  if (tipo === 'u') document.getElementById('w-u').value = '';
   if (oEl) oEl.value = ''; if (tEl) tEl.value = '';
   toggleForm(tipo);
   await load();
@@ -1359,6 +1500,75 @@ async function deleteEntry(id) {
   const { error } = await db.from('finanze').delete().eq('id', id);
   if (error) { setStatus('error', error.message); showToast('Errore: ' + error.message); return; }
   await load();
+}
+
+// ── SPESE ANTICIPATE (rimborsi) ───────────────────────────────
+let allRimborsi = [];
+let rimborsiReady = true;
+const cleanWho = v => { const w = String(v || '').trim(); return (!w || /^cassa( dello spazio)?$/i.test(w)) ? null : w; };
+const whoKey = n => String(n || '').trim().toLowerCase();
+
+async function loadRimborsi() {
+  const { data, error } = await db.from('finanze').select('*').eq('tipo', 'uscita').not('pagato_da', 'is', null).order('created_at');
+  const banner = document.getElementById('rimb-setup');
+  if (error) { rimborsiReady = false; allRimborsi = []; banner.classList.add('show'); return; }
+  rimborsiReady = true; banner.classList.remove('show');
+  allRimborsi = data || [];
+}
+
+async function setRimborsato(r, on) {
+  setStatus('load', 'salvataggio…');
+  const { error } = await db.from('finanze').update({ rimborsato: on, rimborsato_il: on ? new Date().toISOString() : null }).eq('id', r.id);
+  if (error) { setStatus('error', error.message); showToast('Errore: ' + error.message); }
+  await load();
+}
+
+// paga una quota bolletta: crea l'entrata collegata (come la spunta "pagato")
+async function payQuota(q, nota) {
+  const f = q.finanze || {};
+  const nome = `Rimborso ${(f.nome || 'bolletta').toLowerCase()} — ${q.nome}`;
+  const { data, error } = await db.from('finanze')
+    .insert({ anno: f.anno, mese: f.mese, tipo: 'entrata', nome, importo: q.importo, nota: nota || 'quota bolletta' })
+    .select('id').single();
+  if (error) throw error;
+  const { error: e2 } = await db.from('quote_bollette')
+    .update({ pagato: true, pagato_il: new Date().toISOString(), entrata_id: data.id }).eq('id', q.id);
+  if (e2) throw e2;
+}
+
+// SALDA: chiude in un colpo quote e spese anticipate di una persona.
+// Contabilmente: le quote diventano entrate (compensate), le spese restano uscite del loro mese
+// e vengono segnate come rimborsate; passa di mano solo la differenza.
+async function settlePerson(name) {
+  const P = peopleLedger().find(x => whoKey(x.name) === whoKey(name));
+  if (!P) return;
+  setStatus('load', 'saldo in corso…');
+  try {
+    const both = P.quotes.length && P.rimb.length;
+    for (const q of P.quotes) await payQuota(q, both ? 'compensata con spese anticipate' : 'quota bolletta');
+    for (const r of P.rimb) {
+      const { error } = await db.from('finanze').update({ rimborsato: true, rimborsato_il: new Date().toISOString() }).eq('id', r.id);
+      if (error) throw error;
+    }
+  } catch (err) { setStatus('error', err.message); showToast('Errore: ' + err.message); await load(); return; }
+  const net = P.owe - P.cred;
+  showToast(Math.abs(net) < 0.005 ? `${P.name}: tutto compensato, nessuno deve niente`
+    : net > 0 ? `${P.name} ha dato ${fmt(net)} allo spazio` : `lo spazio ha dato ${fmt(-net)} a ${P.name}`, true);
+  await load();
+}
+
+function peopleLedger() {
+  const map = new Map();
+  const get = name => { const k = whoKey(name); if (!map.has(k)) map.set(k, { name: String(name).trim(), quotes: [], rimb: [], pt: false }); return map.get(k); };
+  partecipanti.forEach(p => { get(p.nome).pt = true; });
+  allQuotes.filter(q => q.tipo === 'persona' && !q.pagato).forEach(q => get(q.nome).quotes.push(q));
+  allRimborsi.filter(r => !r.rimborsato).forEach(r => get(r.pagato_da).rimb.push(r));
+  return [...map.values()].map(P => {
+    P.owe = round2(P.quotes.reduce((a, q) => a + parseFloat(q.importo), 0));
+    P.cred = round2(P.rimb.reduce((a, r) => a + parseFloat(r.importo), 0));
+    P.net = round2(P.owe - P.cred);
+    return P;
+  }).sort((a, b) => (b.owe + b.cred > 0) - (a.owe + a.cred > 0) || Math.abs(b.net) - Math.abs(a.net) || a.name.localeCompare(b.name));
 }
 
 // ── DIVISIONE BOLLETTE ────────────────────────────────────────
@@ -1897,24 +2107,104 @@ function toggleBridge(force) {
 }
 function renderBridge() {
   const ready = typeof splitReady !== 'undefined' && splitReady;
-  document.getElementById('bridge-empty').hidden = ready;
-  const open = ready ? allQuotes.filter(q => !q.pagato) : [];
-  const paid = ready ? allQuotes.filter(q => q.pagato) : [];
-  const sOpen = open.reduce((a, q) => a + parseFloat(q.importo), 0);
-  const sPaid = paid.reduce((a, q) => a + parseFloat(q.importo), 0);
-  document.getElementById('t-open').textContent = ready ? fmt(sOpen) : '—';
-  document.getElementById('t-open-sub').textContent = ready ? `${open.length} ${open.length === 1 ? 'quota aperta' : 'quote aperte'}` : '';
-  document.getElementById('t-paid').textContent = ready ? fmt(sPaid) : '—';
-  document.getElementById('t-paid-sub').textContent = ready ? `${paid.length} ${paid.length === 1 ? 'quota pagata' : 'quote pagate'}` : '';
-  document.getElementById('t-pt').textContent = ready ? partecipanti.length : '—';
-  const per = {};
-  open.forEach(q => { const k = q.tipo === 'evento' ? 'eventi esterni' : q.nome; per[k] = (per[k] || 0) + parseFloat(q.importo); });
-  const top = Object.entries(per).sort((a, b) => b[1] - a[1])[0];
-  document.getElementById('t-top').textContent = top ? top[0] : (ready ? 'nessuno ✓' : '—');
-  document.getElementById('t-top-sub').textContent = top ? fmt(top[1]) : '';
-  const tot = sOpen + sPaid, pct = tot ? Math.round(sPaid / tot * 100) : 0;
-  document.getElementById('bp-fill').style.width = (masked ? 35 : pct) + '%';
-  document.getElementById('bp-lbl').textContent = tot ? `${masked ? '**' : pct}% delle quote già incassato` : 'nessuna bolletta divisa per ora';
+  document.getElementById('bridge-empty').hidden = ready || rimborsiReady;
+  // suggerimenti per "pagato da"
+  const dl = document.getElementById('pt-list');
+  if (dl) {
+    const names = [...new Set([...partecipanti.map(p => p.nome), ...allRimborsi.map(r => r.pagato_da)].filter(Boolean))];
+    dl.innerHTML = names.map(n => `<option value="${esc(n)}">`).join('');
+  }
+  const people = peopleLedger();
+  const evOpen = allQuotes.filter(q => q.tipo === 'evento' && !q.pagato);
+  const sumIn = round2(people.reduce((a, P) => a + P.owe, 0) + evOpen.reduce((a, q) => a + parseFloat(q.importo), 0));
+  const sumOut = round2(people.reduce((a, P) => a + P.cred, 0));
+  const paidQ = allQuotes.filter(q => q.pagato), doneR = allRimborsi.filter(r => r.rimborsato);
+  const sumDone = round2(paidQ.reduce((a, q) => a + parseFloat(q.importo), 0) + doneR.reduce((a, r) => a + parseFloat(r.importo), 0));
+  const active = people.filter(P => P.pt || P.owe || P.cred);
+  const even = active.filter(P => !P.owe && !P.cred).length;
+
+  const net = round2(sumIn - sumOut);
+  const netEl = document.getElementById('bh-net');
+  netEl.textContent = (net > 0 ? '+ ' : net < 0 ? '− ' : '') + fmt(Math.abs(net));
+  netEl.className = 'bh-net ' + (masked ? '' : net > 0 ? 'pos' : net < 0 ? 'neg' : '');
+  document.getElementById('bh-sub').textContent = net > 0 ? 'una volta saldato tutto, entrano più soldi di quanti ne escono'
+    : net < 0 ? 'lo spazio deve restituire più di quanto deve ricevere' : 'tutti in pari: rotta libera';
+
+  const quoteN = people.reduce((a, P) => a + P.quotes.length, 0) + evOpen.length;
+  const rimbN = people.reduce((a, P) => a + P.rimb.length, 0);
+  document.getElementById('rd-in').textContent = fmt(sumIn);
+  document.getElementById('rd-in-sub').textContent = `${quoteN} ${quoteN === 1 ? 'quota bolletta' : 'quote bollette'}`;
+  document.getElementById('rd-out').textContent = fmt(sumOut);
+  document.getElementById('rd-out-sub').textContent = `${rimbN} ${rimbN === 1 ? 'spesa anticipata' : 'spese anticipate'}`;
+  document.getElementById('rd-done').textContent = fmt(sumDone);
+  document.getElementById('rd-done-sub').textContent = `${paidQ.length + doneR.length} voci chiuse`;
+  document.getElementById('rd-even').textContent = active.length ? `${even}/${active.length}` : '—';
+  document.getElementById('rd-even-sub').textContent = 'persone senza conti aperti';
+
+  // card per persona
+  const crew = document.getElementById('crew');
+  crew.innerHTML = '';
+  const max = Math.max(1, ...active.map(P => Math.max(P.owe, P.cred)));
+  active.forEach(P => {
+    const state = P.owe && P.cred ? 'both' : P.owe ? 'owes' : P.cred ? 'credit' : 'even';
+    const c = document.createElement('div');
+    c.className = 'pc ' + state;
+    const verdict = state === 'even' ? 'in pari ✓'
+      : P.net > 0 ? `${P.name} deve ${fmt(P.net)} allo spazio`
+      : P.net < 0 ? `lo spazio deve ${fmt(-P.net)} a ${P.name}` : 'si compensano esatti';
+    const action = state === 'both' ? 'compensa e salda' : state === 'owes' ? 'ha pagato tutto' : state === 'credit' ? 'rimborsato' : '';
+    const wL = masked ? (P.owe ? 50 : 0) : P.owe / max * 100, wR = masked ? (P.cred ? 50 : 0) : P.cred / max * 100;
+    c.innerHTML = `
+      <div class="pc-top">
+        <span class="pc-av">${esc(P.name.charAt(0).toUpperCase())}</span>
+        <span class="pc-name">${esc(P.name)}</span>
+        ${P.pt ? '' : '<span class="pc-tag">ospite</span>'}
+      </div>
+      <div class="pc-scale">
+        <div class="pc-side l"><div class="pc-bar"><i style="width:${wL}%"></i></div><span>deve allo spazio</span><b>${fmt(P.owe)}</b></div>
+        <div class="pc-axis"></div>
+        <div class="pc-side r"><div class="pc-bar"><i style="width:${wR}%"></i></div><span>ha anticipato</span><b>${fmt(P.cred)}</b></div>
+      </div>
+      <div class="pc-verdict">${verdict}</div>
+      ${state === 'even' ? '' : `<div class="pc-acts"><button class="pc-go">${action}</button><button class="pc-more">dettagli ▾</button></div>
+      <div class="pc-det" hidden></div>`}`;
+    if (state !== 'even') {
+      const det = c.querySelector('.pc-det');
+      P.quotes.forEach(q => det.appendChild(quotaRow(q, false)));
+      P.rimb.forEach(r => {
+        const row = document.createElement('div'); row.className = 'q-row rimb';
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'q-check'; cb.title = 'Rimborsato';
+        cb.onchange = () => { cb.disabled = true; setRimborsato(r, true); };
+        const lbl = document.createElement('div'); lbl.className = 'q-lbl';
+        lbl.innerHTML = `${esc(r.nome)} <span class="q-sub">spesa anticipata · ${MONTHS_SHORT[(r.mese || 1) - 1]} ${r.anno}</span>`;
+        const amt = document.createElement('div'); amt.className = 'q-amt'; amt.textContent = '− ' + fmt(parseFloat(r.importo));
+        row.append(cb, lbl, amt); det.appendChild(row);
+      });
+      const more = c.querySelector('.pc-more');
+      more.onclick = () => { det.hidden = !det.hidden; more.textContent = det.hidden ? 'dettagli ▾' : 'chiudi ▴'; };
+      const go = c.querySelector('.pc-go');
+      go.onclick = () => {
+        if (!go.classList.contains('armed')) {
+          go.classList.add('armed');
+          go.textContent = state === 'both' ? (P.net > 0 ? `${P.name} dà ${fmt(P.net)}: confermi?` : P.net < 0 ? `date ${fmt(-P.net)} a ${P.name}: confermi?` : 'si annullano: confermi?') : 'confermi?';
+          setTimeout(() => { if (go.isConnected && go.classList.contains('armed')) { go.classList.remove('armed'); go.textContent = action; } }, 3500);
+          return;
+        }
+        go.disabled = true; settlePerson(P.name);
+      };
+    }
+    crew.appendChild(c);
+  });
+  // eventi esterni: pagano solo la loro giornata, niente compensazioni
+  if (evOpen.length) {
+    const c = document.createElement('div');
+    c.className = 'pc ev';
+    c.innerHTML = `<div class="pc-top"><span class="pc-av">◆</span><span class="pc-name">eventi esterni</span></div>
+      <div class="pc-verdict">devono ${fmt(evOpen.reduce((a, q) => a + parseFloat(q.importo), 0))} di utenze</div><div class="pc-det"></div>`;
+    evOpen.forEach(q => c.querySelector('.pc-det').appendChild(quotaRow(q, true)));
+    crew.appendChild(c);
+  }
+  if (!active.length && !evOpen.length) crew.innerHTML = '<div class="crew-empty">nessun conto aperto. aggiungi i partecipanti qui sotto o segna chi ha anticipato una spesa nelle uscite.</div>';
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.body.classList.contains('bridge-mode') && !split && !(e.target.closest && e.target.closest('input'))) toggleBridge(false);

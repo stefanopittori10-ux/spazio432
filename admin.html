@@ -1664,6 +1664,10 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     .home-pill .hp-lbl { display: none; }
     .pop { min-width: 250px; }
   }
+
+  /* gestione eventi: mesi a sinistra, "torna al calendario" a destra (dove c'era "gestisci eventi") */
+  .mgr-top { justify-content: space-between; }
+  @media (max-width: 768px) { .mgr-top .mgr-month-txt { min-width: 8ch; } }
 </style>
 </head>
 <body>
@@ -1740,12 +1744,12 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
   <!-- GESTIONE EVENTI (si apre con + Aggiungi) -->
   <section class="mgr" id="manager" hidden>
     <div class="mgr-top">
-      <button class="tbtn mgr-back" onclick="closeManager()">← calendario</button>
       <div class="mgr-month">
         <button class="mkey" onclick="navMonth(-1)" aria-label="Mese precedente"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg></button>
         <div class="mgr-month-txt"><div class="mgr-ml" id="mgr-month-lbl">—</div><div class="mgr-yl" id="mgr-year-lbl">—</div></div>
         <button class="mkey" onclick="navMonth(1)" aria-label="Mese successivo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg></button>
       </div>
+      <button class="tb-manage mgr-close" onclick="closeManager()" title="Torna al calendario"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="3.5" width="17" height="15" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="1.5" y="3.5" width="17" height="4.5" fill="currentColor"/><path d="M6 1v4M14 1v4" stroke="currentColor" stroke-width="2.2"/><rect x="5" y="10.5" width="3" height="3" fill="currentColor"/><rect x="12" y="10.5" width="3" height="3" fill="currentColor"/></svg><span class="tm-long">torna al calendario</span><span class="tm-short">calendario</span><span class="tm-arrow">→</span></button>
     </div>
 
     <div class="mgr-body">
