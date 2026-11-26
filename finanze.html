@@ -760,6 +760,48 @@
     .crew { grid-template-columns: 1fr; gap: 18px; }
     .f-who { font-size: 16px; }
   }
+
+  /* ═══ PONTE DI COMANDO · palette vivace ═══ */
+  .bridge { --py: #FFD23F; --pc: #FF6B4A; --pv: #7C6CF2; --pg: #2FBF71; --ps: #3EC1F3; --pk: #0a0a0a; }
+  .bridge .bridge-head { background: var(--py); color: var(--pk); box-shadow: 6px 6px 0 var(--pk); border-color: var(--pk);
+    background-image: repeating-linear-gradient(135deg, transparent 0 22px, rgba(0,0,0,.05) 22px 44px); }
+  .bridge .bridge-kicker, .bridge .bh-lbl, .bridge .bh-sub { opacity: .75; }
+  .bridge .bh-net.pos { color: #0B7A3B; } .bridge .bh-net.neg { color: #C2361B; }
+  .bridge-btn.on { background: #0a0a0a; color: #FFD23F; border-color: #0a0a0a; box-shadow: 4px 4px 0 #FFD23F; }
+  [data-theme="dark"] .bridge-btn.on { border-color: #FFD23F; }
+  .bridge-btn.on .helm { color: #FFD23F; }
+
+  .bridge .radar { border: none; box-shadow: none; background: none; gap: 16px; }
+  .bridge .rd { border: 2px solid var(--pk) !important; box-shadow: 5px 5px 0 var(--pk); color: var(--pk); }
+  .bridge .rd.in { background: var(--pc); color: #fff; } .bridge .rd.out { background: var(--pv); color: #fff; }
+  .bridge .rd.done { background: var(--pg); color: var(--pk); } .bridge .rd.even { background: var(--ps); color: var(--pk); }
+  .bridge .rd-lbl::before { display: none; }
+  .bridge .rd-sub { color: inherit; opacity: .85; }
+
+  .bridge .bsec { border-bottom: none; }
+  .bridge .bsec-t { background: var(--pk); color: var(--py); padding: 5px 10px; }
+
+  .bridge .pc { border-color: var(--pk); box-shadow: 6px 6px 0 var(--pk) !important; }
+  .bridge .pc-top { border-bottom-color: var(--pk); }
+  .bridge .pc.owes   .pc-top { background: #FFE1D9; } .bridge .pc.owes   .pc-av { background: var(--pc); }
+  .bridge .pc.credit .pc-top { background: #E6E2FF; } .bridge .pc.credit .pc-av { background: var(--pv); }
+  .bridge .pc.both   .pc-top { background: #FFF1B8; } .bridge .pc.both   .pc-av { background: var(--pk); color: var(--py); }
+  .bridge .pc.even   { opacity: 1; } .bridge .pc.even .pc-top { background: #DDF6E8; } .bridge .pc.even .pc-av { background: var(--pg); color: var(--pk); }
+  .bridge .pc.ev     .pc-top { background: #DFF4FD; } .bridge .pc.ev .pc-av { background: var(--ps); color: var(--pk); }
+  .bridge .pc-top .pc-name { color: var(--pk); }
+  .bridge .pc-side.l .pc-bar i { background: var(--pc); } .bridge .pc-side.r .pc-bar i { background: var(--pv); }
+  .bridge .pc-side.l b { color: #D24A2C; } .bridge .pc-side.r b { color: #5B4BE0; }
+  .bridge .pc.even .pc-verdict { color: #0B7A3B; }
+  .bridge .pc-go { box-shadow: 3px 3px 0 var(--py); }
+  .bridge .pc-go:active { box-shadow: 0 0 0 var(--py); }
+  .bridge .pc-go.armed { background: var(--pg); border-color: var(--pk); color: var(--pk); }
+  .bridge .pc-more { border-color: var(--pk); }
+  .bridge .sp-col { box-shadow: 6px 6px 0 var(--pk) !important; }
+  .bridge .sp-title { background: var(--pv) !important; color: #fff !important; }
+  .bridge .chip { border-color: var(--pk); }
+  [data-theme="dark"] .bridge .pc, [data-theme="dark"] .bridge .rd, [data-theme="dark"] .bridge .sp-col { box-shadow: 6px 6px 0 #e8e8e8 !important; }
+  [data-theme="dark"] .bridge .pc-top { color: #0a0a0a; }
+  @media (max-width: 860px) { .bridge .radar { gap: 12px; } .bridge .rd { border-bottom: 2px solid var(--pk) !important; } }
 </style>
 </head>
 <body>
