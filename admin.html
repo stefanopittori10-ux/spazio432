@@ -1620,6 +1620,34 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     .mgr-acts { grid-column: 2 / 3; }
     .mgr-card { box-shadow: 5px 5px 0 var(--fg); }
   }
+
+  /* ── "gestisci eventi": il bottone principale ── */
+  .tb-manage {
+    display: inline-flex; align-items: center; gap: 9px; height: 40px; padding: 0 16px 0 14px; flex-shrink: 0; cursor: pointer;
+    font-family: var(--font-mono); font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: .8px; white-space: nowrap;
+    background: #534AB7; color: #fff; border: 2px solid var(--fg); box-shadow: 4px 4px 0 var(--fg);
+    transition: transform .1s, box-shadow .1s;
+  }
+  .tb-manage .tb-ico { width: 17px; height: 17px; }
+  .tb-manage .tm-arrow { transition: transform .15s; }
+  @media (hover: hover) {
+    .tb-manage:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--fg); }
+    .tb-manage:hover .tm-arrow { transform: translateX(3px); }
+  }
+  .tb-manage:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--fg); }
+  .tm-short { display: none; }
+  @media (max-width: 768px) {
+    .tb-manage { height: 38px; padding: 0 12px; font-size: 12px; gap: 7px; }
+    .tm-long { display: none; }
+    .tm-short { display: inline; }
+  }
+  /* vecchie regole del vecchio bottone #toggle-add-btn: le annullo */
+  #toggle-add-btn.tb-manage { background: #534AB7 !important; color: #fff !important; border: 2px solid var(--fg) !important;
+    border-radius: 0 !important; width: auto !important; padding: 0 16px 0 14px !important; font-size: 13px !important; }
+  #toggle-add-btn.tb-manage:hover { background: #534AB7 !important; color: #fff !important; }
+  @media (max-width: 768px) { #toggle-add-btn.tb-manage { padding: 0 12px !important; font-size: 12px !important; height: 38px !important; } }
+  /* spazio432.org porta al sito: stesso aspetto di prima */
+  a.footer-link { text-decoration: none; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -1688,7 +1716,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
           </button>
         </div>
       </div>
-      <button class="tbtn tb-add" id="toggle-add-btn" onclick="openManager()"><span class="btn-icon">+</span><span class="btn-label"> Aggiungi</span></button>
+      <button class="tb-manage" id="toggle-add-btn" onclick="openManager()" title="Aggiungi, modifica, duplica ed elimina eventi"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="3.5" width="17" height="15" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="1.5" y="3.5" width="17" height="4.5" fill="currentColor"/><path d="M6 1v4M14 1v4" stroke="currentColor" stroke-width="2.2"/><path d="M7 11.5h6M10 8.5v6" stroke="currentColor" stroke-width="2.2"/></svg><span class="tm-long">gestisci eventi</span><span class="tm-short">gestisci</span><span class="tm-arrow">→</span></button>
     </div>
   </div>
 
@@ -1763,10 +1791,6 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
       </div>
       <div class="header-right">
         <button class="group-toggle-btn" id="group-toggle-btn" onclick="toggleGrouping()" title="Raggruppa eventi simili">⊞</button>
-          <button class="view-switch-btn" id="view-switch-btn" onclick="toggleListView()" title="Cambia vista">
-          <svg id="view-icon-grid" width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="6" fill="currentColor"/><rect x="8" y="0" width="6" height="6" fill="currentColor"/><rect x="0" y="8" width="6" height="6" fill="currentColor"/><rect x="8" y="8" width="6" height="6" fill="currentColor"/></svg>
-          <svg id="view-icon-list" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:none"><rect x="0" y="1" width="14" height="2" fill="currentColor"/><rect x="0" y="6" width="14" height="2" fill="currentColor"/><rect x="0" y="11" width="14" height="2" fill="currentColor"/></svg>
-        </button>
       </div>
       <div class="month-nav">
         <button class="mkey" id="mkey-prev" onclick="navMonth(-1)" aria-label="Mese precedente"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg><span class="mkey-tip" id="mkey-prev-tip"></span></button>
@@ -1807,7 +1831,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
         <div class="li"><div class="ld" style="background:#854F0B"></div>Arte</div>
         <div class="li"><div class="ld" style="background:#4B5563"></div>Riunioni</div>
       </div>
-      <div class="footer-url">spazio432.org</div>
+      <a class="footer-url footer-link" href="index.html" title="Vai al sito pubblico">spazio432.org</a>
     </div>
   
 <!-- VERIFICA BIGLIETTI OVERLAY -->

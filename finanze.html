@@ -518,6 +518,7 @@
 
   /* colonne: blocchi separati, bordo spesso, ombra netta, testata piena */
   .grid { border: none; gap: 22px; align-items: stretch; }
+  .grid > .col { min-width: 0; }   /* i nomi lunghi non allargano la colonna oltre lo schermo */
   .e-del { color: var(--fg-muted); }
   .col { border: 2px solid var(--fg) !important; background: var(--card-bg); box-shadow: 6px 6px 0 var(--sh); min-height: 0; }
   .col-head, [data-theme="dark"] .col-head { border-top: none !important; border-bottom: 2px solid var(--fg); padding: 16px 18px 18px; }
@@ -590,6 +591,43 @@
     .mask-pill { width: 36px; padding: 0; justify-content: center; }
     .mask-lbl { display: none; }
   }
+
+  /* ── icona tema: luna/sole pieni e spessi ── */
+  .th-ico { width: 18px; height: 18px; display: block; }
+  .th-sun { display: none; }
+  [data-theme="dark"] .th-moon { display: none; }
+  [data-theme="dark"] .th-sun { display: inline; }
+
+  .mask-pill { width: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+  .mask-pill .eye-ico { width: 18px; height: 18px; }
+  .back-pill { white-space: nowrap; flex-shrink: 0; }
+  @media (max-width: 860px) {
+    .back-pill { width: 36px; padding: 0; border-radius: 50%; font-size: 15px; }
+    .bp-lbl { display: none; }
+    .toolbar { gap: 6px; }
+    .logo { font-size: 19px; }
+  }
+
+  /* ── "ponte di comando": ritorno al portale ── */
+  .bridge-btn {
+    display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px 0 12px; flex-shrink: 0; cursor: pointer;
+    font-family: var(--font); font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+    background: var(--fg); color: var(--bg); border: 2px solid var(--fg); box-shadow: 4px 4px 0 var(--u-solid);
+    transition: transform .1s, box-shadow .1s;
+  }
+  .bridge-btn .helm { width: 18px; height: 18px; display: block; transition: transform .5s cubic-bezier(.3,1.4,.5,1); }
+  @media (hover: hover) {
+    .bridge-btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--u-solid); }
+    .bridge-btn:hover .helm { transform: rotate(-90deg); }
+  }
+  .bridge-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--u-solid); }
+  .br-short { display: none; }
+  @media (max-width: 860px) {
+    .bridge-btn { padding: 0 12px 0 10px; font-size: 11px; }
+    .br-long { display: none; }
+    .br-short { display: inline; }
+  }
+  @media (max-width: 400px) { .logo { font-size: 17px; } .lg-page { margin-left: 6px; font-size: 9px; padding: 3px 6px; letter-spacing: 1px; } .toolbar { gap: 5px; } }
 </style>
 </head>
 <body>
@@ -598,9 +636,8 @@
   <div class="toolbar">
     <div class="logo"><span class="lg-s">spazio</span><span class="lg-n">432</span><span class="lg-page">finanze</span></div>
     <div class="spacer"></div>
-    <button class="mask-pill" id="mask-btn" onclick="toggleMask()" aria-pressed="false" title="Nascondi le cifre (per mostrare il sito)"><svg class="eye-ico" viewBox="0 0 20 20" aria-hidden="true"><path class="eye-shape" d="M1.5 10S5 4 10 4s8.5 6 8.5 6-3.5 6-8.5 6S1.5 10 1.5 10Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="10" r="2.8" fill="currentColor"/><path class="eye-slash" d="M3 17L17 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg><span class="mask-lbl">cifre visibili</span></button>
-    <button class="icon-btn theme" id="theme-btn" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
-    <button class="back-pill" onclick="backToLogin()" title="Torna al portale">← admin</button>
+    <button class="mask-pill" id="mask-btn" onclick="toggleMask()" aria-pressed="false" title="Nascondi le cifre" aria-label="Nascondi le cifre"><svg class="eye-ico" viewBox="0 0 20 20" aria-hidden="true"><path class="eye-shape" d="M1.5 10S5 4 10 4s8.5 6 8.5 6-3.5 6-8.5 6S1.5 10 1.5 10Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="10" r="2.8" fill="currentColor"/><path class="eye-slash" d="M3 17L17 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg></button>
+    <button class="bridge-btn" onclick="backToLogin()" title="Torna al portale" aria-label="Torna al ponte di comando"><svg class="helm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.2" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 1.5v7M12 15.5v7M1.5 12h7M15.5 12h7M4.6 4.6l4.9 4.9M14.5 14.5l4.9 4.9M4.6 19.4l4.9-4.9M14.5 9.5l4.9-4.9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span class="br-long">ponte di comando</span><span class="br-short">ponte</span></button>
   </div>
 
   <div class="month-bar">
@@ -1790,7 +1827,7 @@ document.addEventListener('click', e => {
 function applyMaskUI() {
   document.body.classList.toggle('masked', masked);
   const b = document.getElementById('mask-btn');
-  if (b) { b.setAttribute('aria-pressed', masked); b.querySelector('.mask-lbl').textContent = masked ? 'cifre nascoste' : 'cifre visibili'; }
+  if (b) { b.setAttribute('aria-pressed', masked); b.title = masked ? 'Mostra le cifre' : 'Nascondi le cifre'; b.setAttribute('aria-label', b.title); }
 }
 function toggleMask() {
   masked = !masked;
@@ -1862,13 +1899,11 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && split) clo
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('theme-btn').textContent = isDark ? '☾' : '☀';
   localStorage.setItem('s432-theme', isDark ? 'light' : 'dark');
 }
 (function initTheme() {
   if (localStorage.getItem('s432-theme') === 'dark') {
     document.documentElement.setAttribute('data-theme','dark');
-    const b = document.getElementById('theme-btn'); if (b) b.textContent = '☀';
   }
 })();
 
