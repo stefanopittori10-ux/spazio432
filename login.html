@@ -7,11 +7,11 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/staff-favicon-32.png">
 <link rel="apple-touch-icon" href="/staff-apple-touch-icon.png">
 <title>spazio 432</title>
-<link rel="manifest" href="#" id="pwa-manifest">
+<link rel="manifest" href="/manifest-staff.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="spazio 432">
+<meta name="apple-mobile-web-app-title" content="432 staff">
 <meta name="theme-color" content="#0a0a0a">
 
 <style>
@@ -387,22 +387,6 @@
 
 <script>
 
-// PWA manifest inline
-const manifest = {
-  name: "spazio 432 · staff",
-  short_name: "432 staff",
-  start_url: "/login.html",
-  display: "standalone",
-  background_color: "#7C6CF2",
-  theme_color: "#0a0a0a",
-  icons: [
-    { src: "https://spazio432.org/staff-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-    { src: "https://spazio432.org/staff-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-    { src: "https://spazio432.org/staff-icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }
-  ]
-};
-const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-document.getElementById('pwa-manifest').href = URL.createObjectURL(blob);
 
 // ── CONFIG ────────────────────────────────────────────────────
 // Un solo progetto Supabase per tutto (eventi, prenotazioni, finanze): un utente per membro.
@@ -503,6 +487,10 @@ function toggleTheme() {
 }
 const t = localStorage.getItem('s432-theme') || localStorage.getItem('s432_theme');
 if (t === 'dark') document.documentElement.dataset.theme = 'dark';
+</script>
+<script>
+// installabile come app "432 staff" (stesso service worker del sito: nessuna cache)
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
 </script>
 </body>
 </html>

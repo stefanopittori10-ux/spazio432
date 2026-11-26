@@ -31,3 +31,5 @@
   Cache-Control: no-cache
 /manifest.webmanifest
   Cache-Control: no-cache
+/manifest-staff.webmanifest
+  Cache-Control: no-cache

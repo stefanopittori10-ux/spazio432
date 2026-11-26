@@ -6,6 +6,8 @@
 <link rel="icon" href="/staff-favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/staff-favicon-32.png">
 <link rel="apple-touch-icon" href="/staff-apple-touch-icon.png">
+<link rel="manifest" href="/manifest-staff.webmanifest">
+<meta name="apple-mobile-web-app-title" content="432 staff">
 <title>Ingresso · spazio 432</title>
 <meta name="theme-color" content="#0a0a0a">
 <script>
@@ -59,6 +61,7 @@
   /* evento selezionato */
   .panel { border: 2px solid var(--fg); background: var(--card); box-shadow: 6px 6px 0 var(--fg); margin-bottom: 26px; }
   .ph { background: var(--c, var(--r)); color: #fff; padding: 18px 20px 20px; border-bottom: 2px solid var(--fg); display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .ph-type { text-transform: none; letter-spacing: .3px; }   /* tipo: iniziale maiuscola; rassegna e quando restano maiuscoli */
   .ph-k { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; opacity: .85; }
   .ph-n { font-size: 30px; font-weight: 900; letter-spacing: -1px; line-height: 1.05; margin-top: 6px; overflow-wrap: anywhere; }
   .ph-w { font-size: 13px; font-weight: bold; margin-top: 8px; }
@@ -10268,7 +10271,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const BK_COLS = 'id, name, email, seats, note, created_at, event_id, checked_in, checked_in_at, codice';
 const MONTHS = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 const DOW = ['dom','lun','mar','mer','gio','ven','sab'];
-const CAT = { music: ['musica', '#534AB7'], film: ['cineforum', '#993C1D'], lab: ['laboratorio', '#3B6D11'], art: ['arte', '#854F0B'], meet: ['riunione', '#4B5563'] };
+const CAT = { music: ['Musica', '#534AB7'], film: ['Cineforum', '#993C1D'], lab: ['Laboratorio', '#3B6D11'], art: ['Arte', '#854F0B'], meet: ['Riunione', '#4B5563'] };
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const norm = s => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
 const hhmm = d => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
@@ -10348,7 +10351,7 @@ function renderMain() {
   main.innerHTML = `
     <div class="panel" style="--c:${c}">
       <div class="ph"><div>
-        <div class="ph-k">${lbl}${e.rassegna ? ' · ' + esc(e.rassegna) : ''} · ${whenLabel(e)}</div>
+        <div class="ph-k"><span class="ph-type">${lbl}</span>${e.rassegna ? ' · ' + esc(e.rassegna) : ''} · ${whenLabel(e)}</div>
         <div class="ph-n">${esc(e.name)}</div>
         <div class="ph-w">${DOW[evDate(e).getDay()]} ${e.day} ${MONTHS[e.month]}${e.time ? ' · ore ' + esc(e.time) : ''}${e.endTime ? '–' + esc(e.endTime) : ''}</div>
       </div></div>

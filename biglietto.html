@@ -132,6 +132,9 @@
     .actions, .hint, .foot { display: none !important; }
     .page { max-width: 170mm; }
   }
+
+  /* tipo con l'iniziale maiuscola, rassegna tutta maiuscola (nel testo) */
+  .tk-cat { text-transform: none; letter-spacing: .5px; }
 </style>
 </head>
 <body>
@@ -205,7 +208,7 @@ function fillTicket(t) {
   document.getElementById('t-day').textContent = day;
   document.getElementById('t-day').style.color = color;
   document.getElementById('t-mon').textContent = mon;
-  document.getElementById('t-cat').textContent = (T_CAT_LABELS[t.cat] || t.cat || '') + (t.rassegna ? ' · ' + t.rassegna : '');
+  document.getElementById('t-cat').textContent = (T_CAT_LABELS[t.cat] || t.cat || '') + (t.rassegna ? ' · ' + t.rassegna.toUpperCase() : '');   // tipo: Iniziale maiuscola · rassegna: TUTTO MAIUSCOLO
   document.getElementById('t-name').textContent = t.event;
   document.getElementById('t-time').textContent = t.time || '';
   document.getElementById('t-seats').textContent = t.seats + (String(t.seats) === '1' ? ' posto' : ' posti');
