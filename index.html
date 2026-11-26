@@ -1737,6 +1737,19 @@
   .miei-row { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #d9d4c7;
     border-left: 6px solid var(--c); text-decoration: none; color: inherit; background: #fff; }
   .miei-row.off { opacity: .5; }
+  .miei-item { position: relative; overflow: hidden; background: #c00; transition: height .25s ease; }
+  .miei-item.via { opacity: 0; transition: height .25s ease, opacity .2s; }
+  .miei-item .miei-row { position: relative; z-index: 1; touch-action: pan-y; transition: transform .22s ease; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none; }
+  .miei-item .miei-row.drag { transition: none; }
+  .miei-del { position: absolute; top: 0; right: 0; bottom: 0; width: 96px; border: 0; background: #c00; color: #fff; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: bold 10px ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-transform: uppercase; letter-spacing: 1px; }
+  .miei-del svg { width: 22px; height: 22px; }
+  .miei-sez { padding: 14px 18px 6px; font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; color: #555; border-bottom: 1px solid #d9d4c7; }
+  .miei-row.stato { background: #faf8f3; }
+  .miei-row.stato .miei-name { font-size: 14px; }
+  .miei-ok { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #3B6D11; color: #fff; font-weight: 900; }
+  .tix-n[hidden] { display: none; }
   .miei-date { border: 2px solid #0a0a0a; text-align: center; padding: 4px 0; line-height: 1; background: #fff; }
   .miei-date small { display: block; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #555; }
   .miei-date b { display: block; font-size: 20px; font-weight: 900; color: var(--c); margin: 2px 0; }
@@ -1974,7 +1987,7 @@
     <div class="miei-head"><span class="miei-k">salvati su questo dispositivo</span><span class="miei-t">I MIEI BIGLIETTI</span>
       <button class="miei-x" onclick="closeMiei()" aria-label="Chiudi">✕</button></div>
     <div class="miei-list" id="miei-list"></div>
-    <p class="miei-hint">apri un biglietto per rivederlo, cambiare i posti o annullare (fino a 2 ore prima dell'evento)</p>
+    <p class="miei-hint">apri un biglietto per rivederlo, cambiare i posti o annullare (fino a 2 ore prima dell'evento). per eliminarne uno dal telefono, trascinalo verso sinistra</p>
   </div>
 </div>
 
@@ -3217,54 +3230,150 @@ function applyStato(btn) {
 }
 
 // ── I MIEI BIGLIETTI: salvati su questo dispositivo ──
+// per ogni biglietto: c codice, e id evento, n nome, d giorno, t ora, cat, s posti, a annullata, in entrato
+//  · prossimi: eventi da oggi in poi, non annullati
+//  · "ci sei stato": eventi passati in cui sei stato segnato all'ingresso (restano come ricordo)
+//  · annullati e passati senza ingresso spariscono da soli; trascinando a sinistra si elimina a mano
 const MIEI_KEY = 's432_miei';
 const isoGiorno = (y, m, d) => `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+const oggiIso = () => { const o = new Date(); return isoGiorno(o.getFullYear(), o.getMonth(), o.getDate()); };
 function leggiMiei() {
   try { return JSON.parse(localStorage.getItem(MIEI_KEY) || '[]').filter(x => x && x.c); } catch (e) { return []; }
 }
 function scriviMiei(list) { try { localStorage.setItem(MIEI_KEY, JSON.stringify(list)); } catch (e) {} aggiornaTix(); }
-function mieiFuturi() {
-  const oggi = new Date(); const o = isoGiorno(oggi.getFullYear(), oggi.getMonth(), oggi.getDate());
-  return leggiMiei().filter(x => (x.d || '') >= o);
+function dividiMiei(list = leggiMiei()) {
+  const o = oggiIso();
+  return {
+    prossimi: list.filter(x => (x.d || '') >= o && !x.a).sort((a, b) => (a.d + a.t).localeCompare(b.d + b.t)),
+    passati: list.filter(x => (x.d || '') < o && x.in && !x.a).sort((a, b) => (b.d + b.t).localeCompare(a.d + a.t))
+  };
 }
+function mieiFuturi() { return dividiMiei().prossimi; }
 function salvaMio(codice, evt) {
   const list = leggiMiei().filter(x => x.c !== codice);
   list.push({ c: codice, e: evt.id, n: evt.name, d: isoGiorno(evt.year, evt.month, evt.day), t: evt.time || '', cat: evt.cat });
   scriviMiei(list);
 }
+function eliminaMio(codice) {
+  scriviMiei(leggiMiei().filter(x => x.c !== codice));
+  try { localStorage.removeItem('s432_tk_' + codice); } catch (e) {}
+}
 function aggiornaTix() {
   const btn = document.getElementById('tix-toolbtn'); if (!btn) return;
-  const n = mieiFuturi().length;
-  btn.hidden = n === 0;
-  document.getElementById('tix-n').textContent = n;
+  const { prossimi, passati } = dividiMiei();
+  btn.hidden = prossimi.length + passati.length === 0;   // tutti annullati (o eliminati): niente tasto
+  const n = document.getElementById('tix-n');
+  n.textContent = prossimi.length; n.hidden = prossimi.length === 0;
 }
-async function openMiei() {
-  const ov = document.getElementById('miei-overlay');
-  const box = document.getElementById('miei-list');
-  const list = mieiFuturi().sort((a, b) => (a.d + a.t).localeCompare(b.d + b.t));
-  box.innerHTML = '';
-  if (!list.length) box.innerHTML = '<div class="miei-empty">nessun biglietto per i prossimi eventi</div>';
-  const DW = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'], MS = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
-  list.forEach(x => {
-    const [y, m, d] = x.d.split('-').map(Number);
-    const a = document.createElement('a');
-    a.className = 'miei-row'; a.href = 'biglietto.html#c=' + x.c;
-    a.style.setProperty('--c', CAT_COLORS[x.cat] || '#534AB7');
-    a.innerHTML = `<span class="miei-date"><small>${DW[new Date(y, m - 1, d).getDay()]}</small><b>${d}</b><small>${MS[m - 1]}</small></span>
-      <span class="miei-info"><span class="miei-name"></span><span class="miei-st">…</span></span><span class="miei-go">apri →</span>`;
-    a.querySelector('.miei-name').textContent = x.n + (x.t ? ' · ' + x.t : '');
-    box.appendChild(a);
-    // stato vero dal database (la prenotazione potrebbe essere stata cambiata o annullata)
-    _supabase.rpc('biglietto_info', { c: x.c }).then(({ data, error }) => {
-      const st = a.querySelector('.miei-st');
-      if (error) { st.textContent = 'senza rete · salvato sul telefono'; return; }
-      if (!data) { st.textContent = 'biglietto non trovato'; a.classList.add('off'); return; }
-      if (data.annullata_il) { st.textContent = 'annullata'; a.classList.add('off'); return; }
-      st.textContent = data.seats + (data.seats === 1 ? ' posto' : ' posti') + (data.modificabile ? '' : ' · modifiche chiuse');
-    }).catch(() => { a.querySelector('.miei-st').textContent = 'senza rete · salvato sul telefono'; });
+// stato vero dal database: annullata, entrato, posti. Senza rete non tocca niente.
+let _statiInCorso = null;
+function aggiornaStatiMiei() {
+  if (_statiInCorso) return _statiInCorso;
+  _statiInCorso = (async () => {
+    const o = oggiIso();
+    const daChiedere = leggiMiei().filter(x => !(x.d < o && x.in));   // i ricordi già confermati non servono
+    if (!daChiedere.length || typeof _supabase === 'undefined') return;
+    const ris = await Promise.all(daChiedere.map(x => _supabase.rpc('biglietto_info', { c: x.c }).then(r => [x.c, r], () => [x.c, { error: true }])));
+    const list = leggiMiei(); let cambiato = false;
+    ris.forEach(([c, r]) => {
+      if (r.error) return;                                   // senza rete: lascio com'è
+      const i = list.findIndex(x => x.c === c); if (i < 0) return;
+      const x = list[i], d = r.data;
+      if (!d) { if (!x.in) { list.splice(i, 1); cambiato = true; } return; }   // non esiste più
+      const nx = { ...x, a: !!d.annullata_il, in: !!d.entrato, s: d.seats, m: !!d.modificabile };
+      if (JSON.stringify(nx) !== JSON.stringify(x)) { list[i] = nx; cambiato = true; }
+    });
+    // pulizia: annullati di eventi passati, e passati senza ingresso
+    const tenuti = list.filter(x => !(x.d < o && (x.a || !x.in)));
+    if (tenuti.length !== list.length) cambiato = true;
+    if (cambiato) scriviMiei(tenuti);
+  })().finally(() => { _statiInCorso = null; });
+  return _statiInCorso;
+}
+const DW_MIEI = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'], MS_MIEI = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+function rigaMio(x, passato) {
+  const [y, m, d] = x.d.split('-').map(Number);
+  const item = document.createElement('div');
+  item.className = 'miei-item';
+  item.innerHTML = `<button class="miei-del" type="button" aria-label="elimina questo biglietto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"/></svg><span>elimina</span></button>`;
+  const a = document.createElement(passato ? 'div' : 'a');
+  a.className = 'miei-row' + (passato ? ' stato' : '');
+  if (!passato) a.href = 'biglietto.html#c=' + x.c;
+  a.draggable = false; a.addEventListener('dragstart', ev => ev.preventDefault());   // col mouse: trascinare non deve spostare il link
+  a.style.setProperty('--c', CAT_COLORS[x.cat] || '#534AB7');
+  a.innerHTML = `<span class="miei-date"><small>${DW_MIEI[new Date(y, m - 1, d).getDay()]}</small><b>${d}</b><small>${MS_MIEI[m - 1]}${passato && y !== new Date().getFullYear() ? ' ' + String(y).slice(2) : ''}</small></span>
+    <span class="miei-info"><span class="miei-name"></span><span class="miei-st"></span></span>${passato ? '<span class="miei-ok">✓</span>' : '<span class="miei-go">apri →</span>'}`;
+  a.querySelector('.miei-name').textContent = x.n + (x.t && !passato ? ' · ' + x.t : '');
+  a.querySelector('.miei-st').textContent = passato
+    ? 'c\'eri' + (x.s ? ' · ' + x.s + (x.s === 1 ? ' posto' : ' posti') : '')
+    : x.s ? x.s + (x.s === 1 ? ' posto' : ' posti') + (x.m === false ? ' · modifiche chiuse' : '') : '';
+  item.appendChild(a);
+  item.querySelector('.miei-del').onclick = () => {
+    item.style.height = item.offsetHeight + 'px';
+    requestAnimationFrame(() => { item.classList.add('via'); item.style.height = '0px'; });
+    setTimeout(() => { eliminaMio(x.c); renderMiei(); }, 260);
+  };
+  swipeMio(item, a);
+  return item;
+}
+// trascina a sinistra → compare il cestino; tocca il cestino → eliminato
+const DEL_W = 96;
+function swipeMio(item, row) {
+  let x0 = null, y0 = 0, base = 0, cur = 0, drag = null, mosso = false;
+  const chiudi = () => { row.style.transform = ''; item.classList.remove('aperto'); };
+  row.addEventListener('pointerdown', e => {
+    if (e.button > 0) return;
+    x0 = e.clientX; y0 = e.clientY; drag = null; mosso = false;
+    base = item.classList.contains('aperto') ? -DEL_W : 0; cur = base;
   });
-  ov.classList.add('open');
+  row.addEventListener('pointermove', e => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0, dy = e.clientY - y0;
+    if (drag === null) {
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+        drag = true; mosso = true; row.classList.add('drag');
+        try { row.setPointerCapture(e.pointerId); } catch (_) {}
+        document.querySelectorAll('.miei-item.aperto').forEach(o => { if (o !== item) { o.classList.remove('aperto'); o.querySelector('.miei-row').style.transform = ''; } });
+      } else if (Math.abs(dy) > 8) { x0 = null; return; }
+      else return;
+    }
+    cur = Math.min(0, Math.max(-DEL_W - 30, base + dx));
+    row.style.transform = `translateX(${cur}px)`;
+  });
+  const fine = () => {
+    if (x0 === null) return;
+    x0 = null;
+    if (!drag) return;
+    row.classList.remove('drag');
+    if (cur < -DEL_W / 2) { row.style.transform = `translateX(${-DEL_W}px)`; item.classList.add('aperto'); } else chiudi();
+  };
+  row.addEventListener('pointerup', fine);
+  row.addEventListener('pointercancel', fine);
+  // dopo un trascinamento il tocco non apre il biglietto; se il cestino è visibile, un tocco lo richiude
+  row.addEventListener('click', e => {
+    if (mosso || item.classList.contains('aperto')) { e.preventDefault(); if (!mosso) chiudi(); }
+    mosso = false;
+  }, true);
+}
+function renderMiei() {
+  const box = document.getElementById('miei-list');
+  const { prossimi, passati } = dividiMiei();
+  box.innerHTML = '';
+  if (!prossimi.length && !passati.length) { box.innerHTML = '<div class="miei-empty">nessun biglietto salvato su questo telefono</div>'; return; }
+  if (prossimi.length) {
+    if (passati.length) box.insertAdjacentHTML('beforeend', '<div class="miei-sez">prossimi</div>');
+    prossimi.forEach(x => box.appendChild(rigaMio(x, false)));
+  } else box.insertAdjacentHTML('beforeend', '<div class="miei-empty">nessun biglietto per i prossimi eventi</div>');
+  if (passati.length) {
+    box.insertAdjacentHTML('beforeend', `<div class="miei-sez">ci sei stato · ${passati.length}</div>`);
+    passati.forEach(x => box.appendChild(rigaMio(x, true)));
+  }
+}
+function openMiei() {
+  renderMiei();
+  document.getElementById('miei-overlay').classList.add('open');
   document.documentElement.classList.add('ticket-open');
+  aggiornaStatiMiei().then(() => { if (document.getElementById('miei-overlay').classList.contains('open')) renderMiei(); });
 }
 function closeMiei() {
   document.getElementById('miei-overlay').classList.remove('open');
@@ -3272,6 +3381,7 @@ function closeMiei() {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('miei-overlay').classList.contains('open')) closeMiei(); });
 aggiornaTix();
+setTimeout(() => aggiornaStatiMiei(), 1500);   // all'apertura del sito: controlla annullati ed entrati
 
 // ── CAROSELLO FILTRI (mobile) — loop infinito ─────────────────
 let carouselIdx = 0;

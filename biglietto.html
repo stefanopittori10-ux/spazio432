@@ -510,7 +510,15 @@ function quandoLimite(iso) {
 function msg(text, ok) { const m = document.getElementById('g-msg'); m.textContent = text || ''; m.className = 'gest-msg' + (text ? (ok ? ' ok' : ' bad') : ''); }
 
 const TK_CACHE = c => 's432_tk_' + c;
-function salvaCopia(b) { try { localStorage.setItem(TK_CACHE(b.codice), JSON.stringify(b)); } catch (e) {} }
+function salvaCopia(b) {
+  try {
+    localStorage.setItem(TK_CACHE(b.codice), JSON.stringify(b));
+    // tiene allineata la lista "i miei biglietti" del sito (annullata, entrato, posti)
+    const L = JSON.parse(localStorage.getItem('s432_miei') || '[]');
+    const x = L.find(y => y && y.c === b.codice);
+    if (x) { x.a = !!b.annullata_il; x.in = !!b.entrato; x.s = b.seats; x.m = !!b.modificabile; localStorage.setItem('s432_miei', JSON.stringify(L)); }
+  } catch (e) {}
+}
 function leggiCopia(c) { try { return JSON.parse(localStorage.getItem(TK_CACHE(c)) || 'null'); } catch (e) { return null; } }
 let senzaRete = false;
 
