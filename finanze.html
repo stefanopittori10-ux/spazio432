@@ -628,16 +628,60 @@
     .br-short { display: inline; }
   }
   @media (max-width: 400px) { .logo { font-size: 17px; } .lg-page { margin-left: 6px; font-size: 9px; padding: 3px 6px; letter-spacing: 1px; } .toolbar { gap: 5px; } }
+
+  /* ── bottone home (come nel sito): torna al portale ── */
+  .home-pill { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; flex-shrink: 0; cursor: pointer;
+    border-radius: 20px; border: 1px solid var(--fg); background: var(--pill-bg, var(--card-bg)); color: var(--fg);
+    font-family: inherit; font-size: 12px; font-weight: bold; text-decoration: none; transition: background .15s, color .15s; }
+  .home-pill .house-ico { width: 16px; height: 16px; display: block; }
+  @media (hover: hover) { .home-pill:hover { background: var(--fg); color: var(--bg); } }
+  .logo-link { cursor: pointer; }
+
+  .bridge-btn.on { background: var(--u-solid); border-color: var(--fg); box-shadow: 4px 4px 0 var(--sh); }
+  .month-display, .bridge-title { user-select: none; -webkit-user-select: none; touch-action: manipulation; cursor: default; }
+  body.masked .month-bar { border-style: dashed; }
+
+  /* ═══ PONTE DI COMANDO ═══ */
+  body.bridge-mode .month-bar, body.bridge-mode .status-bar, body.bridge-mode #grid, body.bridge-mode .fin-footer { display: none !important; }
+  .bridge[hidden] { display: none; }
+  .bridge-head { background: var(--fg); color: var(--bg); border: 2px solid var(--fg); box-shadow: 6px 6px 0 var(--u-solid); padding: 18px 22px 20px; margin-bottom: 22px; }
+  .bridge-kicker { font-size: 10px; font-weight: bold; letter-spacing: 1.8px; text-transform: uppercase; opacity: .7; margin-bottom: 8px; }
+  .bridge-title { font-size: 40px; font-weight: 900; letter-spacing: -1.5px; line-height: .95; }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-bottom: 18px; }
+  .tile { display: flex; flex-direction: column; gap: 6px; padding: 16px 18px 18px; color: #fff; border: 2px solid var(--fg); box-shadow: 5px 5px 0 var(--sh); min-width: 0; }
+  .tile.u { background: var(--u-solid); } .tile.e { background: var(--e-solid); } .tile.r { background: var(--r-solid); }
+  .tile.k { background: var(--card-bg); color: var(--fg); }
+  .tile-lbl { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; opacity: .85; }
+  .tile-val { font-size: 28px; font-weight: 900; letter-spacing: -1px; line-height: 1.05; overflow-wrap: anywhere; }
+  .tile-val.small { font-size: 20px; letter-spacing: 0; }
+  .tile-sub { font-size: 11px; opacity: .85; }
+  .bridge-progress { display: flex; align-items: center; gap: 14px; font-size: 11px; font-weight: bold; color: var(--fg-muted); margin: 4px 0 22px; }
+  .bp-bar { flex: 1; height: 14px; border: 2px solid var(--fg); background: var(--card-bg); }
+  .bp-fill { height: 100%; background: var(--e-solid); transition: width .6s cubic-bezier(.2,.8,.2,1); }
+  .bridge .split-panel { border: none !important; box-shadow: none !important; background: none !important; margin-top: 0 !important; gap: 22px; }
+  .bridge .sp-col { border: 2px solid var(--fg) !important; background: var(--card-bg); box-shadow: 6px 6px 0 var(--sh); padding: 0 0 18px; }
+  .bridge .sp-title { background: var(--fg); color: var(--bg); padding: 14px 18px; margin-bottom: 16px; font-size: 11px; letter-spacing: 1.5px; }
+  .bridge .sp-title .tot { color: var(--bg); font-size: 14px; }
+  .bridge .sp-col > :not(.sp-title) { margin-left: 18px; margin-right: 18px; }
+  .bridge-empty { border: 2px dashed var(--fg); padding: 22px; font-size: 13px; line-height: 1.5; }
+  @media (max-width: 860px) {
+    .tiles { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tile-val { font-size: 22px; }
+    .bridge-title { font-size: 30px; }
+    .bridge .split-panel { gap: 18px; }
+    .home-pill { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+    .home-pill .hp-lbl { display: none; }
+  }
 </style>
 </head>
 <body>
 <div class="root">
 
   <div class="toolbar">
-    <div class="logo"><span class="lg-s">spazio</span><span class="lg-n">432</span><span class="lg-page">finanze</span></div>
+    <div class="logo logo-link" onclick="backToLogin()" title="Torna al portale" role="link" tabindex="0"><span class="lg-s">spazio</span><span class="lg-n">432</span><span class="lg-page">finanze</span></div>
     <div class="spacer"></div>
-    <button class="mask-pill" id="mask-btn" onclick="toggleMask()" aria-pressed="false" title="Nascondi le cifre" aria-label="Nascondi le cifre"><svg class="eye-ico" viewBox="0 0 20 20" aria-hidden="true"><path class="eye-shape" d="M1.5 10S5 4 10 4s8.5 6 8.5 6-3.5 6-8.5 6S1.5 10 1.5 10Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="10" r="2.8" fill="currentColor"/><path class="eye-slash" d="M3 17L17 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg></button>
-    <button class="bridge-btn" onclick="backToLogin()" title="Torna al portale" aria-label="Torna al ponte di comando"><svg class="helm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.2" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 1.5v7M12 15.5v7M1.5 12h7M15.5 12h7M4.6 4.6l4.9 4.9M14.5 14.5l4.9 4.9M4.6 19.4l4.9-4.9M14.5 9.5l4.9-4.9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span class="br-long">ponte di comando</span><span class="br-short">ponte</span></button>
+    <button class="bridge-btn" id="bridge-btn" onclick="toggleBridge()" title="Partecipanti e quote delle bollette" aria-label="Ponte di comando"><svg class="helm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.2" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 1.5v7M12 15.5v7M1.5 12h7M15.5 12h7M4.6 4.6l4.9 4.9M14.5 14.5l4.9 4.9M4.6 19.4l4.9-4.9M14.5 9.5l4.9-4.9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span class="br-long">ponte di comando</span><span class="br-short">ponte</span></button>
+    <a class="home-pill" href="login.html" title="Torna al portale" aria-label="Torna al portale"><svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/><path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/><rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/></svg><span class="hp-lbl">home</span></a>
   </div>
 
   <div class="month-bar">
@@ -820,6 +864,19 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
     <div class="foot-addr">via ceva 47, torino</div>
   </div>
 
+  <!-- PONTE DI COMANDO: cruscotto bollette -->
+  <section class="bridge" id="bridge" hidden>
+    <div class="bridge-head">
+      <div><div class="bridge-kicker">bollette · quote · partecipanti</div><div class="bridge-title" id="bridge-title">PONTE DI COMANDO</div></div>
+    </div>
+    <div class="tiles">
+      <div class="tile u"><span class="tile-lbl">da incassare</span><span class="tile-val" id="t-open">—</span><span class="tile-sub" id="t-open-sub"></span></div>
+      <div class="tile e"><span class="tile-lbl">già incassato</span><span class="tile-val" id="t-paid">—</span><span class="tile-sub" id="t-paid-sub"></span></div>
+      <div class="tile r"><span class="tile-lbl">partecipanti</span><span class="tile-val" id="t-pt">—</span><span class="tile-sub">dividono le bollette</span></div>
+      <div class="tile k"><span class="tile-lbl">chi deve di più</span><span class="tile-val small" id="t-top">—</span><span class="tile-sub" id="t-top-sub"></span></div>
+    </div>
+    <div class="bridge-progress"><div class="bp-bar"><div class="bp-fill" id="bp-fill"></div></div><span id="bp-lbl"></span></div>
+
   <!-- DIVISIONE BOLLETTE -->
   <div class="split-panel" id="split-panel" style="display:none">
     <div class="sp-col">
@@ -835,6 +892,8 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
       <div id="debt-list"></div>
     </div>
   </div>
+    <div class="bridge-empty" id="bridge-empty" hidden>Le tabelle per dividere le bollette non sono ancora pronte: segui le istruzioni nel riquadro in alto.</div>
+  </section>
 </div>
 
 <!-- SPLIT MODAL -->
@@ -1084,6 +1143,7 @@ function render() {
   renderList('u', u); renderList('e', e); renderList('r', r);
   renderCharts(u, e, r);
   renderSplitPanel();
+  renderBridge();
 
   const tU = sum(u), tE = sum(e), tR = sum(r);
   document.getElementById('tot-u').textContent = fmt(tU);
@@ -1823,6 +1883,43 @@ document.addEventListener('click', e => {
   }
 });
 
+// ── PONTE DI COMANDO ─────────────────────────────────────────
+function toggleBridge(force) {
+  const on = typeof force === 'boolean' ? force : !document.body.classList.contains('bridge-mode');
+  document.body.classList.toggle('bridge-mode', on);
+  document.getElementById('bridge').hidden = !on;
+  const b = document.getElementById('bridge-btn');
+  b.querySelector('.br-long').textContent = on ? 'torna ai conti' : 'ponte di comando';
+  b.querySelector('.br-short').textContent = on ? 'conti' : 'ponte';
+  b.classList.toggle('on', on);
+  if (on) { closeAllForms(); renderBridge(); }
+  window.scrollTo(0, 0);
+}
+function renderBridge() {
+  const ready = typeof splitReady !== 'undefined' && splitReady;
+  document.getElementById('bridge-empty').hidden = ready;
+  const open = ready ? allQuotes.filter(q => !q.pagato) : [];
+  const paid = ready ? allQuotes.filter(q => q.pagato) : [];
+  const sOpen = open.reduce((a, q) => a + parseFloat(q.importo), 0);
+  const sPaid = paid.reduce((a, q) => a + parseFloat(q.importo), 0);
+  document.getElementById('t-open').textContent = ready ? fmt(sOpen) : '—';
+  document.getElementById('t-open-sub').textContent = ready ? `${open.length} ${open.length === 1 ? 'quota aperta' : 'quote aperte'}` : '';
+  document.getElementById('t-paid').textContent = ready ? fmt(sPaid) : '—';
+  document.getElementById('t-paid-sub').textContent = ready ? `${paid.length} ${paid.length === 1 ? 'quota pagata' : 'quote pagate'}` : '';
+  document.getElementById('t-pt').textContent = ready ? partecipanti.length : '—';
+  const per = {};
+  open.forEach(q => { const k = q.tipo === 'evento' ? 'eventi esterni' : q.nome; per[k] = (per[k] || 0) + parseFloat(q.importo); });
+  const top = Object.entries(per).sort((a, b) => b[1] - a[1])[0];
+  document.getElementById('t-top').textContent = top ? top[0] : (ready ? 'nessuno ✓' : '—');
+  document.getElementById('t-top-sub').textContent = top ? fmt(top[1]) : '';
+  const tot = sOpen + sPaid, pct = tot ? Math.round(sPaid / tot * 100) : 0;
+  document.getElementById('bp-fill').style.width = (masked ? 35 : pct) + '%';
+  document.getElementById('bp-lbl').textContent = tot ? `${masked ? '**' : pct}% delle quote già incassato` : 'nessuna bolletta divisa per ora';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.body.classList.contains('bridge-mode') && !split && !(e.target.closest && e.target.closest('input'))) toggleBridge(false);
+});
+
 // ── CIFRE NASCOSTE ───────────────────────────────────────────
 function applyMaskUI() {
   document.body.classList.toggle('masked', masked);
@@ -1835,10 +1932,23 @@ function toggleMask() {
   applyMaskUI();
   render();
   if (typeof split !== 'undefined' && split) renderSplitModal();
+  renderBridge();
   if (typeof payEntry !== 'undefined' && payEntry) { document.getElementById('ps-importo').textContent = fmt(payEntry.importo); updateMailto(); }
   showToast(masked ? 'Cifre nascoste: puoi mostrare il sito' : 'Cifre di nuovo visibili', true);
 }
 applyMaskUI();
+// doppio tocco sul mese (o sul titolo del ponte): cifre nascoste / visibili
+function onDoubleTap(el, fn) {
+  let last = 0;
+  el.addEventListener('pointerup', e => {
+    if (e.target.closest('button')) return;
+    const now = Date.now();
+    if (now - last < 350) { last = 0; fn(); } else last = now;
+  });
+  el.addEventListener('dblclick', e => e.preventDefault());
+}
+onDoubleTap(document.querySelector('.month-display'), toggleMask);
+onDoubleTap(document.getElementById('bridge-title'), toggleMask);
 
 // ── NAVIGAZIONE ──────────────────────────────────────────────
 function backToLogin() { location.href = 'login.html'; }

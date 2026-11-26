@@ -1648,6 +1648,22 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
   @media (max-width: 768px) { #toggle-add-btn.tb-manage { padding: 0 12px !important; font-size: 12px !important; height: 38px !important; } }
   /* spazio432.org porta al sito: stesso aspetto di prima */
   a.footer-link { text-decoration: none; cursor: pointer; }
+
+  /* ── bottone home (come nel sito): torna al portale ── */
+  .home-pill { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; flex-shrink: 0; cursor: pointer;
+    border-radius: 20px; border: 1px solid var(--fg); background: var(--pill-bg, var(--card-bg)); color: var(--fg);
+    font-family: inherit; font-size: 12px; font-weight: bold; text-decoration: none; transition: background .15s, color .15s; }
+  .home-pill .house-ico { width: 16px; height: 16px; display: block; }
+  @media (hover: hover) { .home-pill:hover { background: var(--fg); color: var(--bg); } }
+  .logo-link { cursor: pointer; }
+
+  .toolbar-filters { display: flex !important; gap: 8px !important; }
+  .logo-area.logo-link { cursor: pointer; }
+  @media (max-width: 768px) {
+    .home-pill { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+    .home-pill .hp-lbl { display: none; }
+    .pop { min-width: 250px; }
+  }
 </style>
 </head>
 <body>
@@ -1697,14 +1713,12 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
           <button class="pop-item" data-cat="meet" onclick="pickFilter('meet')"><span class="pop-sq" style="background:#4B5563"></span>riunioni<span class="pop-check">✓</span></button>
         </div>
       </div>
-    </div>
-    <div class="toolbar-actions">
       <div class="pop-wrap">
         <button class="tbtn tb-export" id="export-btn" onclick="togglePop('export-pop', event)" aria-haspopup="true" aria-expanded="false" title="Esporta">
           <svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v10M5.5 8l4.5 4.5L14.5 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/><rect x="3" y="15.5" width="14" height="2.6" fill="currentColor"/></svg>
           <span class="tb-lbl">esporta</span>
         </button>
-        <div class="pop pop-right" id="export-pop" role="menu">
+        <div class="pop" id="export-pop" role="menu">
           <div class="pop-title">esporta il mese</div>
           <button class="pop-item big" onclick="closePops(); exportICS()">
             <span class="pop-ico">📅</span>
@@ -1716,6 +1730,9 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
           </button>
         </div>
       </div>
+    </div>
+    <div class="toolbar-actions">
+      <a class="home-pill" href="login.html" title="Torna al portale" aria-label="Torna al portale"><svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/><path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/><rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/></svg><span class="hp-lbl">home</span></a>
       <button class="tb-manage" id="toggle-add-btn" onclick="openManager()" title="Aggiungi, modifica, duplica ed elimina eventi"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="3.5" width="17" height="15" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="1.5" y="3.5" width="17" height="4.5" fill="currentColor"/><path d="M6 1v4M14 1v4" stroke="currentColor" stroke-width="2.2"/><path d="M7 11.5h6M10 8.5v6" stroke="currentColor" stroke-width="2.2"/></svg><span class="tm-long">gestisci eventi</span><span class="tm-short">gestisci</span><span class="tm-arrow">→</span></button>
     </div>
   </div>
@@ -1784,7 +1801,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
 
   <div class="card" id="cal-card">
     <div class="card-header">
-      <div class="logo-area logo-static">
+      <div class="logo-area logo-static logo-link" onclick="location.href='login.html'" title="Torna al portale" role="link" tabindex="0">
         <div class="logo-text-group">
           <div class="logo-line"><span class="logo-spazio">spazio</span><span class="logo-num">432</span><span class="lg-page">admin</span></div>
         </div>
