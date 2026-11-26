@@ -1186,6 +1186,12 @@
     opacity: 0; transition: opacity .25s, left .3s, top .3s, width .3s, height .3s;
   }
   .dia-ring.on { opacity: 1; }
+  /* prova di prenotazione: Dia sta sopra anche al biglietto aperto */
+  body.dia-demo .dia-ring { z-index: 10000; }
+  body.dia-demo .dia-bubble, body.dia-demo .dia-mascot { z-index: 10001; }
+  .ticket-overlay.demo .tk { position: relative; }
+  .ticket-overlay.demo .tk::after { content: 'ESEMPIO'; position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%) rotate(-12deg);
+    font-size: 40px; font-weight: 900; letter-spacing: 4px; color: #993C1D; border: 5px solid #993C1D; padding: 4px 16px; background: rgba(255,255,255,.85); pointer-events: none; }
 
   @media (prefers-reduced-motion: reduce) {
     .dia-mascot, .dia-mascot .dia-eyes, .dia-mascot.talking .dia-prongs, .logo-subtitle .loc-pin { animation: none !important; }
@@ -3063,7 +3069,7 @@ function openBookingPanel(evt, triggerBtn) {
     </div>`;
   panel.classList.add('open');
   setTimeout(() => {
-    document.getElementById('bk-name-' + uid)?.focus();
+    if (!window.__diaDemo) document.getElementById('bk-name-' + uid)?.focus();
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 100);
 }
@@ -3109,7 +3115,7 @@ function buildRecapBookingBlock(evt) {
     e.stopPropagation();
     const isOpen = formWrap.classList.toggle('open');
     btn.classList.toggle('open', isOpen);
-    if (isOpen) setTimeout(() => document.getElementById('bk-name-' + uid)?.focus(), 80);
+    if (isOpen && !window.__diaDemo) setTimeout(() => document.getElementById('bk-name-' + uid)?.focus(), 80);
   };
   topRow.appendChild(btn);
   wrap.appendChild(topRow); wrap.appendChild(formWrap);
@@ -3132,6 +3138,7 @@ async function loadBookingCount(eventId, counterEl) {
 }
 
 async function submitBooking(uid, eventId) {
+  if (window.__diaDemo) return;   // prova di Dia: non si prenota davvero
   const nameEl  = document.getElementById('bk-name-' + uid);
   const emailEl = document.getElementById('bk-email-' + uid);
   const seatsEl = document.getElementById('bk-seats-' + uid);
@@ -3963,12 +3970,135 @@ fetchAndBuild();
   function endTour() {
     cancelAnimationFrame(raf); target = null; ring.classList.remove('on');
     store.set('s432-dia-seen', '1');
-    say('Buon giro! Se ti perdi, <b>tocca me</b>.', '');
-    setTimeout(() => { if (idx === -2) bubble.classList.remove('open'); }, 2600);
     idx = -2;
+    say('Buon giro! Vuoi vedere anche <b>come ci si prenota</b> e come si salva il biglietto?',
+      `<div class="dia-actions"><button class="dia-btn primary" data-a="demo">sì, fammi vedere</button><button class="dia-btn ghost" data-a="no">no grazie</button></div>`);
+    bubble.querySelector('[data-a="demo"]').onclick = startDemo;
+    bubble.querySelector('[data-a="no"]').onclick = () => { say('Ok! Se ti perdi, <b>tocca me</b>.', ''); setTimeout(() => { if (idx === -2) bubble.classList.remove('open'); }, 2400); };
+  }
+
+  // ── PROVA DI PRENOTAZIONE: Dia compila il modulo da sola e mostra il biglietto (niente viene inviato) ──
+  const pausa = ms => new Promise(r => setTimeout(r, ms));
+  let demoTok = 0, demoBtn = null, demoEvt = null, demoUid = '', demoAttiva = false;
+  // il modulo può essere quello sotto l'evento nella lista (rbk-) o il pannello del calendario (bk-)
+  const demoForm = () => demoUid.startsWith('rbk-') ? document.getElementById('form-' + demoUid) : document.getElementById('booking-panel');
+  const nonPassa = () => !demoAttiva;
+  async function scrivi(el, txt) {
+    if (!el) return;
+    el.value = '';
+    for (const ch of txt) { if (nonPassa()) return; el.value += ch; await pausa(60); }
+  }
+  const DEMO = [
+    { prima: async () => {
+        if (vaiA('eventi')) await pausa(600);
+        demoBtn = [...document.querySelectorAll('#list-view .btn-prenota, .btn-prenota')].find(b => visible(b) && !b.disabled && !b.classList.contains('done') && !b.classList.contains('soldout'));
+        demoUid = demoBtn ? demoBtn.id.slice(4) : '';
+        const id = demoBtn && demoBtn.id.replace(/^btn-r?bk-/, '');
+        demoEvt = id ? events.find(e => String(e.id) === id) : null;
+      },
+      el: () => demoBtn, serve: true,
+      text: 'Ti faccio vedere come ci si prenota. È <b>solo una prova</b>: non prenoto niente davvero. Si parte da <b>vengo!</b>, accanto all\'evento.' },
+    { prima: async () => {
+        const f = demoForm();
+        if (!f || !f.classList.contains('open')) demoBtn.click();
+        await pausa(650);
+      },
+      el: () => { const f = demoForm(); return f && f.classList.contains('open') ? f.querySelector('.bk-row') : null; },
+      dopo: async () => {
+        const uid = demoUid;
+        await pausa(300);
+        await scrivi(document.getElementById('bk-name-' + uid), 'Mario Rossi');
+        if (nonPassa()) return;
+        await pausa(250);
+        const s = document.getElementById('bk-seats-' + uid); if (s) s.value = 2;
+      },
+      text: 'Si apre il modulo: scrivi il tuo <b>nome</b>, la <b>mail</b> se vuoi (è facoltativa) e <b>in quanti siete</b>.' },
+    { el: () => { const f = demoForm(); return f && f.classList.contains('open') ? f.querySelector('.bk-submit') : null; },
+      text: 'Poi tocchi <b>ci sarò</b> e il posto è tuo. Subito dopo arriva il biglietto…' },
+    { prima: async () => {
+        pulisciModulo();
+        const MESI_D = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+        const e = demoEvt;
+        openTicketOverlay({ name: 'Mario Rossi', email: '', seats: '2', event: e.name, rassegna: e.rassegna || null, cat: e.cat,
+          date: `${e.day} ${MESI_D[e.month]} ${e.year}`, time: (e.time || '') + (e.endTime ? ' – ' + e.endTime : '') });
+        const ov = document.getElementById('ticket-overlay'); ov.classList.add('demo');
+        const mg = document.getElementById('t-manage'); if (mg) { mg.hidden = false; mg.removeAttribute('href'); mg.onclick = ev => ev.preventDefault(); }
+        await pausa(450);
+      },
+      el: () => document.querySelector('#ticket-overlay.open .tk'),
+      text: 'Ecco il <b>biglietto</b> con il QR: all\'ingresso basta mostrarlo dal telefono.' },
+    { el: () => document.getElementById('t-act-img'),
+      text: 'Con <b>salva biglietto</b> lo tieni sul telefono: su Android finisce in galleria, su iPhone scegli <b>Salva immagine</b> e va nelle Foto.' },
+    { el: () => document.getElementById('t-act-share'),
+      text: 'Con la <b>freccia</b> lo mandi a chi viene con te, per esempio su WhatsApp.' },
+    { el: () => document.getElementById('t-act-print'),
+      text: 'Se lo vuoi su carta, <b>stampa</b>: esce solo il biglietto.' },
+    { el: () => document.getElementById('t-manage'),
+      text: 'Da qui puoi <b>cambiare i posti</b> o <b>annullare</b>, fino a 2 ore prima dell\'evento.' },
+    { prima: async () => {
+        chiudiBigliettoDemo();
+        const b = document.getElementById('tix-toolbtn'); if (b && b.hidden) { b.hidden = false; b.dataset.demo = '1'; }
+        await pausa(350);
+      },
+      el: () => firstVisible('#tix-toolbtn'),
+      text: 'E qui ritrovi <b>tutti i tuoi biglietti</b>, anche dopo aver chiuso e riaperto il sito. Fine della prova!' }
+  ];
+  function pulisciModulo() {
+    if (demoUid) {
+      ['name', 'email', 'note'].forEach(k => { const el = document.getElementById(`bk-${k}-${demoUid}`); if (el) el.value = ''; });
+      const s = document.getElementById('bk-seats-' + demoUid); if (s) s.value = 1;
+      if (demoUid.startsWith('rbk-')) closeRecapForm(demoUid); else if (typeof closeBookingPanel === 'function') closeBookingPanel();
+    }
+  }
+  function chiudiBigliettoDemo() {
+    const ov = document.getElementById('ticket-overlay');
+    if (ov.classList.contains('demo')) { ov.classList.remove('demo'); if (ov.classList.contains('open')) closeTicketOverlay(); }
+    const mg = document.getElementById('t-manage'); if (mg) { mg.onclick = null; mg.hidden = true; }
+    _ticket = null;
+  }
+  function pulisciDemo() {
+    if (!demoAttiva) return;
+    demoAttiva = false; window.__diaDemo = false; demoTok++;
+    document.body.classList.remove('dia-demo');
+    pulisciModulo(); chiudiBigliettoDemo();
+    const b = document.getElementById('tix-toolbtn'); if (b && b.dataset.demo) { delete b.dataset.demo; aggiornaTix(); }
+  }
+  async function demoStep(i) {
+    const tok = ++demoTok, s = DEMO[i];
+    idx = 99;
+    cancelAnimationFrame(raf); target = null; ring.classList.remove('on');
+    if (s.prima) { bubble.classList.remove('open'); try { await s.prima(); } catch (e) { console.error(e); } }
+    if (tok !== demoTok) return;
+    target = s.el();
+    if (!visible(target)) {
+      if (s.serve) { pulisciDemo(); idx = -1; say('Ora non ci sono eventi prenotabili da usare per la prova: riprova quando esce il programma!', ''); return; }
+      return i + 1 < DEMO.length ? demoStep(i + 1) : endDemo();
+    }
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const last = i === DEMO.length - 1;
+    say(typeof s.text === 'function' ? s.text() : s.text,
+      `<div class="dia-actions"><button class="dia-btn primary" data-a="next">${last ? 'fine' : 'avanti →'}</button>${last ? '' : '<button class="dia-btn ghost" data-a="end">esci</button>'}</div>`,
+      'dia · prova di prenotazione');
+    bubble.querySelector('[data-a="next"]').onclick = () => last ? endDemo() : demoStep(i + 1);
+    const end = bubble.querySelector('[data-a="end"]'); if (end) end.onclick = endDemo;
+    loop();
+    if (s.dopo) s.dopo();
+  }
+  function startDemo() {
+    demoAttiva = true; window.__diaDemo = true;
+    document.body.classList.add('dia-demo');
+    demoStep(0);
+  }
+  function endDemo() {
+    pulisciDemo();
+    cancelAnimationFrame(raf); target = null; ring.classList.remove('on');
+    idx = -2;
+    say('Ora tocca a te! Se ti serve, <b>tocca me</b>.', '');
+    setTimeout(() => { if (idx === -2) bubble.classList.remove('open'); }, 2600);
   }
 
   function closeAll() {
+    pulisciDemo();
     cancelAnimationFrame(raf); target = null; idx = -1;
     ring.classList.remove('on'); bubble.classList.remove('open', 'top');
     store.set('s432-dia-seen', '1');
@@ -3977,12 +4107,14 @@ fetchAndBuild();
   function menu() {
     say('Cosa ti serve?', `<div class="dia-menu">
       <button class="dia-btn" data-a="tour">→ fammi fare il giro del sito</button>
+      <button class="dia-btn" data-a="demo">→ come mi prenoto? (prova)</button>
       <button class="dia-btn" data-a="map">→ dove siete? come arrivo?</button>
       <button class="dia-btn" data-a="cta">→ voglio proporre un progetto</button>
       ${document.body.classList.contains('is-home') ? '' : '<button class="dia-btn" data-a="home">→ torna alla home</button>'}
       <button class="dia-btn ghost" data-a="hide">nasconditi per ora</button>
     </div>`);
     bubble.querySelector('[data-a="tour"]').onclick = startTour;
+    bubble.querySelector('[data-a="demo"]').onclick = startDemo;
     bubble.querySelector('[data-a="map"]').onclick = () => { closeAll(); if (typeof openLocation === 'function') openLocation(); };
     bubble.querySelector('[data-a="cta"]').onclick = () => {
       closeAll();
