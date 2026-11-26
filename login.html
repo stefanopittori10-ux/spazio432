@@ -57,10 +57,10 @@
   /* Form */
   .form-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 3px; display: block; }
   .form-input {
-    width: 100%; font-family: var(--mono); font-size: 15px;
+    width: 100%; font-family: var(--mono);    font-size: 16px;
     padding: 10px 14px; border: 1px solid var(--border);
     background: var(--bg); color: var(--fg); outline: none;
-    letter-spacing: 3px; transition: border-color .15s;
+    transition: border-color .15s;
   }
   .form-input:focus { border-color: var(--music); }
   .form-input.err { border-color: var(--error) !important; }
@@ -332,13 +332,19 @@
   <div id="login-section">
     <div class="panel active" id="panel-login">
       <div>
+        <label class="form-label" for="email-input">nome</label>
+        <input class="form-input" id="email-input" type="text"
+          placeholder="es. michela" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false"
+          onkeydown="if(event.key==='Enter') document.getElementById('pwd-input').focus()">
+      </div>
+      <div>
         <label class="form-label" for="pwd-input">password</label>
         <input class="form-input" id="pwd-input" type="password"
           placeholder="········" autocomplete="current-password"
           onkeydown="if(event.key==='Enter') doLogin()">
       </div>
-      <div class="error-msg" id="error-msg">password errata</div>
-      <button class="login-btn" onclick="doLogin()">entra →</button>
+      <div class="error-msg" id="error-msg">nome o password errati</div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">entra →</button>
     </div>
   </div>
 
@@ -396,333 +402,77 @@ const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
 document.getElementById('pwa-manifest').href = URL.createObjectURL(blob);
 
 // ── CONFIG ────────────────────────────────────────────────────
-const PASSWORD    = 'spazio432'; // ← cambia questa
-const SESSION_KEY = 's432_auth';
-const SUPABASE_URL = "https://udaymqqytagtayviwolr.supabase.co";
-const SUPABASE_KEY = "sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs";
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const MONTHS = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+// Due progetti Supabase: calendario (eventi, prenotazioni) e finanze.
+// Ogni membro dello spazio ha un utente con la stessa email e password in entrambi.
+// Le chiavi publishable sono pubbliche per natura: a proteggere i dati sono le policy RLS.
+const _supabase = supabase.createClient("https://udaymqqytagtayviwolr.supabase.co", "sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs");
+const _finanze  = supabase.createClient("https://rsgazxwkdyphdjogvbpe.supabase.co", "sb_publishable_WOZoyGngLDMhJRDMDfx42Q_Y7qYW9GG");
+try { sessionStorage.removeItem('s432_auth'); } catch {}   // residuo del vecchio login
 
 // ── LOGIN ─────────────────────────────────────────────────────
-function doLogin() {
-  const input = document.getElementById('pwd-input');
-  const err   = document.getElementById('error-msg');
-  input.classList.remove('err');
-  err.classList.remove('visible');
-  if (input.value === PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, '1');
-    showSections();
-  } else {
-    input.classList.add('err');
-    err.classList.add('visible');
-    input.value = '';
-    input.focus();
-    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
-  }
+function loginError(msg) {
+  const err = document.getElementById('error-msg');
+  err.textContent = msg; err.classList.add('visible');
+  document.getElementById('pwd-input').classList.add('err');
+  if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
 }
 
-function doLogout() {
-  sessionStorage.removeItem(SESSION_KEY);
-  stopScanner();
+async function doLogin() {
+  const emailEl = document.getElementById('email-input');
+  const pwdEl   = document.getElementById('pwd-input');
+  const btn     = document.getElementById('login-btn');
+  const err     = document.getElementById('error-msg');
+  const user = emailEl.value.trim().toLowerCase(), password = pwdEl.value;
+  // basta il nome: "michela" diventa michela@spazio432.org (una mail completa funziona lo stesso)
+  const email = !user ? '' : user.includes('@') ? user : user.replace(/\s+/g, '') + '@spazio432.org';
+  pwdEl.classList.remove('err'); err.classList.remove('visible');
+  if (!email || !password) { loginError('inserisci nome e password'); return; }
+
+  btn.disabled = true; btn.textContent = 'verifico…';
+  const cal = await _supabase.auth.signInWithPassword({ email, password });
+  if (cal.error) {
+    btn.disabled = false; btn.textContent = 'entra →';
+    pwdEl.value = ''; pwdEl.focus();
+    loginError(/invalid/i.test(cal.error.message) ? 'nome o password errati' : 'errore: ' + cal.error.message);
+    return;
+  }
+  // stesse credenziali sul progetto finanze; se non va, il calendario resta comunque accessibile
+  const fin = await _finanze.auth.signInWithPassword({ email, password });
+  btn.disabled = false; btn.textContent = 'entra →';
+  pwdEl.value = '';
+  showSections(!fin.error);
+}
+
+async function doLogout() {
+  await Promise.allSettled([_supabase.auth.signOut(), _finanze.auth.signOut()]);
   document.getElementById('sections').classList.remove('visible');
   document.getElementById('login-section').style.display = '';
   document.getElementById('pwd-input').value = '';
-  document.getElementById('pwd-input').focus();
+  document.getElementById('email-input').focus();
 }
 
-function showSections() {
+function showSections(finOk) {
   document.getElementById('login-section').style.display = 'none';
   document.getElementById('sections').classList.add('visible');
+  const fin = document.querySelector('.hub-btn.fin');
+  if (fin) {
+    fin.style.opacity = finOk ? '' : '.45';
+    fin.querySelector('.hb-sub').textContent = finOk ? 'entrate, uscite e rendiconto' : 'accesso finanze non attivo per questo utente';
+  }
+  loadBookingPreview();
 }
 
-if (sessionStorage.getItem(SESSION_KEY) === '1') {
-  showSections();
-} else {
-  setTimeout(() => document.getElementById('pwd-input').focus(), 100);
-}
-
-// ── SCANNER QR ────────────────────────────────────────────────
-let scanning = false, cooldown = false, stream = null;
-let scannerOpen = false;
-
-
-
-// ── CHECK-IN ──────────────────────────────────────────────────
-const checkinSet   = new Set(); // IDs prenotazioni spuntate
-const checkinTimes = {};        // orari di check-in
-
-async function toggleCheckin(boxEl, bookingId) {
-  const id     = String(bookingId);
-  const item   = boxEl.closest('.bk-item');
-  const label  = boxEl.nextElementSibling;
-  const timeEl = document.getElementById('ci-time-' + bookingId);
-
-  // Disabilita temporaneamente per evitare doppio click
-  boxEl.style.pointerEvents = 'none';
-
-  if (checkinSet.has(id)) {
-    // ── Rimuovi check-in ──
-    const { error } = await _supabase
-      .from('bookings')
-      .update({ checked_in: false, checked_in_at: null })
-      .eq('id', bookingId);
-
-    if (error) { console.error(error); boxEl.style.pointerEvents = ''; return; }
-
-    checkinSet.delete(id);
-    delete checkinTimes[id];
-    boxEl.classList.remove('checked');
-    boxEl.textContent = '';
-    item.classList.remove('checked-in');
-    if (label) label.textContent = 'segna entrata';
-    if (timeEl) timeEl.textContent = '';
-
-  } else {
-    // ── Segna check-in ──
-    const now = new Date();
-    const { error } = await _supabase
-      .from('bookings')
-      .update({ checked_in: true, checked_in_at: now.toISOString() })
-      .eq('id', bookingId);
-
-    if (error) { console.error(error); boxEl.style.pointerEvents = ''; return; }
-
-    const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-    checkinSet.add(id);
-    checkinTimes[id] = t;
-    boxEl.classList.add('checked');
-    boxEl.textContent = '✓';
-    item.classList.add('checked-in');
-    if (label) label.textContent = 'entrato';
-    if (timeEl) timeEl.textContent = t;
-  }
-
-  // Aggiorna counter
-  const countEl = document.getElementById('bk-checkin-count');
-  if (countEl) countEl.textContent = checkinSet.size;
-  boxEl.style.pointerEvents = '';
-}
-// ── GESTIONE PRENOTAZIONI — TABS ──────────────────────────────
-function switchMgmtTab(tab) {
-  document.getElementById('tab-scanner').classList.toggle('active', tab === 'scanner');
-  document.getElementById('tab-lista').classList.toggle('active', tab === 'lista');
-  document.getElementById('mgmt-scanner').style.display = tab === 'scanner' ? 'block' : 'none';
-  document.getElementById('mgmt-lista').style.display   = tab === 'lista'   ? 'block' : 'none';
-  if (tab === 'lista') {
-    stopScanner();
-    loadBookings();
-  }
-  if (tab === 'scanner') {
-    setTimeout(startScanner, 150);
-  }
-}
-
-async function loadBookings() {
-  const listEl   = document.getElementById('bk-list');
-  const filterEl = document.getElementById('bk-event-filter');
-  const totalEl  = document.getElementById('bk-total');
-  const postiEl  = document.getElementById('bk-posti');
-
-  listEl.innerHTML = '<div class="bk-empty">caricamento…</div>';
-
-  // Carica eventi per il filtro
-  const { data: evts } = await _supabase
-    .from('events')
-    .select('id, name, day, month, year')
-    .order('day', { ascending: true });
-
-  // Popola il select solo la prima volta
-  if (filterEl.options.length <= 1 && evts) {
-    evts.forEach(ev => {
-      const opt = document.createElement('option');
-      opt.value = ev.id;
-      opt.textContent = `${ev.day} ${MONTHS[ev.month]} — ${ev.name}`;
-      filterEl.appendChild(opt);
-    });
-  }
-
-  // Carica prenotazioni
-  let query = _supabase
-    .from('bookings')
-    .select('id, name, email, seats, note, created_at, event_id, checked_in, checked_in_at')
-    .order('checked_in', { ascending: true })
-    .order('created_at', { ascending: false });
-
-  const selectedEvent = filterEl.value;
-  if (selectedEvent) query = query.eq('event_id', selectedEvent);
-
-  const { data: bookings, error } = await query;
-
-  if (error || !bookings) {
-    listEl.innerHTML = '<div class="bk-empty">errore nel caricamento</div>';
-    return;
-  }
-
-  if (bookings.length === 0) {
-    listEl.innerHTML = '<div class="bk-empty">nessuna prenotazione trovata</div>';
-    totalEl.textContent = '0';
-    postiEl.textContent = '0';
-    return;
-  }
-
-  const daVerificare = bookings.filter(b => !b.checked_in).length;
-  totalEl.textContent = bookings.length;
-  postiEl.textContent = daVerificare;
-
-  listEl.innerHTML = '';
-  bookings.forEach(b => {
-    const ev = evts?.find(e => String(e.id) === String(b.event_id));
-    const evLabel = ev ? `${ev.day} ${MONTHS[ev.month]} — ${ev.name}` : 'evento sconosciuto';
-    const date = new Date(b.created_at);
-    const dateStr = date.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-
-    const item = document.createElement('div');
-    item.className = 'bk-item';
-    item.dataset.bid = b.id;
-    // Stato check-in da Supabase (fonte di verità)
-    const isChecked = b.checked_in === true;
-    if (isChecked) {
-      checkinSet.add(String(b.id));
-      if (b.checked_in_at) {
-        const d = new Date(b.checked_in_at);
-        checkinTimes[String(b.id)] = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-      }
-      item.classList.add('checked-in');
-    }
-
-    item.innerHTML = `
-      <div class="bk-item-seats">${b.seats || 1} ${(b.seats || 1) === 1 ? 'posto' : 'posti'}</div>
-      <div class="bk-item-name">${b.name}</div>
-      <div class="bk-item-event">${evLabel}</div>
-      <div class="bk-item-meta">
-        <span>${b.email}</span>
-        <span>${dateStr}</span>
-        ${b.note ? '<span>📝 ' + b.note + '</span>' : ''}
-      </div>
-      <div class="bk-checkin">
-        <div class="bk-checkin-box ${checkinSet.has(String(b.id)) ? 'checked' : ''}" onclick="toggleCheckin(this, '${b.id}')">
-          ${checkinSet.has(String(b.id)) ? '✓' : ''}
-        </div>
-        <span class="bk-checkin-label">${checkinSet.has(String(b.id)) ? 'entrato' : 'segna entrata'}</span>
-        <span class="bk-checkin-time" id="ci-time-${b.id}">${checkinTimes[String(b.id)] || ''}</span>
-      </div>
-    `;
-    listEl.appendChild(item);
-  });
-}
-
-function toggleScanner() {
-  const panel = document.getElementById('scanner-panel');
-  const card  = document.getElementById('scanner-card');
-  const arrow = document.getElementById('scanner-arrow');
-  scannerOpen = !scannerOpen;
-  if (scannerOpen) {
-    panel.style.display = 'flex';
-    card.classList.add('open');
-    arrow.textContent = '↓';
-    // Mostra tab scanner di default e avvia fotocamera
-    switchMgmtTab('scanner');
-  } else {
-    panel.style.display = 'none';
-    card.classList.remove('open');
-    arrow.textContent = '→';
-    stopScanner();
-  }
-}
-
-async function startScanner() {
-  const startEl = document.getElementById('scan-start');
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: {ideal:1280}, height: {ideal:1280} }
-    });
-    const video = document.getElementById('qr-video');
-    video.srcObject = stream;
-    await video.play();
-    startEl.classList.add('hidden');
-    scanning = true;
-    requestAnimationFrame(tick);
-  } catch(e) {
-    startEl.querySelector('.scanner-start-label').textContent =
-      'accesso fotocamera negato\nverifica i permessi del browser';
-  }
-}
-
-function stopScanner() {
-  scanning = false;
-  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-}
-
-function tick() {
-  if (!scanning) return;
-  const video  = document.getElementById('qr-video');
-  const canvas = document.getElementById('qr-canvas');
-  if (video.readyState === video.HAVE_ENOUGH_DATA) {
-    canvas.width  = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0);
-    const img  = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(img.data, img.width, img.height, {inversionAttempts:'dontInvert'});
-    if (code && !cooldown) onQR(code.data);
-  }
-  requestAnimationFrame(tick);
-}
-
-async function onQR(raw) {
-  cooldown = true;
-  setTimeout(() => { cooldown = false; }, 3000);
-
-  if (!raw.startsWith('SPAZIO432|')) {
-    showScanResult('fail', '✗ QR non riconosciuto', raw, '', {});
-    return;
-  }
-
-  const parts = raw.split('|');
-  const name  = parts[2] || '';
-  const event = parts[3] || '';
-  const dt    = parts[4] || '';
-  const seats = (parts[5] || '').replace('posti:','');
-
-  document.getElementById('scan-status').textContent = 'verifica…';
-
-  const { data, error } = await _supabase
-    .from('bookings')
-    .select('id, name, email, seats, event_id')
-    .ilike('name', name)
-    .limit(5);
-
-  if (error || !data || data.length === 0) {
-    showScanResult('fail', '✗ non trovata', name, event, { data: dt, posti: seats });
-    document.getElementById('scan-status').textContent = 'punta la fotocamera sul QR';
-    return;
-  }
-
-  const match = data[0];
-  showScanResult('ok', '✓ prenotazione valida', match.name, event, {
-    posti: match.seats,
-    email: match.email
-  });
-  document.getElementById('scan-status').textContent = 'punta la fotocamera sul QR';
-}
-
-function showScanResult(type, status, name, event, meta) {
-  const card = document.getElementById('scan-result');
-  card.className = 'scan-result visible ' + type;
-  document.getElementById('scan-status-text').textContent = status;
-  document.getElementById('scan-name').textContent  = name;
-  document.getElementById('scan-event').textContent = event;
-  document.getElementById('scan-meta').innerHTML = Object.entries(meta)
-    .map(([k,v]) => `<div class="scan-result-meta-item"><strong>${v}</strong>${k}</div>`)
-    .join('');
-  const frame = document.getElementById('scan-frame');
-  frame.className = 'scanner-frame ' + type;
-  setTimeout(() => { frame.className = 'scanner-frame'; }, 2500);
-}
+// sessione già aperta (dura finché non premi "esci")
+(async () => {
+  const [c, f] = await Promise.all([_supabase.auth.getSession(), _finanze.auth.getSession()]);
+  if (c.data.session) showSections(!!f.data.session);
+  else setTimeout(() => document.getElementById('email-input').focus(), 100);
+})();
 
 // ── BOTTONI: effetto pressione prima di cambiare pagina ──────
 document.querySelectorAll('a.hub-btn').forEach(b => b.addEventListener('click', e => {
   e.preventDefault();
+  if (b.style.opacity) return;   // finanze non disponibile per questo utente
   if (b.classList.contains('pressed')) return;
   b.classList.add('pressed');
   setTimeout(() => { location.href = b.getAttribute('href'); }, 140);
@@ -749,9 +499,6 @@ async function loadBookingPreview() {
       : '<div class="hb-row">ancora nessun prenotato per i prossimi eventi</div>';
   } catch { box.innerHTML = ''; }
 }
-if (sessionStorage.getItem('s432_auth') === '1') loadBookingPreview();
-const _showSections = showSections;
-showSections = function () { _showSections(); loadBookingPreview(); };
 window.addEventListener('pageshow', () => document.querySelectorAll('.hub-btn.pressed').forEach(b => b.classList.remove('pressed')));
 
 // ── TEMA ─────────────────────────────────────────────────────
