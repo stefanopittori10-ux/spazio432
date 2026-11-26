@@ -1928,7 +1928,7 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
               <button type="button" data-cat="meet" style="--c:#4B5563">riunione</button>
             </div>
           </div>
-          <label class="mf" id="mf-rass-wrap" hidden><span>rassegna <i>(facoltativa)</i></span><input type="text" id="mf-rass" list="mf-rass-list" placeholder="es. Porta I: La Chiamata" autocomplete="off"><datalist id="mf-rass-list"></datalist></label>
+          <label class="mf" id="mf-rass-wrap"><span>rassegna <i>(facoltativa)</i></span><input type="text" id="mf-rass" list="mf-rass-list" placeholder="es. Porta I: La Chiamata" autocomplete="off"><datalist id="mf-rass-list"></datalist></label>
           <div class="mf-row">
             <label class="mf"><span>quando</span><input type="date" id="mf-date"></label>
             <label class="mf mf-t"><span>dalle</span><input type="time" id="mf-time" value="19:00"></label>
@@ -14165,8 +14165,6 @@ function mgrSetCat(cat) {
   mgrCat = cat;
   document.querySelectorAll('#mf-cats button').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
   document.getElementById('mgr-form').style.setProperty('--fc', CAT_COLORS[cat] || '#534AB7');
-  // la rassegna vale per il cineforum: lì il titolo è solo quello del film
-  document.getElementById('mf-rass-wrap').hidden = cat !== 'film';
   document.getElementById('mf-name').placeholder = cat === 'film' ? 'titolo del film' : "titolo dell'evento";
 }
 // suggerimenti: le rassegne già usate
@@ -14249,7 +14247,7 @@ async function mgrSave() {
     time: document.getElementById('mf-time').value || '',
     endTime: document.getElementById('mf-end').value || null,
     description: document.getElementById('mf-desc').value.trim() || null,
-    rassegna: mgrCat === 'film' ? (document.getElementById('mf-rass').value.trim() || null) : null
+    rassegna: document.getElementById('mf-rass').value.trim() || null   // facoltativa, per qualsiasi tipo di evento
   };
   const saveBtn = document.getElementById('mf-save');
   saveBtn.disabled = true;
