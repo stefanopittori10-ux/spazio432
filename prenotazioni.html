@@ -121,6 +121,16 @@
   .bk-n { font-size: 15px; font-weight: bold; overflow-wrap: anywhere; }
   .bk-m { font-size: 11px; color: var(--muted); margin-top: 3px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
   .bk-r { text-align: right; }
+  .bk-x { display: inline-block; margin-top: 4px; font: inherit; font-size: 11px; font-weight: bold; background: none; border: 1.5px solid var(--line); color: var(--muted);
+    padding: 3px 9px; border-radius: 20px; cursor: pointer; }
+  .bk-x.armed { background: #c00; border-color: #c00; color: #fff; }
+  .bk-r .seats + .bk-x { margin-left: 8px; }
+  .bk.ann { opacity: .55; }
+  .bk.ann .bk-n { text-decoration: line-through; }
+  .ck.off { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 2px dashed var(--line); color: var(--muted); font-weight: bold; }
+  .ann-head { padding: 10px 16px 6px; font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); border-top: 2px solid var(--line); }
+  .st b small { font-size: .55em; opacity: .7; }
+  .st.full b, .st.full span { color: #c00; }
   .seats { display: inline-block; font-size: 12px; font-weight: 900; padding: 3px 9px; border: 2px solid var(--fg); }
   .bk-t { display: block; font-size: 10px; font-weight: bold; color: var(--e); margin-top: 4px; }
   .empty { padding: 26px 16px; font-size: 13px; color: var(--muted); line-height: 1.6; }
@@ -10272,7 +10282,7 @@ const sb = supabase.createClient('https://udaymqqytagtayviwolr.supabase.co', 'sb
 sb.auth.getSession().then(({ data }) => { if (!data.session) location.replace('login.html'); });
 sb.auth.onAuthStateChange(ev => { if (ev === 'SIGNED_OUT') location.replace('login.html'); });
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const BK_COLS = 'id, name, email, seats, note, created_at, event_id, checked_in, checked_in_at, codice';
+const BK_COLS = 'id, name, email, seats, note, created_at, event_id, checked_in, checked_in_at, codice, annullata_il';
 const MONTHS = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 const DOW = ['dom','lun','mar','mer','gio','ven','sab'];
 const CAT = { music: ['Musica', '#534AB7'], film: ['Cineforum', '#993C1D'], lab: ['Laboratorio', '#3B6D11'], art: ['Arte', '#854F0B'], meet: ['Riunione', '#4B5563'] };
@@ -10313,7 +10323,9 @@ async function load() {
   render();
 }
 
-const bkOf = id => bookings.filter(b => String(b.event_id) === String(id));
+// le prenotazioni annullate non contano nei posti: restano visibili, barrate, in fondo alla lista
+const bkOf = id => bookings.filter(b => String(b.event_id) === String(id) && !b.annullata_il);
+const annOf = id => bookings.filter(b => String(b.event_id) === String(id) && b.annullata_il);
 const seatsOf = list => list.reduce((a, b) => a + (parseInt(b.seats) || 1), 0);
 
 function render() {
@@ -10361,7 +10373,7 @@ function renderMain() {
       </div></div>
       <div class="stats">
         <div class="st"><b>${list.length}</b><span>prenotazioni</span></div>
-        <div class="st"><b>${seats}</b><span>posti</span></div>
+        <div class="st${e.capienza && seats >= e.capienza ? ' full' : ''}"><b>${seats}${e.capienza ? `<small> / ${e.capienza}</small>` : ''}</b><span>${e.capienza && seats >= e.capienza ? 'posti · sold out' : 'posti'}</span></div>
         <div class="st in"><b>${seatsIn}</b><span>già dentro</span></div>
       </div>
       <div class="meter"><i style="width:${pct}%"></i></div>
@@ -10404,7 +10416,9 @@ function renderList() {
   if (view === 'fuori') list = list.filter(b => !b.checked_in);
   if (view === 'dentro') list = list.filter(b => b.checked_in);
   if (query.trim()) list = list.filter(b => norm(b.name).includes(norm(query)) || norm(b.email).includes(norm(query)));
-  if (!list.length) { box.innerHTML = `<div class="empty">${bkOf(selId).length ? 'nessuno corrisponde.' : 'ancora nessuna prenotazione per questo evento.'}</div>`; return; }
+  let ann = view === 'tutti' ? annOf(selId) : [];
+  if (query.trim()) ann = ann.filter(b => norm(b.name).includes(norm(query)) || norm(b.email).includes(norm(query)));
+  if (!list.length && !ann.length) { box.innerHTML = `<div class="empty">${bkOf(selId).length ? 'nessuno corrisponde.' : 'ancora nessuna prenotazione per questo evento.'}</div>`; return; }
   box.innerHTML = '';
   list.forEach(b => {
     const row = document.createElement('div');
@@ -10412,10 +10426,36 @@ function renderList() {
     const n = parseInt(b.seats) || 1;
     row.innerHTML = `<button class="ck" title="${b.checked_in ? 'annulla ingresso' : 'segna entrato'}">${b.checked_in ? '✓' : ''}</button>
       <div><div class="bk-n">${esc(b.name)}</div><div class="bk-m"><span>${esc(b.email)}</span>${b.note ? `<span>“${esc(b.note)}”</span>` : ''}</div></div>
-      <div class="bk-r"><span class="seats">${n} ${n === 1 ? 'posto' : 'posti'}</span>${b.checked_in && b.checked_in_at ? `<span class="bk-t">dentro dalle ${hhmm(new Date(b.checked_in_at))}</span>` : ''}</div>`;
+      <div class="bk-r"><span class="seats">${n} ${n === 1 ? 'posto' : 'posti'}</span>${b.checked_in && b.checked_in_at ? `<span class="bk-t">dentro dalle ${hhmm(new Date(b.checked_in_at))}</span>` : `<button class="bk-x" type="button">annulla</button>`}</div>`;
     row.querySelector('.ck').onclick = ev => { ev.currentTarget.disabled = true; setIn(b, !b.checked_in); };
+    const x = row.querySelector('.bk-x');
+    if (x) x.onclick = () => {
+      if (!x.classList.contains('armed')) { x.classList.add('armed'); x.textContent = 'sicuro?'; setTimeout(() => { if (x.isConnected) { x.classList.remove('armed'); x.textContent = 'annulla'; } }, 3000); return; }
+      x.disabled = true; setAnnullata(b, true);
+    };
     box.appendChild(row);
   });
+  if (ann.length) {
+    const h = document.createElement('div'); h.className = 'ann-head'; h.textContent = `annullate (${ann.length})`; box.appendChild(h);
+    ann.forEach(b => {
+      const row = document.createElement('div'); row.className = 'bk ann';
+      const n = parseInt(b.seats) || 1;
+      row.innerHTML = `<span class="ck off">✕</span>
+        <div><div class="bk-n">${esc(b.name)}</div><div class="bk-m"><span>annullata ${hhmm(new Date(b.annullata_il))} · ${new Date(b.annullata_il).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}</span></div></div>
+        <div class="bk-r"><span class="seats">${n} ${n === 1 ? 'posto' : 'posti'}</span><button class="bk-x" type="button">ripristina</button></div>`;
+      row.querySelector('.bk-x').onclick = ev => { ev.currentTarget.disabled = true; setAnnullata(b, false); };
+      box.appendChild(row);
+    });
+  }
+}
+
+async function setAnnullata(b, on) {
+  const at = on ? new Date().toISOString() : null;
+  const { error } = await sb.from('bookings').update({ annullata_il: at, modificata_il: new Date().toISOString() }).eq('id', b.id);
+  if (error) { toast('errore: ' + error.message, true); renderList(); return; }
+  b.annullata_il = at;
+  toast(on ? `${b.name}: prenotazione annullata` : `${b.name}: prenotazione ripristinata`);
+  render();
 }
 
 async function setIn(b, on) {
@@ -10486,10 +10526,11 @@ async function onQR(raw) {
     // biglietto nuovo: il codice univoco identifica la prenotazione, il nome nel QR non conta
     let hit = bookings.find(b => b.codice === code);
     if (!hit) { const { data } = await sb.from('bookings').select(BK_COLS).eq('codice', code).maybeSingle(); hit = data || null; }
+    if (hit && hit.annullata_il) { showRes('fail', '✗ prenotazione annullata', hit.name, `annullata il ${new Date(hit.annullata_il).toLocaleDateString('it-IT')}`); return; }
     cands = hit ? [hit] : [];
   } else {
     // biglietto vecchio, emesso prima dei codici: confronto per nome come prima
-    cands = bookings.filter(b => norm(b.name) === norm(name));
+    cands = bookings.filter(b => norm(b.name) === norm(name) && !b.annullata_il);
   }
   const evMatch = b => { const e = events.find(x => String(x.id) === String(b.event_id)); return e && norm(e.name) === norm(evName); };
   const sel = cands.find(b => String(b.event_id) === String(selId) && evMatch(b)) || cands.find(b => String(b.event_id) === String(selId));

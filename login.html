@@ -469,7 +469,7 @@ async function loadBookingPreview() {
     const fut = (evs || []).filter(e => new Date(e.year, e.month, e.day) >= today)
       .sort((a, b) => new Date(a.year, a.month, a.day) - new Date(b.year, b.month, b.day) || String(a.time || '').localeCompare(String(b.time || '')));
     if (!fut.length) { box.innerHTML = '<div class="hb-row">nessun evento in arrivo</div>'; return; }
-    const { data: bks } = await _supabase.from('bookings').select('event_id, seats, checked_in').in('event_id', fut.map(e => e.id));
+    const { data: bks } = await _supabase.from('bookings').select('event_id, seats, checked_in').in('event_id', fut.map(e => e.id)).is('annullata_il', null);
     const rows = fut.map(e => {
       const l = (bks || []).filter(b => String(b.event_id) === String(e.id));
       return { e, n: l.length, s: l.reduce((a, b) => a + (parseInt(b.seats) || 1), 0) };

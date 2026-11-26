@@ -1684,6 +1684,45 @@
   /* lista eventi: tipo con l'iniziale maiuscola, rassegna tutta maiuscola */
   .ev-cat { text-transform: none !important; letter-spacing: .3px !important; }
   .ev-rass { text-transform: uppercase; letter-spacing: .5px; }
+
+  /* ═══ posti: pochi posti / sold out ═══ */
+  .posti-badge { display: inline-block; font-size: 10px; font-weight: bold; letter-spacing: .3px; color: var(--c, #993C1D);
+    border: 1.5px dashed var(--c, #993C1D); padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+  .ev-action { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .ev-row.det-open .posti-badge { color: #fff; border-color: #fff; }
+  .btn-prenota.soldout, .btn-prenota.soldout:hover { background: transparent !important; color: var(--fg-muted) !important; border-color: var(--border-light) !important;
+    cursor: not-allowed; text-decoration: line-through; text-decoration-thickness: 1.5px; }
+  .ev-row.det-open .btn-prenota.soldout { color: rgba(255,255,255,.75) !important; border-color: rgba(255,255,255,.5) !important; }
+
+  /* ═══ i miei biglietti ═══ */
+  .loc-tix { position: relative; }
+  .loc-tix[hidden] { display: none !important; }
+  .loc-tix .tix-ico { width: 18px; height: 18px; display: block; }
+  .tix-n { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; font-size: 10px; line-height: 18px;
+    text-align: center; background: #993C1D; color: #fff; border: 1.5px solid var(--bg); }
+  .miei-overlay { display: none; position: fixed; inset: 0; z-index: 9998; background: rgba(10,10,10,.92); overflow-y: auto; padding: 24px 16px;
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+  .miei-overlay.open { display: flex; }
+  .miei-card { margin: auto; width: 100%; max-width: 480px; background: #f4f1ea; color: #0a0a0a; border: 3px solid #0a0a0a; box-shadow: 8px 8px 0 #993C1D;
+    font-family: var(--font-mono); }
+  .miei-head { position: relative; padding: 16px 18px 14px; border-bottom: 3px solid #0a0a0a; display: flex; flex-direction: column; gap: 4px; }
+  .miei-k { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; color: #555; }
+  .miei-t { font-size: 26px; font-weight: 900; letter-spacing: -1px; }
+  .miei-x { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 2px solid #0a0a0a; background: #fff; font-weight: bold; cursor: pointer; font-family: inherit; }
+  .miei-row { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #d9d4c7;
+    border-left: 6px solid var(--c); text-decoration: none; color: inherit; background: #fff; }
+  .miei-row.off { opacity: .5; }
+  .miei-date { border: 2px solid #0a0a0a; text-align: center; padding: 4px 0; line-height: 1; background: #fff; }
+  .miei-date small { display: block; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #555; }
+  .miei-date b { display: block; font-size: 20px; font-weight: 900; color: var(--c); margin: 2px 0; }
+  .miei-info { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .miei-name { font-size: 15px; font-weight: 900; overflow-wrap: anywhere; }
+  .miei-st { font-size: 11px; color: #555; }
+  .miei-go { font-size: 12px; font-weight: bold; border: 2px solid #0a0a0a; padding: 6px 10px; white-space: nowrap; }
+  .miei-empty { padding: 22px 18px; font-size: 13px; }
+  .miei-hint { font-size: 11px; color: #555; padding: 12px 18px 16px; line-height: 1.5; }
+  .ticket-manage { color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: bold; text-align: center; text-decoration: underline; text-underline-offset: 3px; }
+  .ticket-manage[hidden] { display: none; }
 </style>
 </head>
 <body class="is-home">
@@ -1783,6 +1822,7 @@
     </div>
     <!-- Riga 2 (mobile): navigazione mesi + azioni + dark toggle -->
     <div class="toolbar-actions">
+      <button class="location-close loc-home loc-tix" id="tix-toolbtn" onclick="openMiei()" aria-label="I miei biglietti" title="I miei biglietti" hidden><svg class="tix-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 6.5V4.5h16v2a2 2 0 0 0 0 4v2H2v-2a2 2 0 0 0 0-4Z" transform="translate(0 2.5)" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M12.5 7.5v1.6M12.5 11v1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>biglietti</span><b class="tix-n" id="tix-n">0</b></button>
       <button class="location-close loc-home loc-map" id="map-toolbtn" onclick="openLocation()" aria-label="Dove siamo"><svg class="map-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 19.5S3.5 12.6 3.5 8A6.5 6.5 0 0 1 16.5 8C16.5 12.6 10 19.5 10 19.5Z" fill="currentColor"/><circle cx="10" cy="8" r="2.6" fill="var(--pill-bg)"/></svg><span>mappa</span></button>
       <button class="location-close loc-home" id="home-toolbtn" onclick="goHome()" aria-label="Torna alla home"><svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/><path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/><rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/></svg><span>home</span></button>
     </div>
@@ -1864,6 +1904,7 @@
       <button class="t-act-pdf" onclick="saveTicketImage()" id="t-act-img">↓ salva biglietto</button>
     </div>
     <div class="ticket-hint">all'ingresso basta mostrare il QR: salvalo o fai uno screenshot</div>
+    <a class="ticket-manage" id="t-manage" href="#" hidden>cambia posti o annulla la prenotazione →</a>
   </div>
 </div>
 </div>
@@ -1898,6 +1939,16 @@
     <div class="site-legal">spazio432 · via ceva 47 · torino · <a href="privacy.html">informativa privacy</a></div>
   </div>
   
+<!-- I MIEI BIGLIETTI -->
+<div class="miei-overlay" id="miei-overlay" onclick="if (event.target === this) closeMiei()">
+  <div class="miei-card" role="dialog" aria-label="I miei biglietti">
+    <div class="miei-head"><span class="miei-k">salvati su questo dispositivo</span><span class="miei-t">I MIEI BIGLIETTI</span>
+      <button class="miei-x" onclick="closeMiei()" aria-label="Chiudi">✕</button></div>
+    <div class="miei-list" id="miei-list"></div>
+    <p class="miei-hint">apri un biglietto per rivederlo, cambiare i posti o annullare (fino a 2 ore prima dell'evento)</p>
+  </div>
+</div>
+
 <!-- TICKET OVERLAY -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1944,6 +1995,7 @@ async function fetchAndBuild() {
 
   buildGrid(cur);
   buildListView();
+  loadStati();          // pochi posti / sold out
   updateViewIcons();
   const carousel = document.getElementById("filter-carousel");
   if (carousel && window.getComputedStyle(carousel).display !== "none") carouselBuild();
@@ -2936,6 +2988,7 @@ function buildDetailBookingTrigger(evt) {
   counter.textContent = '…';
   btn.onclick = (e) => { e.stopPropagation(); openBookingPanel(evt, btn); };
   wrap.appendChild(btn);
+  applyStato(btn);
   return wrap;
 }
 
@@ -3018,6 +3071,7 @@ function buildRecapBookingBlock(evt) {
   };
   topRow.appendChild(btn);
   wrap.appendChild(topRow); wrap.appendChild(formWrap);
+  applyStato(btn);
   return wrap;
 }
 
@@ -3059,13 +3113,14 @@ async function submitBooking(uid, eventId) {
     subBtn.disabled = false; msgEl.textContent = error.code === 'P0001' ? error.message : 'qualcosa non è andato, riprova tra poco'; msgEl.className = 'bk-message fail'; return;
   }
   msgEl.textContent = `Prenotazione confermata per ${name}!`; msgEl.className = 'bk-message ok';
-  document.querySelectorAll(`[id^="cnt-bk-${eventId}"],[id^="cnt-rbk-${eventId}"]`).forEach(el => loadBookingCount(eventId, el));
+  loadStati();
   const trigBtn = document.getElementById('btn-' + uid);
   if (trigBtn) { trigBtn.innerHTML = 'ci sei'; trigBtn.classList.add('done'); trigBtn.classList.remove('open'); trigBtn.disabled = true; }
 
   // Prepara dati biglietto
   const MONTHS_TICK = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   const evt = events.find(e => String(e.id) === String(eventId));
+  if (evt) salvaMio(codice, evt);
 
   // Chiudi form e pannello dopo 1.2s, poi apri biglietto
   setTimeout(() => {
@@ -3090,6 +3145,96 @@ async function submitBooking(uid, eventId) {
     }
   }, 1200);
 }
+
+
+// ── POSTI: "pochi posti" e "sold out" (il pubblico non vede mai i numeri) ──
+let STATI = {};
+async function loadStati() {
+  const ids = events.map(e => e.id);
+  STATI = {};
+  if (ids.length) {
+    try {
+      const { data } = await _supabase.rpc('stato_eventi', { ids });
+      (data || []).forEach(r => { STATI[String(r.event_id)] = r.stato; });
+    } catch (e) {}
+  }
+  document.querySelectorAll('.btn-prenota').forEach(applyStato);
+}
+function applyStato(btn) {
+  if (!btn || !btn.id || btn.classList.contains('done')) return;
+  const st = STATI[btn.id.replace(/^btn-r?bk-/, '')];
+  const host = btn.parentElement;
+  if (host) host.querySelectorAll('.posti-badge').forEach(b => b.remove());
+  if (st === 'sold_out') {
+    btn.disabled = true; btn.classList.add('soldout'); btn.classList.remove('open');
+    btn.textContent = 'sold out';
+    return;
+  }
+  if (btn.classList.contains('soldout')) {
+    btn.disabled = false; btn.classList.remove('soldout');
+    btn.innerHTML = '<span class="bk-arrow">→</span> vengo!';
+  }
+  if (st === 'pochi' && host) {
+    const b = document.createElement('span'); b.className = 'posti-badge'; b.textContent = 'pochi posti';
+    host.appendChild(b);
+  }
+}
+
+// ── I MIEI BIGLIETTI: salvati su questo dispositivo ──
+const MIEI_KEY = 's432_miei';
+const isoGiorno = (y, m, d) => `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+function leggiMiei() {
+  try { return JSON.parse(localStorage.getItem(MIEI_KEY) || '[]').filter(x => x && x.c); } catch (e) { return []; }
+}
+function scriviMiei(list) { try { localStorage.setItem(MIEI_KEY, JSON.stringify(list)); } catch (e) {} aggiornaTix(); }
+function mieiFuturi() {
+  const oggi = new Date(); const o = isoGiorno(oggi.getFullYear(), oggi.getMonth(), oggi.getDate());
+  return leggiMiei().filter(x => (x.d || '') >= o);
+}
+function salvaMio(codice, evt) {
+  const list = leggiMiei().filter(x => x.c !== codice);
+  list.push({ c: codice, e: evt.id, n: evt.name, d: isoGiorno(evt.year, evt.month, evt.day), t: evt.time || '', cat: evt.cat });
+  scriviMiei(list);
+}
+function aggiornaTix() {
+  const btn = document.getElementById('tix-toolbtn'); if (!btn) return;
+  const n = mieiFuturi().length;
+  btn.hidden = n === 0;
+  document.getElementById('tix-n').textContent = n;
+}
+async function openMiei() {
+  const ov = document.getElementById('miei-overlay');
+  const box = document.getElementById('miei-list');
+  const list = mieiFuturi().sort((a, b) => (a.d + a.t).localeCompare(b.d + b.t));
+  box.innerHTML = '';
+  if (!list.length) box.innerHTML = '<div class="miei-empty">nessun biglietto per i prossimi eventi</div>';
+  const DW = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'], MS = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  list.forEach(x => {
+    const [y, m, d] = x.d.split('-').map(Number);
+    const a = document.createElement('a');
+    a.className = 'miei-row'; a.href = 'biglietto.html#c=' + x.c;
+    a.style.setProperty('--c', CAT_COLORS[x.cat] || '#534AB7');
+    a.innerHTML = `<span class="miei-date"><small>${DW[new Date(y, m - 1, d).getDay()]}</small><b>${d}</b><small>${MS[m - 1]}</small></span>
+      <span class="miei-info"><span class="miei-name"></span><span class="miei-st">…</span></span><span class="miei-go">apri →</span>`;
+    a.querySelector('.miei-name').textContent = x.n + (x.t ? ' · ' + x.t : '');
+    box.appendChild(a);
+    // stato vero dal database (la prenotazione potrebbe essere stata cambiata o annullata)
+    _supabase.rpc('biglietto_info', { c: x.c }).then(({ data }) => {
+      const st = a.querySelector('.miei-st');
+      if (!data) { st.textContent = 'biglietto non trovato'; a.classList.add('off'); return; }
+      if (data.annullata_il) { st.textContent = 'annullata'; a.classList.add('off'); return; }
+      st.textContent = data.seats + (data.seats === 1 ? ' posto' : ' posti') + (data.modificabile ? '' : ' · modifiche chiuse');
+    }).catch(() => {});
+  });
+  ov.classList.add('open');
+  document.documentElement.classList.add('ticket-open');
+}
+function closeMiei() {
+  document.getElementById('miei-overlay').classList.remove('open');
+  document.documentElement.classList.remove('ticket-open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('miei-overlay').classList.contains('open')) closeMiei(); });
+aggiornaTix();
 
 // ── CAROSELLO FILTRI (mobile) — loop infinito ─────────────────
 let carouselIdx = 0;
@@ -3299,6 +3444,8 @@ function openTicketOverlay(data) {
   const code  = data.codice ? 'S432-' + data.codice.slice(0, 4).toUpperCase() : genTicketCode(name, event, date);
   const seatsN = String(seats);
   _ticket = { ...data, code };
+  const mg = document.getElementById('t-manage');
+  if (mg) { mg.hidden = !data.codice; if (data.codice) mg.href = 'biglietto.html#c=' + data.codice; }
 
   fillTicket({ ...data, code, seats: seatsN });
 

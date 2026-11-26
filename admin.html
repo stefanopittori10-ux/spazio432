@@ -1326,6 +1326,9 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
 
   /* tipo di evento: iniziale maiuscola */
   .det-cat, .recap-cat, .recap-group-cat { text-transform: none; letter-spacing: .3px; }
+
+  .booking-count.pieno { color: #c00 !important; border-color: #c00 !important; font-weight: bold; }
+  .mf-cap input { max-width: 160px; }
 </style>
 </head>
 <body>
@@ -1406,6 +1409,7 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
             </div>
           </div>
           <label class="mf" id="mf-rass-wrap"><span>rassegna <i>(facoltativa)</i></span><input type="text" id="mf-rass" list="mf-rass-list" placeholder="es. Porta I: La Chiamata" autocomplete="off"><datalist id="mf-rass-list"></datalist></label>
+          <label class="mf mf-cap"><span>capienza <i>(facoltativa: vuota = senza limite)</i></span><input type="number" id="mf-cap" min="1" max="999" inputmode="numeric" placeholder="es. 40"></label>
           <div class="mf-row">
             <label class="mf"><span>quando</span><input type="date" id="mf-date"></label>
             <label class="mf mf-t"><span>dalle</span><input type="time" id="mf-time" value="19:00"></label>
@@ -2134,9 +2138,15 @@ function closeRecapForm(uid) {
 
 async function loadBookingCount(eventId, counterEl) {
   try {
-    const { count } = await _supabase.from('bookings').select('id', { count: 'exact', head: true }).eq('event_id', eventId);
-    const n = count || 0;
-    counterEl.textContent = n === 0 ? 'Nessuna prenotazione' : n === 1 ? '1 prenotazione' : `${n} prenotazioni`;
+    const { data } = await _supabase.from('bookings').select('seats, annullata_il').eq('event_id', eventId);
+    const valide = (data || []).filter(b => !b.annullata_il);
+    const posti = valide.reduce((a, b) => a + (parseInt(b.seats) || 1), 0);
+    const ev = events.find(e => String(e.id) === String(eventId));
+    const cap = ev && ev.capienza;
+    counterEl.textContent = !valide.length && !cap ? 'nessuna prenotazione'
+      : cap ? `${posti} / ${cap} posti${posti >= cap ? ' · sold out' : ''}`
+      : `${valide.length} ${valide.length === 1 ? 'prenotazione' : 'prenotazioni'} · ${posti} posti`;
+    counterEl.classList.toggle('pieno', !!cap && posti >= cap);
   } catch { counterEl.textContent = ''; }
 }
 
@@ -2591,7 +2601,7 @@ function mgrDefaultDate() {
 
 function mgrReset() {
   mgrEditing = null;
-  ['mf-name', 'mf-end', 'mf-desc', 'mf-rass'].forEach(id => document.getElementById(id).value = '');
+  ['mf-name', 'mf-end', 'mf-desc', 'mf-rass', 'mf-cap'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('mf-time').value = '19:00';
   document.getElementById('mf-date').value = mgrDefaultDate();
   document.getElementById('mf-rep').checked = false;
@@ -2614,6 +2624,7 @@ function mgrFill(ev, asCopy) {
   document.getElementById('mf-end').value = ev.endTime || '';
   document.getElementById('mf-desc').value = ev.description || '';
   document.getElementById('mf-rass').value = ev.rassegna || '';
+  document.getElementById('mf-cap').value = ev.capienza || '';
   mgrSetCat(ev.cat || 'music');
   document.getElementById('mf-rep').checked = false;
   document.getElementById('mf-weeks-wrap').hidden = true;
@@ -2655,7 +2666,8 @@ async function mgrSave() {
     time: document.getElementById('mf-time').value || '',
     endTime: document.getElementById('mf-end').value || null,
     description: document.getElementById('mf-desc').value.trim() || null,
-    rassegna: document.getElementById('mf-rass').value.trim() || null   // facoltativa, per qualsiasi tipo di evento
+    rassegna: document.getElementById('mf-rass').value.trim() || null,   // facoltativa, per qualsiasi tipo di evento
+    capienza: parseInt(document.getElementById('mf-cap').value, 10) > 0 ? parseInt(document.getElementById('mf-cap').value, 10) : null
   };
   const saveBtn = document.getElementById('mf-save');
   saveBtn.disabled = true;
