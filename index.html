@@ -1498,7 +1498,7 @@
   }
   .ticket-overlay.open { display: flex; }
   .ticket-overlay-inner {
-    margin: auto; width: 100%; max-width: 480px; max-height: none; overflow: visible;
+    margin: auto; width: 100%; max-width: 490px; max-height: none; overflow: visible;
     display: flex; flex-direction: column; align-items: stretch; gap: 16px;
     animation: ticket-in .28s cubic-bezier(.2,.8,.2,1);
   }
@@ -1532,11 +1532,65 @@
     .ticket-overlay .ticket-body { padding: 18px 16px 14px; gap: 12px; }
     .ticket-overlay .ticket-name { font-size: 17px; }
   }
+
+  /* ═══ BIGLIETTO · stesso linguaggio del png "programma del mese" ═══ */
+  .tk { position: relative; width: 100%; max-width: 480px; padding: 0 10px 10px 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; color: #0a0a0a; font-size: 16px; text-align: left; }
+  .tk * { box-sizing: border-box; margin: 0; padding: 0; }
+  .tk-sh { position: absolute; left: 10px; top: 10px; right: 0; bottom: 0; background: #0a0a0a; }
+  .tk-in { position: relative; background: #f4f1ea; border: 3px solid #0a0a0a; padding: 20px 20px 16px; }
+  .tk-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-bottom: 12px; border-bottom: 5px solid #0a0a0a; }
+  .tk-logo { font-size: 30px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+  .tk-logo span { color: #8a8a8a; margin-left: 3px; }
+  .tk-addr { font-size: 10px; letter-spacing: 1.5px; color: #555; margin-top: 6px; }
+  .tk-tag { background: #0a0a0a; color: #f4f1ea; font-size: 11px; font-weight: bold; letter-spacing: 2.5px; padding: 4px 8px; white-space: nowrap; }
+  .tk-cw { position: relative; margin: 18px 6px 6px 0; }
+  .tk-csh { position: absolute; left: 6px; top: 6px; right: -6px; bottom: -6px; background: #0a0a0a; }
+  .tk-card { position: relative; display: flex; gap: 14px; align-items: center; border: 3px solid #0a0a0a; padding: 14px; color: #fff; background: #534AB7; }
+  .tk-date { flex: 0 0 auto; width: 66px; background: #fff; border: 3px solid #0a0a0a; text-align: center; padding: 6px 0 7px; color: #0a0a0a; }
+  .tk-dow, .tk-mon { font-size: 11px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; }
+  .tk-day { font-size: 32px; font-weight: 900; line-height: 1.05; letter-spacing: -1px; }
+  .tk-info { min-width: 0; flex: 1; }
+  .tk-cat { font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; opacity: .9; overflow-wrap: anywhere; }
+  .tk-name { font-size: 24px; font-weight: 900; line-height: 1.08; letter-spacing: -.5px; margin-top: 4px; overflow-wrap: anywhere; }
+  .tk-pills { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tk-pill { font-size: 12px; font-weight: bold; border: 2px solid #fff; border-radius: 20px; padding: 1px 9px; white-space: nowrap; }
+  .tk-pill:empty { display: none; }
+  .tk-mid { display: flex; gap: 16px; align-items: flex-end; justify-content: space-between; margin-top: 18px; }
+  .tk-who { min-width: 0; flex: 1; }
+  .tk-lbl { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; color: #555; }
+  .tk-holder { font-size: 18px; font-weight: 900; margin: 2px 0 10px; overflow-wrap: anywhere; }
+  .tk-email { font-size: 13px; margin-top: 2px; overflow-wrap: anywhere; }
+  .tk-qr { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .tk .qr-box { width: 104px; height: 104px; background: #fff; border: 3px solid #0a0a0a; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .tk .qr-box canvas { display: block; width: 92px !important; height: 92px !important; }
+  .tk-qr-lbl { font-size: 9px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; color: #555; line-height: 1.4; }
+  .tk-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; padding-top: 12px; border-top: 5px solid #0a0a0a; }
+  .tk-code { font-size: 22px; font-weight: 900; letter-spacing: 3px; margin-top: 2px; white-space: nowrap; }
+  .tk-dia { display: flex; align-items: center; gap: 10px; }
+  .tk-bubble { position: relative; background: #fff; border: 2px solid #0a0a0a; font-size: 12px; font-weight: 900; padding: 6px 9px; box-shadow: 3px 3px 0 #0a0a0a; white-space: nowrap; }
+  .tk-bubble::after { content: ''; position: absolute; right: -9px; top: 50%; margin-top: -6px; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 8px solid #0a0a0a; }
+  .tk-dia-svg { width: 34px; height: 45px; display: block; }
+  @media (max-width: 420px) {
+    .tk-in { padding: 16px 14px 14px; }
+    .tk-logo { font-size: 25px; }
+    .tk-card { padding: 12px; gap: 12px; }
+    .tk-date { width: 58px; }
+    .tk-day { font-size: 27px; }
+    .tk-name { font-size: 20px; }
+    .tk .qr-box { width: 96px; height: 96px; }
+    .tk .qr-box canvas { width: 84px !important; height: 84px !important; }
+    .tk-code { font-size: 18px; letter-spacing: 2px; }
+    .tk-bubble { display: none; }
+  }
   @media print {
     .ticket-overlay { position: static !important; background: #fff !important; padding: 0 !important; overflow: visible !important; }
     .ticket-overlay .ticket { box-shadow: none !important; }
     .ticket-hint { display: none !important; }
   }
+
+  /* rassegna del cineforum: sopra il titolo del film */
+  .ev-rass { font-size: 11px; font-weight: bold; color: var(--c); letter-spacing: .3px; margin-top: 4px; overflow-wrap: anywhere; }
+  .ev-rass[hidden] { display: none; }
 </style>
 </head>
 <body class="is-home">
@@ -1679,43 +1733,36 @@
 
     <div class="ticket-overlay" id="ticket-overlay">
   <div class="ticket-overlay-inner">
-    <div class="ticket-wrap">
-      <div class="ticket" id="ticket">
-        <div class="ticket-stripe" id="t-stripe"></div>
-        <div class="ticket-body">
-          <div class="ticket-left">
-            <div class="ticket-venue">spazio 432 — via ceva 47, torino</div>
-            <div class="ticket-cat" id="t-cat"></div>
-            <div class="ticket-name" id="t-name"></div>
-            <div class="ticket-meta">
-              <div class="ticket-meta-row"><span class="ticket-meta-label">Data</span><span class="ticket-meta-val" id="t-date"></span></div>
-              <div class="ticket-meta-row"><span class="ticket-meta-label">Ora</span><span class="ticket-meta-val" id="t-time"></span></div>
-              <div class="ticket-meta-row"><span class="ticket-meta-label">Posti</span><span class="ticket-meta-val" id="t-seats"></span></div>
-            </div>
-            <div class="ticket-holder">
-              <div class="ticket-holder-label">Intestato a</div>
-              <div class="ticket-holder-val" id="t-holder"></div>
-              <div class="ticket-holder-label">Email</div>
-              <div class="ticket-holder-email" id="t-email"></div>
-            </div>
+    <div class="tk" id="ticket">
+        <div class="tk-sh"></div>
+        <div class="tk-in">
+          <div class="tk-head">
+            <div><div class="tk-logo">spazio<span>432</span></div><div class="tk-addr">VIA CEVA 47 · TORINO</div></div>
+            <span class="tk-tag">BIGLIETTO</span>
           </div>
-          <div class="ticket-qr">
-            <div class="qr-box" id="qr-box"></div>
-            <div class="qr-label">scansiona<br>all'ingresso</div>
+          <div class="tk-cw"><div class="tk-csh"></div><div class="tk-card" id="tk-card">
+            <div class="tk-date"><div class="tk-dow" id="t-dow"></div><div class="tk-day" id="t-day"></div><div class="tk-mon" id="t-mon"></div></div>
+            <div class="tk-info">
+              <div class="tk-cat" id="t-cat"></div>
+              <div class="tk-name" id="t-name"></div>
+              <div class="tk-pills"><span class="tk-pill" id="t-time"></span><span class="tk-pill" id="t-seats"></span></div>
+            </div>
+          </div></div>
+          <div class="tk-mid">
+            <div class="tk-who">
+              <div class="tk-lbl">intestato a</div>
+              <div class="tk-holder" id="t-holder"></div>
+              <div class="tk-lbl">email</div>
+              <div class="tk-email" id="t-email"></div>
+            </div>
+            <div class="tk-qr"><div class="qr-box" id="qr-box"></div><div class="tk-qr-lbl">mostralo<br>all'ingresso</div></div>
           </div>
-        </div>
-        <div class="ticket-perf">
-          <div class="perf-circle"></div>
-          <div class="perf-line"></div>
-          <div class="perf-circle"></div>
-        </div>
-        <div class="ticket-stub">
-          <div class="stub-code" id="t-code"></div>
-          <div class="stub-seats" id="t-stub-seats"></div>
-          <div class="stub-logo">spazio<span>432</span></div>
+          <div class="tk-foot">
+            <div><div class="tk-lbl">codice</div><div class="tk-code" id="t-code"></div></div>
+            <div class="tk-dia"><div class="tk-bubble">ci vediamo lì!</div><svg class="tk-dia-svg" viewBox="0 0 60 80" aria-hidden="true"><path d="M14 4 H22 V36 A8 8 0 0 0 38 36 V4 H46 V36 A16 16 0 0 1 14 36 Z" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2" stroke-linejoin="round"/><circle cx="18" cy="15" r="3.4" fill="#fff" stroke="#0a0a0a"/><circle cx="42" cy="15" r="3.4" fill="#fff" stroke="#0a0a0a"/><circle cx="18.8" cy="15.6" r="1.6" fill="#000"/><circle cx="42.8" cy="15.6" r="1.6" fill="#000"/><path d="M25 46.5 Q30 50 35 46.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><rect x="27" y="51" width="6" height="18" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2"/><circle cx="30" cy="72" r="5.5" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2"/></svg></div>
+          </div>
         </div>
       </div>
-    </div>
     <div class="ticket-overlay-actions">
       <button class="t-act-close" onclick="closeTicketOverlay()">✕ chiudi</button>
       <button class="t-act-pdf" onclick="saveTicketImage()" id="t-act-img">↓ salva biglietto</button>
@@ -1956,7 +2003,7 @@ function fillEventDetails(box, ev) {
     if (en <= st) en = new Date(en.getTime() + 24 * 3600e3);   // finisce dopo mezzanotte
     const f = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
     gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
-      + '&text=' + encodeURIComponent(ev.name + ' · spazio432')
+      + '&text=' + encodeURIComponent((ev.rassegna ? ev.rassegna + ': ' : '') + ev.name + ' · spazio432')
       + '&dates=' + f(st) + '/' + f(en) + '&ctz=Europe/Rome'
       + '&location=' + encodeURIComponent('Spazio 432, Via Ceva 47, Torino')
       + '&details=' + encodeURIComponent((ev.description ? ev.description + '\n\n' : '') + 'https://spazio432.org/#eventi');
@@ -1976,7 +2023,7 @@ function fillEventDetails(box, ev) {
   const sh = box.querySelector('.ev-share');
   sh.onclick = async () => {
     const url = 'https://spazio432.org/#eventi';
-    const text = `${ev.name} · ${dateLong}${ev.time ? ' ore ' + ev.time : ''} · spazio432, via ceva 47`;
+    const text = `${ev.rassegna ? ev.rassegna + ': ' : ''}${ev.name} · ${dateLong}${ev.time ? ' ore ' + ev.time : ''} · spazio432, via ceva 47`;
     try {
       if (navigator.share) { await navigator.share({ title: ev.name, text, url }); return; }
       await navigator.clipboard.writeText(text + '\n' + url);
@@ -2032,11 +2079,13 @@ function buildListView() {
         </div>
         <div class="ev-body">
           <div class="ev-top"><span class="ev-cat">${CAT_LABELS[first.cat]}</span>${t ? `<span class="ev-time">${t}</span>` : ''}</div>
+          <div class="ev-rass" hidden></div>
           <button class="ev-name" type="button" aria-expanded="false"></button>
           <button class="ev-more" type="button">dimmi di + !</button>
         </div>
         <div class="ev-details"><div class="ev-details-inner"></div></div>`;
       row.querySelector('.ev-name').textContent = first.name;
+      if (first.rassegna) { const rs = row.querySelector('.ev-rass'); rs.hidden = false; rs.textContent = 'rassegna · ' + first.rassegna; }
       fillEventDetails(row.querySelector('.ev-details-inner'), first);
       const toggleDet = () => {
         const open = row.classList.toggle('det-open');
@@ -2072,12 +2121,14 @@ function buildListView() {
         <div class="ev-date"><span class="ev-dow">serie</span><span class="ev-day">${evts.length}</span><span class="ev-mon">date</span></div>
         <div class="recap-group-left">
           <div class="ev-top"><span class="ev-cat">${CAT_LABELS[first.cat]}</span></div>
+          <div class="ev-rass" hidden></div>
           <div class="ev-name"></div>
           ${first.description ? '<p class="ev-desc"></p>' : ''}
         </div>
         <span class="recap-group-arrow">›</span>
       `;
       header.querySelector('.ev-name').textContent = first.name;
+      if (first.rassegna) { const rs = header.querySelector('.ev-rass'); rs.hidden = false; rs.textContent = 'rassegna · ' + first.rassegna; }
       if (first.description) header.querySelector('.ev-desc').textContent = first.description;
 
       const body = document.createElement('div');
@@ -2174,7 +2225,7 @@ function showDetail(ev) {
 
     const cat = document.createElement('div');
     cat.className = 'det-cat';
-    cat.textContent = CAT_LABELS[evt.cat].toUpperCase();
+    cat.textContent = CAT_LABELS[evt.cat].toUpperCase() + (evt.rassegna ? ' · ' + evt.rassegna : '');
     cat.style.color = CAT_COLORS[evt.cat];
 
     const name = document.createElement('div');
@@ -2319,7 +2370,7 @@ function exportInstagramPNG() {
 
       const cat = document.createElement('div');
       cat.className = 'recap-cat';
-      cat.textContent = CAT_LABELS[ev.cat].toUpperCase();
+      cat.textContent = CAT_LABELS[ev.cat].toUpperCase() + (ev.rassegna ? ' · ' + ev.rassegna : '');
 
       const name = document.createElement('div');
       name.className = 'recap-name';
@@ -2932,6 +2983,7 @@ async function submitBooking(uid, eventId) {
         email,
         seats: String(seats),
         event: evt.name,
+        rassegna: evt.rassegna || null,
         cat:   evt.cat,
         date:  `${evt.day} ${MONTHS_TICK[evt.month]} ${evt.year}`,
         time:  evt.time + (evt.endTime ? ' – ' + evt.endTime : '')
@@ -3112,6 +3164,33 @@ function drawQR(box, text, px) {
   box.appendChild(c);
 }
 
+// riempie il biglietto (stesso disegno nel sito, nell'admin, nella pagina biglietto e nell'immagine)
+const TK_MESI = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+const TK_DOW = ['dom','lun','mar','mer','gio','ven','sab'];
+function fillTicket(t) {
+  const color = T_CAT_COLORS[t.cat] || '#534AB7';
+  document.getElementById('tk-card').style.background = color;
+  const m = String(t.date || '').match(/(\d{1,2})\s+(\S+)\s+(\d{4})/);
+  let dow = '', day = '', mon = '';
+  if (m) {
+    const mi = TK_MESI.indexOf(m[2].toLowerCase());
+    day = m[1];
+    mon = (mi >= 0 ? TK_MESI[mi] : m[2]).slice(0, 3) + ' ' + m[3].slice(2);
+    if (mi >= 0) dow = TK_DOW[new Date(+m[3], mi, +m[1]).getDay()];
+  }
+  document.getElementById('t-dow').textContent = dow;
+  document.getElementById('t-day').textContent = day;
+  document.getElementById('t-day').style.color = color;
+  document.getElementById('t-mon').textContent = mon;
+  document.getElementById('t-cat').textContent = (T_CAT_LABELS[t.cat] || t.cat || '') + (t.rassegna ? ' · ' + t.rassegna : '');
+  document.getElementById('t-name').textContent = t.event;
+  document.getElementById('t-time').textContent = t.time || '';
+  document.getElementById('t-seats').textContent = t.seats + (String(t.seats) === '1' ? ' posto' : ' posti');
+  document.getElementById('t-holder').textContent = t.name;
+  document.getElementById('t-email').textContent = t.email;
+  document.getElementById('t-code').textContent = t.code;
+}
+
 let _ticket = null;
 
 function openTicketOverlay(data) {
@@ -3121,17 +3200,7 @@ function openTicketOverlay(data) {
   const seatsN = String(seats);
   _ticket = { ...data, code };
 
-  document.getElementById('t-stripe').style.background = color;
-  document.getElementById('t-cat').textContent    = T_CAT_LABELS[cat] || cat;
-  document.getElementById('t-cat').style.color    = color;
-  document.getElementById('t-name').textContent   = event;
-  document.getElementById('t-date').textContent   = date;
-  document.getElementById('t-time').textContent   = time;
-  document.getElementById('t-seats').textContent  = seatsN;
-  document.getElementById('t-holder').textContent = name;
-  document.getElementById('t-email').textContent  = email;
-  document.getElementById('t-code').textContent   = code;
-  document.getElementById('t-stub-seats').textContent = seatsN + (seatsN == '1' ? ' posto' : ' posti');
+  fillTicket({ ...data, code, seats: seatsN });
 
   // biglietti nuovi: QR corto (codice univoco + nome); vecchi: formato completo di prima
   const qrData = data.codice
@@ -3181,13 +3250,13 @@ async function saveTicketImage() {
   btn.disabled = true;
   try {
     const canvas = await html2canvas(document.getElementById('ticket'), {
-      scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false
+      scale: 3, useCORS: true, backgroundColor: '#f4f1ea', logging: false
     });
     // cornice chiara intorno
     const pad = 48, out = document.createElement('canvas');
     out.width = canvas.width + pad * 2; out.height = canvas.height + pad * 2;
     const ctx = out.getContext('2d');
-    ctx.fillStyle = '#f5f4f0'; ctx.fillRect(0, 0, out.width, out.height);
+    ctx.fillStyle = '#f4f1ea'; ctx.fillRect(0, 0, out.width, out.height);
     ctx.drawImage(canvas, pad, pad);
 
     const blob = await new Promise(res => out.toBlob(res, 'image/png'));

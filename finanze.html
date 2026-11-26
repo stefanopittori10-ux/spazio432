@@ -6,7 +6,7 @@
 <title>Finanze · spazio 432</title>
 <script>
   // accesso riservato: serve una sessione Supabase (login con email e password)
-  try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token') || !localStorage.getItem('sb-rsgazxwkdyphdjogvbpe-auth-token')) location.replace('login.html'); } catch (e) { location.replace('login.html'); }
+  try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.replace('login.html'); } catch (e) { location.replace('login.html'); }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
@@ -853,7 +853,7 @@ create policy "accesso totale" on finanze
       <span class="setup-title">⚠ Spese anticipate — serve una query su Supabase</span>
       <button class="setup-close" onclick="document.getElementById('rimb-setup').classList.remove('show')">chiudi ✕</button>
     </div>
-    <p class="setup-txt">Nel progetto <strong>finanze</strong> → SQL Editor, poi ricarica:</p>
+    <p class="setup-txt">Nel progetto Supabase dello spazio → SQL Editor, poi ricarica:</p>
     <div class="setup-sql">alter table finanze add column if not exists pagato_da     text;
 alter table finanze add column if not exists rimborsato    boolean default false;
 alter table finanze add column if not exists rimborsato_il timestamptz;</div>
@@ -865,7 +865,7 @@ alter table finanze add column if not exists rimborsato_il timestamptz;</div>
       <span class="setup-title">⚠ Divisione bollette — servono due query su Supabase</span>
       <button class="setup-close" onclick="document.getElementById('split-setup').classList.remove('show')">chiudi ✕</button>
     </div>
-    <p class="setup-txt"><strong>1.</strong> Nel progetto <strong>finanze</strong> (rsgazxwkdyphdjogvbpe) → SQL Editor:</p>
+    <p class="setup-txt"><strong>1.</strong> Nel progetto Supabase dello spazio → SQL Editor:</p>
     <div class="setup-sql">alter table finanze add column if not exists periodo_dal date;
 alter table finanze add column if not exists periodo_al  date;
 
@@ -896,7 +896,7 @@ create policy "accesso totale" on partecipanti   for all to authenticated using 
 create policy "accesso totale" on quote_bollette for all to authenticated using (true) with check (true);
 
 insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Alejandra');</div>
-    <p class="setup-txt" style="margin-top:12px"><strong>2.</strong> Nel progetto <strong>calendario</strong> (udaymqqytagtayviwolr) → SQL Editor:</p>
+    <p class="setup-txt" style="margin-top:12px"><strong>2.</strong> Sempre nello stesso progetto → SQL Editor:</p>
     <div class="setup-sql">alter table events add column if not exists esterno boolean default false;</div>
   </div>
 
@@ -1154,9 +1154,10 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
 <script>
 // ── SUPABASE ──────────────────────────────────────────────────
 const { createClient } = supabase;
+// un solo progetto Supabase per tutto: calendario, prenotazioni e finanze
 const db = createClient(
-  'https://rsgazxwkdyphdjogvbpe.supabase.co',
-  'sb_publishable_WOZoyGngLDMhJRDMDfx42Q_Y7qYW9GG'
+  'https://udaymqqytagtayviwolr.supabase.co',
+  'sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs'
 );
 
 // ── MONTHS / STATE ────────────────────────────────────────────
@@ -1168,19 +1169,12 @@ let allRisparmio = [];
 let editingId = null;   // id della voce in modifica (null = nessuna)
 
 // ── DIVISIONE BOLLETTE: stato ─────────────────────────────────
-// Il calendario sta su un altro progetto Supabase → secondo client
-const cal = createClient(
-  'https://udaymqqytagtayviwolr.supabase.co',
-  'sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs'
-);
+// eventi e finanze ora stanno nello stesso progetto: "cal" è lo stesso client
+const cal = db;
 
 // la sessione va confermata dal server: se è scaduta o revocata si torna al login
 db.auth.getSession().then(({ data }) => { if (!data.session) location.replace('login.html'); });
 db.auth.onAuthStateChange(ev => { if (ev === 'SIGNED_OUT') location.replace('login.html'); });
-
-// la sessione va confermata dal server: se è scaduta o revocata si torna al login
-cal.auth.getSession().then(({ data }) => { if (!data.session) location.replace('login.html'); });
-cal.auth.onAuthStateChange(ev => { if (ev === 'SIGNED_OUT') location.replace('login.html'); });
 const K_EVENTO = 2;       // un giorno con evento esterno = 2 giornate normali
 let partecipanti = [];    // attivi
 let allQuotes = [];       // tutte le quote, con join su finanze
@@ -2359,7 +2353,6 @@ function toggleTheme() {
 
 // ── BOOT ─────────────────────────────────────────────────────
 (async function boot() {
-  await checkSeed();
   await load();
 })();
 </script>

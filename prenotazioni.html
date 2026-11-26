@@ -48,6 +48,7 @@
   .ev-d { border: 2px solid var(--fg); background: var(--card); color: var(--fg); text-align: center; padding: 4px 0; line-height: 1; }
   .ev-d small { display: block; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
   .ev-d b { display: block; font-size: 22px; font-weight: 900; color: var(--c); margin: 2px 0; }
+  .ev-r { font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--c); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ev-n { font-size: 13px; font-weight: bold; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .ev-m { font-size: 10px; font-weight: bold; margin-top: 5px; opacity: .8; }
   .ev-when { font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; opacity: .7; }
@@ -10321,7 +10322,7 @@ function render() {
     btn.className = 'ev' + (String(e.id) === String(selId) ? ' on' : '');
     btn.style.setProperty('--c', c);
     btn.innerHTML = `<div class="ev-d"><small>${DOW[evDate(e).getDay()]}</small><b>${e.day}</b><small>${MONTHS[e.month].slice(0, 3)}</small></div>
-      <div><div class="ev-n">${esc(e.name)}</div>
+      <div>${e.rassegna ? `<div class="ev-r">${esc(e.rassegna)}</div>` : ''}<div class="ev-n">${esc(e.name)}</div>
       <div class="ev-m">${list.length ? `${list.length} pren. · ${seatsOf(list)} posti` : 'nessuna prenotazione'}${inside.length ? ` · ${inside.length} dentro` : ''}</div>
       <div class="ev-when">${whenLabel(e)}${e.time ? ' · ' + esc(e.time) : ''}</div></div>`;
     btn.onclick = () => { selId = e.id; query = ''; render(); };
@@ -10344,7 +10345,7 @@ function renderMain() {
   main.innerHTML = `
     <div class="panel" style="--c:${c}">
       <div class="ph"><div>
-        <div class="ph-k">${lbl} · ${whenLabel(e)}</div>
+        <div class="ph-k">${lbl}${e.rassegna ? ' · ' + esc(e.rassegna) : ''} · ${whenLabel(e)}</div>
         <div class="ph-n">${esc(e.name)}</div>
         <div class="ph-w">${DOW[evDate(e).getDay()]} ${e.day} ${MONTHS[e.month]}${e.time ? ' · ore ' + esc(e.time) : ''}${e.endTime ? '–' + esc(e.endTime) : ''}</div>
       </div></div>
