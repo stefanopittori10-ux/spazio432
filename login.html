@@ -16,16 +16,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="staff432">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#FFCC00">
 
 <style>
   :root {
     --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
-    --bg: #fff; --fg: #0a0a0a; --muted: #666;
-    --border: #0a0a0a; --border-light: #e5e5e5;
+    --bg: #FFCC00; --fg: #0a0a0a; --muted: #5a4a00;   /* giallo cantiere: sfondo di login e pagina con i tasti */
+    --border: #0a0a0a; --border-light: rgba(0,0,0,.12);
     --music: #534AB7; --green: #3B6D11;
     --error: #993C1D; --error-bg: #FAECE7;
   }
+  /* i campi restano bianchi sul giallo */
+  :root:not([data-theme="dark"]) input { background: #fff; }
+  :root:not([data-theme="dark"]) .login-btn { color: #fff; }   /* il tasto entra resta com'era */
   [data-theme="dark"] {
     --bg: #111; --fg: #e8e8e8; --muted: #888;
     --border: #444; --border-light: #2a2a2a; --error-bg: #2a1a16;
@@ -173,7 +176,9 @@
     cursor: pointer; font-size: 14px;
     display: flex; align-items: center; justify-content: center;
   }
-  .footer-note { font-size: 9px; color: var(--border-light); text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+  .footer-note { font-size: 10px; color: var(--muted); text-align: center; letter-spacing: 1px; }
+  .site-link { color: inherit; text-decoration: underline; text-underline-offset: 3px; font-weight: bold; }
+  .site-link:hover { text-decoration-thickness: 2px; }
 
   /* Dashboard prenotazioni */
   .mgmt-tabs {
@@ -379,7 +384,7 @@
     </a>
 
     <div class="logout-row">
-      <span>spazio432.org</span>
+      <a class="site-link" href="https://spazio432.org/">spazio432.org ↗</a>
       <button class="logout-btn" onclick="doLogout()">esci</button>
     </div>
   </div>

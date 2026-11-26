@@ -7,8 +7,8 @@
   "start_url": "/login.html?app=staff",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#7C6CF2",
-  "theme_color": "#0a0a0a",
+  "background_color": "#FFCC00",
+  "theme_color": "#FFCC00",
   "icons": [
     {
       "src": "/staff-icon-192.png",
