@@ -31,6 +31,12 @@
     --c-e:#3B6D11; --c-e-bg:#EAF3DE;
     --c-r:#534AB7; --c-r-bg:#EEEDFE;
   }
+  /* tema giallo cantiere: cambiano solo gli sfondi; il tasto del ponte diventa giallo */
+  [data-theme="giallo"] { --bg:#FFCC00; --card-bg:#FFCC00; --pill-bg:#FFCC00; --hover:rgba(0,0,0,.07); --border-light:rgba(0,0,0,.15); --fg-muted:#4a3d00;
+    --nav-prev-bg:rgba(0,0,0,.08); --nav-prev-fg:#0a0a0a; }
+  [data-theme="giallo"] body { background:#FFCC00 !important; }
+  [data-theme="giallo"] .bridge-btn:not(.on) { background:#FFCC00; color:#0a0a0a; border-color:#0a0a0a; box-shadow:4px 4px 0 #0a0a0a; }
+  [data-theme="giallo"] .bridge .bridge-head { border-width:3px; }
   [data-theme="dark"] {
     --bg:#111; --fg:#e8e8e8; --fg-muted:#999;
     --border:#444; --border-light:#2a2a2a;
@@ -1936,9 +1942,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && split) clo
 
 // ── DARK MODE ─────────────────────────────────────────────────
 (function initTheme() {
-  if (localStorage.getItem('s432-theme') === 'dark') {
-    document.documentElement.setAttribute('data-theme','dark');
-  }
+  const t = localStorage.getItem('s432-theme');
+  if (t === 'dark' || t === 'giallo') document.documentElement.setAttribute('data-theme', t);
 })();
 
 // ── BOOT ─────────────────────────────────────────────────────

@@ -16,19 +16,20 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="staff432">
-<meta name="theme-color" content="#FFCC00">
+<meta name="theme-color" content="#ffffff">
 
 <style>
   :root {
     --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
-    --bg: #FFCC00; --fg: #0a0a0a; --muted: #5a4a00;   /* giallo cantiere: sfondo di login e pagina con i tasti */
-    --border: #0a0a0a; --border-light: rgba(0,0,0,.12);
+    --bg: #fff; --fg: #0a0a0a; --muted: #666;
+    --border: #0a0a0a; --border-light: #e5e5e5;
     --music: #534AB7; --green: #3B6D11;
     --error: #993C1D; --error-bg: #FAECE7;
   }
-  /* i campi restano bianchi sul giallo */
-  :root:not([data-theme="dark"]) input { background: #fff; }
-  :root:not([data-theme="dark"]) .login-btn { color: #fff; }   /* il tasto entra resta com'era */
+  /* tema giallo cantiere: solo gli sfondi cambiano, tasti e campi restano com'erano */
+  [data-theme="giallo"] { --bg: #FFCC00; --muted: #4a3d00; --border-light: rgba(0,0,0,.12); }
+  [data-theme="giallo"] input { background: #fff; }
+  [data-theme="giallo"] .login-btn { color: #fff; }
   [data-theme="dark"] {
     --bg: #111; --fg: #e8e8e8; --muted: #888;
     --border: #444; --border-light: #2a2a2a; --error-bg: #2a1a16;
@@ -278,9 +279,10 @@
 
   /* ── icona tema: luna/sole pieni e spessi ── */
   .th-ico { width: 18px; height: 18px; display: block; }
-  .th-sun { display: none; }
-  [data-theme="dark"] .th-moon { display: none; }
-  [data-theme="dark"] .th-sun { display: inline; }
+  /* il tasto mostra il tema successivo: chiaro → giallo (ciambella) → scuro (luna) → chiaro (sole) */
+  .th-sun, .th-moon { display: none; }
+  [data-theme="giallo"] .th-donut { display: none; } [data-theme="giallo"] .th-moon { display: inline; }
+  [data-theme="dark"] .th-donut { display: none; } [data-theme="dark"] .th-sun { display: inline; }
 
   /* ═══ BOTTONI COME LA HOME DEL SITO ═══════════════════════ */
   .login-wrap { max-width: 440px; }
@@ -330,7 +332,7 @@
 </head>
 <body>
 
-<button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Tema chiaro/scuro" aria-label="Tema chiaro/scuro"><svg class="th-ico" viewBox="0 0 24 24" aria-hidden="true"><g class="th-moon"><path d="M20.8 14.6A9 9 0 1 1 9.4 3.2a7.2 7.2 0 0 0 11.4 11.4Z" fill="currentColor"/></g><g class="th-sun"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><path d="M12 1.2v3.4M12 19.4v3.4M1.2 12h3.4M19.4 12h3.4M4.4 4.4l2.4 2.4M17.2 17.2l2.4 2.4M4.4 19.6l2.4-2.4M17.2 6.8l2.4-2.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square"/></g></svg></button>
+<button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Cambia tema: chiaro, giallo, scuro" aria-label="Cambia tema: chiaro, giallo, scuro"><svg class="th-ico" viewBox="0 0 24 24" aria-hidden="true"><g class="th-donut"><defs><mask id="th-morso" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24"><rect width="24" height="24" fill="#fff"/><circle cx="12" cy="12" r="2.5" fill="#000"/><circle cx="21.4" cy="4.6" r="2.7" fill="#000"/><circle cx="23.2" cy="8.4" r="2.1" fill="#000"/><circle cx="18.2" cy="2.4" r="2.0" fill="#000"/></mask></defs><g mask="url(#th-morso)"><circle cx="12" cy="12" r="10.6" fill="#D9934A" stroke="#1a1206" stroke-width="1"/><path d="M20.16 12.00 L20.37 12.44 L20.53 12.90 L20.61 13.36 L20.60 13.83 L20.48 14.27 L20.27 14.69 L19.98 15.06 L19.62 15.39 L19.24 15.69 L18.86 15.96 L18.49 16.21 L18.16 16.47 L17.87 16.75 L17.62 17.06 L17.40 17.40 L17.19 17.77 L16.98 18.15 L16.75 18.53 L16.48 18.89 L16.16 19.20 L15.79 19.44 L15.39 19.61 L14.95 19.68 L14.50 19.69 L14.04 19.62 L13.60 19.53 L13.17 19.41 L12.77 19.32 L12.38 19.26 L12.00 19.26 L11.62 19.31 L11.22 19.42 L10.80 19.56 L10.36 19.71 L9.90 19.84 L9.42 19.93 L8.95 19.95 L8.49 19.89 L8.06 19.73 L7.68 19.48 L7.35 19.16 L7.07 18.78 L6.84 18.37 L6.63 17.96 L6.44 17.56 L6.24 17.18 L6.02 16.84 L5.76 16.53 L5.47 16.24 L5.14 15.96 L4.80 15.67 L4.47 15.35 L4.16 15.01 L3.91 14.63 L3.74 14.21 L3.66 13.77 L3.67 13.32 L3.77 12.86 L3.94 12.42 L4.16 12.00 L4.40 11.60 L4.62 11.22 L4.81 10.86 L4.95 10.50 L5.03 10.13 L5.05 9.74 L5.04 9.33 L5.01 8.89 L4.99 8.43 L5.00 7.96 L5.07 7.50 L5.21 7.07 L5.43 6.68 L5.73 6.35 L6.08 6.08 L6.49 5.88 L6.91 5.72 L7.34 5.59 L7.76 5.47 L8.16 5.35 L8.53 5.19 L8.88 4.99 L9.22 4.75 L9.55 4.47 L9.90 4.17 L10.27 3.87 L10.67 3.61 L11.10 3.41 L11.54 3.28 L12.00 3.26 L12.45 3.33 L12.89 3.51 L13.31 3.76 L13.69 4.06 L14.04 4.39 L14.37 4.72 L14.68 5.01 L15.00 5.27 L15.33 5.47 L15.68 5.62 L16.07 5.74 L16.48 5.84 L16.91 5.94 L17.34 6.07 L17.76 6.24 L18.13 6.48 L18.45 6.77 L18.71 7.13 L18.89 7.53 L19.00 7.96 L19.06 8.40 L19.08 8.85 L19.10 9.28 L19.13 9.68 L19.19 10.07 L19.31 10.45 L19.47 10.82 L19.68 11.19 L19.92 11.58Z" fill="#F0479B" stroke="#1a1206" stroke-width=".9" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.5" fill="#D9934A" stroke="#1a1206" stroke-width=".9"/><path d="M6.55 8.62L7.85 9.38" stroke="#2F9BE0" stroke-width="1.05" stroke-linecap="round"/><path d="M8.90 6.86L10.30 6.34" stroke="#FFFFFF" stroke-width="1.05" stroke-linecap="round"/><path d="M14.22 5.75L14.97 7.05" stroke="#F7D21E" stroke-width="1.05" stroke-linecap="round"/><path d="M16.42 11.17L17.38 10.03" stroke="#3BB54A" stroke-width="1.05" stroke-linecap="round"/><path d="M15.50 14.94L16.90 15.46" stroke="#FFFFFF" stroke-width="1.05" stroke-linecap="round"/><path d="M12.14 18.30L12.66 16.90" stroke="#2F9BE0" stroke-width="1.05" stroke-linecap="round"/><path d="M7.23 15.12L8.37 16.08" stroke="#F7D21E" stroke-width="1.05" stroke-linecap="round"/><path d="M6.27 13.14L6.53 11.66" stroke="#E8382F" stroke-width="1.05" stroke-linecap="round"/><path d="M11.47 4.66L11.73 6.14" stroke="#E8382F" stroke-width="1.05" stroke-linecap="round"/><path d="M16.85 13.00L18.35 13.00" stroke="#F7D21E" stroke-width="1.05" stroke-linecap="round"/><path d="M8.66 17.67L10.14 17.93" stroke="#3BB54A" stroke-width="1.05" stroke-linecap="round"/><circle cx="12" cy="12" r="2.5" fill="none" stroke="#1a1206" stroke-width=".9"/></g></g><g class="th-moon"><path d="M20.8 14.6A9 9 0 1 1 9.4 3.2a7.2 7.2 0 0 0 11.4 11.4Z" fill="currentColor"/></g><g class="th-sun"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><path d="M12 1.2v3.4M12 19.4v3.4M1.2 12h3.4M19.4 12h3.4M4.4 4.4l2.4 2.4M17.2 17.2l2.4 2.4M4.4 19.6l2.4-2.4M17.2 6.8l2.4-2.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square"/></g></svg></button>
 
 <div class="login-wrap">
 
@@ -489,13 +491,20 @@ async function loadBookingPreview() {
 window.addEventListener('pageshow', () => document.querySelectorAll('.hub-btn.pressed').forEach(b => b.classList.remove('pressed')));
 
 // ── TEMA ─────────────────────────────────────────────────────
+// tre temi: chiaro → giallo → scuro → chiaro (la scelta vale per tutte le pagine dello staff)
+const TEMA_COLORE = { light: '#ffffff', giallo: '#FFCC00', dark: '#111111' };
+function applicaTema(t) {
+  document.documentElement.dataset.theme = t === 'light' ? '' : t;
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = TEMA_COLORE[t] || '#ffffff';
+}
 function toggleTheme() {
-  const dark = document.documentElement.dataset.theme === 'dark';
-  document.documentElement.dataset.theme = dark ? '' : 'dark';
-  localStorage.setItem('s432-theme', dark ? 'light' : 'dark');   // stessa chiave di sito, admin e finanze
+  const ora = document.documentElement.dataset.theme || 'light';
+  const dopo = ora === 'light' ? 'giallo' : ora === 'giallo' ? 'dark' : 'light';
+  applicaTema(dopo);
+  localStorage.setItem('s432-theme', dopo);   // stessa chiave di admin, ingresso e finanze
 }
 const t = localStorage.getItem('s432-theme') || localStorage.getItem('s432_theme');
-if (t === 'dark') document.documentElement.dataset.theme = 'dark';
+if (t === 'dark' || t === 'giallo') applicaTema(t);
 </script>
 <script>
 // installabile come app "staff432" (stesso service worker del sito: nessuna cache)

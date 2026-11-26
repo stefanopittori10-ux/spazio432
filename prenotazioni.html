@@ -18,7 +18,7 @@
   // senza login si torna al portale
   // accesso riservato: serve una sessione Supabase (login con email e password)
   try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.replace('login.html'); } catch (e) { location.replace('login.html'); }
-  if (localStorage.getItem('s432-theme') === 'dark' || localStorage.getItem('s432_theme') === 'dark') document.documentElement.dataset.theme = 'dark';
+  { const t = localStorage.getItem('s432-theme') || localStorage.getItem('s432_theme'); if (t === 'dark' || t === 'giallo') document.documentElement.dataset.theme = t; }
 </script>
 <style>
   :root {
@@ -26,6 +26,8 @@
     --bg: #fff; --fg: #0a0a0a; --muted: #666; --line: #e5e5e5; --card: #fff; --hover: #f3f3f3;
     --u: #993C1D; --e: #3B6D11; --r: #534AB7; --a: #854F0B; --g: #4B5563;
   }
+  [data-theme="giallo"] { --bg: #FFCC00; --card: #FFCC00; --hover: rgba(0,0,0,.07); --line: rgba(0,0,0,.15); --muted: #4a3d00; }
+  [data-theme="giallo"] input { background: #fff; }
   [data-theme="dark"] { --bg: #111; --fg: #e8e8e8; --muted: #999; --line: #2a2a2a; --card: #1a1a1a; --hover: #222; --e: #4fa82a; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--mono); background: var(--bg); color: var(--fg); padding: 20px; min-height: 100dvh; }
@@ -10556,11 +10558,11 @@ async function onQR(raw) {
 
 // se il tema cambia nel login (anche in un'altra scheda), la pagina lo segue
 window.addEventListener('storage', e => {
-  if (e.key === 's432-theme') document.documentElement.dataset.theme = e.newValue === 'dark' ? 'dark' : '';
+  if (e.key === 's432-theme') document.documentElement.dataset.theme = (e.newValue === 'dark' || e.newValue === 'giallo') ? e.newValue : '';
 });
 window.addEventListener('pageshow', () => {
   const t = localStorage.getItem('s432-theme') || localStorage.getItem('s432_theme');
-  document.documentElement.dataset.theme = t === 'dark' ? 'dark' : '';
+  document.documentElement.dataset.theme = (t === 'dark' || t === 'giallo') ? t : '';
 });
 window.addEventListener('pagehide', stopCam);
 document.addEventListener('visibilitychange', () => { if (document.hidden) { stopCam(); } else if (scanning) { renderMain(); startCam(); } });

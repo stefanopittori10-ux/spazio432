@@ -58,6 +58,13 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
     --add-btn-border: #F59E0B;
   }
 
+  /* tema giallo cantiere (scelto dal tasto tema nella pagina staff): cambiano solo gli sfondi */
+  [data-theme="giallo"] {
+    --bg: #FFCC00; --surface: #FFCC00; --surface-hover: rgba(0,0,0,.08); --surface-alt: rgba(0,0,0,.06);
+    --pill-bg: #FFCC00; --card-bg: #FFCC00; --add-bg: #FFCC00; --footer-bg: #FFCC00;
+    --border-light: rgba(0,0,0,.15); --fg-muted: #4a3d00; --fg-dim: #3d3200; --recap-meta: #3d3200; --det-desc: #2e2600; --footer-url: #4a3d00;
+    --nav-prev-bg: rgba(0,0,0,.08); --nav-prev-fg: #0a0a0a;
+  }
   [data-theme="dark"] {
     --bg: #111;
     --fg: #e8e8e8;
@@ -2018,6 +2025,7 @@ function navToday() {
 // ── DARK MODE ──────────────────────────────────────────────
 (function initTheme() {
   const saved = localStorage.getItem('s432-theme');
+  if (saved === 'giallo') document.documentElement.setAttribute('data-theme', 'giallo');
   if (saved === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
     window.addEventListener('DOMContentLoaded', () => {
