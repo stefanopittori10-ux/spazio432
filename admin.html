@@ -1366,6 +1366,103 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     .stub-logo  { font-size: 17px; }
     .ticket-wrap { width: 170mm; max-width: 170mm; }
   }
+
+  /* ═══ STILE ALLINEATO A INDEX ═══════════════════════════════ */
+  a, button, .logo-area { touch-action: manipulation; }
+  .logo-area.logo-static { cursor: default; }
+  .logo-area.logo-static:hover .logo-subtitle { color: var(--fg-muted); }
+
+  /* bottoni toolbar: pillole con icona, ogni funzione il suo colore */
+  .toolbar-actions { gap: 8px; }
+  .tbtn {
+    --tc: var(--fg);
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+    height: 36px; padding: 0 14px; border-radius: 20px; cursor: pointer;
+    font-family: var(--font-mono); font-size: 12px; font-weight: bold;
+    border: 1px solid var(--tc) !important; color: var(--tc) !important; background: var(--pill-bg) !important;
+    transition: background .15s, color .15s, transform .1s, box-shadow .1s;
+  }
+  .tbtn .tb-ico { width: 15px; height: 15px; display: block; flex-shrink: 0; }
+  .tb-map      { --tc: #993C1D; }
+  .tb-verifica { --tc: #534AB7; }
+  .tb-export   { --tc: #3B6D11; }
+  [data-theme="dark"] .tb-map      { --tc: #d4825e; }
+  [data-theme="dark"] .tb-verifica { --tc: #8d86e0; }
+  [data-theme="dark"] .tb-export   { --tc: #7fae5a; }
+  @media (hover: hover) {
+    .tbtn:not(.tb-add):hover { background: var(--tc) !important; color: #fff !important; }
+    .tbtn:not(.tb-add):hover .tb-ico circle { fill: var(--tc); }
+  }
+  /* "+ Aggiungi": il bottone principale, pieno con ombra netta */
+  .tbtn.tb-add {
+    background: var(--fg) !important; color: var(--bg) !important; border: 2px solid var(--fg) !important;
+    box-shadow: 3px 3px 0 #993C1D; font-size: 12px;
+  }
+  .tbtn.tb-add .btn-icon { font-size: 16px; line-height: 1; }
+  @media (hover: hover) { .tbtn.tb-add:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #993C1D; } }
+  .tbtn.tb-add:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #993C1D; }
+  .more-btn { border-color: var(--fg); color: var(--fg); }
+
+  /* mappa: bottoni */
+  .loc-back { font-weight: bold; }
+  .loc-go { font-size: 14px; font-weight: bold; padding: 13px 22px; display: inline-flex; align-items: center; gap: 10px;
+    border: 2px solid var(--fg); border-radius: 30px; box-shadow: 4px 4px 0 #993C1D; transition: transform .12s, box-shadow .12s; }
+  .loc-go span { transition: transform .15s; }
+  .loc-go:hover { opacity: 1 !important; transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #993C1D; }
+  .loc-go:hover span { transform: translateX(4px); }
+  .loc-go:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #993C1D; }
+
+  /* navigazione mesi */
+  .card-header { gap: 14px; }
+  .card-header .header-right { margin-left: auto; }
+  .month-nav { display: flex; align-items: center; gap: 12px; }
+  .mkey {
+    position: relative; width: 38px; height: 38px; padding: 0; flex-shrink: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--fg); background: var(--card-bg); color: var(--fg);
+    box-shadow: 3px 3px 0 #993C1D; transition: transform .1s, box-shadow .1s, background .12s, color .12s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mkey svg { width: 15px; height: 15px; display: block; transition: transform .15s; }
+  @media (hover: hover) {
+    .mkey:hover { background: var(--fg); color: var(--bg); }
+    #mkey-prev:hover svg { transform: translateX(-2px); }
+    #mkey-next:hover svg { transform: translateX(2px); }
+    .mkey:hover .mkey-tip { opacity: 1; transform: translate(-50%, 0); }
+  }
+  .mkey:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #993C1D; }
+  .mkey-tip {
+    position: absolute; top: calc(100% + 9px); left: 50%; transform: translate(-50%, -4px);
+    font-size: 10px; font-weight: bold; white-space: nowrap; letter-spacing: .5px;
+    background: var(--fg); color: var(--bg); padding: 3px 7px; pointer-events: none;
+    opacity: 0; transition: opacity .15s, transform .15s; z-index: 5;
+  }
+  @media (hover: none) { .mkey-tip { display: none; } }
+  .month-nav .month-display { display: flex; flex-direction: column; align-items: center; min-width: 9.5ch; overflow: hidden; padding: 0; cursor: default; }
+  .month-slide.from-right { animation: month-in-r .32s cubic-bezier(.2,.8,.2,1); }
+  .month-slide.from-left  { animation: month-in-l .32s cubic-bezier(.2,.8,.2,1); }
+  @keyframes month-in-r { from { transform: translateX(40%); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes month-in-l { from { transform: translateX(-40%); opacity: 0; } to { transform: none; opacity: 1; } }
+  .month-nav .month-label { font-size: 17px; letter-spacing: .5px; }
+  .month-sub { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+  .month-sub .year-label { margin-left: 0; font-size: 11px; letter-spacing: 1px; }
+  .month-today { font-family: var(--font-mono); font-size: 10px; font-weight: bold; color: #993C1D; background: none; border: none;
+    cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 2px; }
+  [data-theme="dark"] .month-today { color: #d4825e; }
+  [data-theme="dark"] .mkey, [data-theme="dark"] .tbtn.tb-add { box-shadow: 3px 3px 0 #d4825e; }
+
+  @media (max-width: 768px) {
+    /* toolbar: bottoni tondi con sola icona */
+    .tbtn { width: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+    .tbtn .tb-lbl, .tbtn .btn-label { display: none; }
+    .tbtn.tb-add { width: 36px; font-size: 0 !important; }
+    /* intestazione: i mesi vanno su una riga tutta loro */
+    .card-header { flex-wrap: wrap; row-gap: 0; }
+    .month-nav { order: 3; flex-basis: 100%; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-light); }
+    .mkey { width: 40px; height: 40px; }
+    .month-nav .month-label { font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .month-slide.from-right, .month-slide.from-left { animation: none; } }
 </style>
 </head>
 <body>
@@ -1375,10 +1472,10 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
   <!-- LOCATION OVERLAY -->
   <div class="location-overlay" id="location-overlay">
     <div class="location-header">
-      <div class="logo-area">
+      <div class="logo-area" onclick="closeLocation()" title="Torna al calendario" style="cursor:pointer">
         <span class="logo-spazio">spazio</span><span class="logo-num">432</span>
       </div>
-      <button class="location-close" onclick="closeLocation()">← torna al calendario</button>
+      <button class="location-close loc-back" onclick="closeLocation()">← calendario</button>
     </div>
     <div class="location-body">
       <div class="map-container" id="map-container">
@@ -1391,8 +1488,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
           <span>Torino, TO — 10144</span>
         </div>
         <div class="location-actions">
-          <a class="loc-btn primary" href="https://maps.google.com/?q=Via+Ceva+47+Torino" target="_blank">Apri in Maps</a>
-          <a class="loc-btn" href="https://www.google.com/maps/dir/?api=1&destination=Via+Ceva+47+Torino" target="_blank">Indicazioni</a>
+          <a class="loc-btn primary loc-go" href="https://www.google.com/maps/dir/?api=1&destination=Via+Ceva+47%2C+10144+Torino" target="_blank" rel="noopener">portami al 432 <span>→</span></a>
         </div>
       </div>
     </div>
@@ -1409,7 +1505,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
       <div class="filter-drawer" id="filter-drawer">
         <button class="pill active" data-cat="all" onclick="filterEvt(this,'all')">Tutto</button>
         <button class="pill" data-cat="music" onclick="filterEvt(this,'music')">Musica</button>
-        <button class="pill" data-cat="film" onclick="filterEvt(this,'film')">Cinema</button>
+        <button class="pill" data-cat="film" onclick="filterEvt(this,'film')">Cineforum</button>
         <button class="pill" data-cat="lab" onclick="filterEvt(this,'lab')">Laboratorio</button>
         <button class="pill" data-cat="art" onclick="filterEvt(this,'art')">Arte</button>
         <button class="pill" data-cat="meet" onclick="filterEvt(this,'meet')">Riunioni</button>
@@ -1421,7 +1517,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
           <div class="carousel-pill-wrap" id="carousel-pills">
             <button class="pill active" data-cat="all" onclick="carouselFilter(this,'all')">Tutto</button>
             <button class="pill" data-cat="music" onclick="carouselFilter(this,'music')">Musica</button>
-            <button class="pill" data-cat="film" onclick="carouselFilter(this,'film')">Cinema</button>
+            <button class="pill" data-cat="film" onclick="carouselFilter(this,'film')">Cineforum</button>
             <button class="pill" data-cat="lab" onclick="carouselFilter(this,'lab')">Laboratorio</button>
             <button class="pill" data-cat="art" onclick="carouselFilter(this,'art')">Arte</button>
             <button class="pill" data-cat="meet" onclick="carouselFilter(this,'meet')">Riunioni</button>
@@ -1433,19 +1529,16 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     <!-- Riga 2 (mobile): navigazione mesi + azioni + dark toggle -->
     <div class="toolbar-actions">
       <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
-      <div class="nav">
-        <button class="pill" onclick="changeMonth(-1)">&lt;</button>
-        <button class="pill" onclick="changeMonth(1)">&gt;</button>
-      </div>
-      <button class="pill verifica-btn" onclick="openVerifica()" title="Verifica biglietti"><span class="btn-icon">⌁</span><span class="btn-label"> Verifica</span></button>
-      <button class="pill export-btn" onclick="exportInstagramPNG()" title="Esporta PNG per Instagram"><span class="btn-icon">↓</span><span class="btn-label">Esporta</span></button>
-      <button class="pill" id="toggle-add-btn" onclick="toggleAddArea()"><span class="btn-icon">+</span><span class="btn-label"> Aggiungi</span></button>
+      <button class="tbtn tb-map" id="map-toolbtn" onclick="openLocation()" title="Dove siamo"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 19.5S3.5 12.6 3.5 8A6.5 6.5 0 0 1 16.5 8C16.5 12.6 10 19.5 10 19.5Z" fill="currentColor"/><circle cx="10" cy="8" r="2.6" fill="var(--pill-bg)"/></svg><span class="tb-lbl">mappa</span></button>
+      <button class="tbtn tb-verifica verifica-btn" onclick="openVerifica()" title="Verifica biglietti"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 7V2h5M13 2h5v5M18 13v5h-5M7 18H2v-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/><rect x="6" y="9" width="8" height="2.4" fill="currentColor"/></svg><span class="tb-lbl">verifica</span></button>
+      <button class="tbtn tb-export export-btn" onclick="exportInstagramPNG()" title="Esporta PNG per Instagram"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v10M5.5 8l4.5 4.5L14.5 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/><rect x="3" y="15.5" width="14" height="2.6" fill="currentColor"/></svg><span class="tb-lbl">esporta</span></button>
+      <button class="tbtn tb-add" id="toggle-add-btn" onclick="toggleAddArea()"><span class="btn-icon">+</span><span class="btn-label"> Aggiungi</span></button>
       <!-- Menu ··· mobile -->
       <div style="position:relative;">
         <button class="more-btn" id="more-btn" onclick="toggleMoreMenu()">···</button>
         <div class="more-menu" id="more-menu">
           <button class="more-menu-item" onclick="openVerifica(); closeMoreMenu()">
-            <span class="mi-icon">⌁</span><span class="mi-label">Verifica biglietti</span>
+            <span class="mi-icon">⌗</span><span class="mi-label">Verifica biglietti</span>
           </button>
           <button class="more-menu-item" onclick="exportInstagramPNG(); closeMoreMenu()">
             <span class="mi-icon">↓</span><span class="mi-label">Esporta PNG</span>
@@ -1458,10 +1551,10 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
 
   <div class="card" id="cal-card">
     <div class="card-header">
-      <div class="logo-area" onclick="openLocation()" title="Dove siamo">
+      <div class="logo-area logo-static">
         <div class="logo-text-group">
           <div><span class="logo-spazio">spazio</span><span class="logo-num">432</span></div>
-          <div class="logo-subtitle">via ceva 47, torino ↗</div>
+          <div class="logo-subtitle">via ceva 47, torino · admin</div>
         </div>
       </div>
       <div class="header-right">
@@ -1470,10 +1563,14 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
           <svg id="view-icon-grid" width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0" y="0" width="6" height="6" fill="currentColor"/><rect x="8" y="0" width="6" height="6" fill="currentColor"/><rect x="0" y="8" width="6" height="6" fill="currentColor"/><rect x="8" y="8" width="6" height="6" fill="currentColor"/></svg>
           <svg id="view-icon-list" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:none"><rect x="0" y="1" width="14" height="2" fill="currentColor"/><rect x="0" y="6" width="14" height="2" fill="currentColor"/><rect x="0" y="11" width="14" height="2" fill="currentColor"/></svg>
         </button>
+      </div>
+      <div class="month-nav">
+        <button class="mkey" id="mkey-prev" onclick="navMonth(-1)" aria-label="Mese precedente"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg><span class="mkey-tip" id="mkey-prev-tip"></span></button>
         <div class="month-display">
-          <span class="month-label" id="month-lbl">MAGGIO</span>
-          <span class="year-label" id="year-lbl">2026</span>
+          <div class="month-slide" id="month-slide"><span class="month-label" id="month-lbl">MAGGIO</span></div>
+          <div class="month-sub"><span class="year-label" id="year-lbl">2026</span><button class="month-today" id="month-today" onclick="navToday()" hidden>oggi ↺</button></div>
         </div>
+        <button class="mkey" id="mkey-next" onclick="navMonth(1)" aria-label="Mese successivo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg><span class="mkey-tip" id="mkey-next-tip"></span></button>
       </div>
     </div>
 
@@ -1491,7 +1588,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
         <span>Data: <span id="det-date"></span></span>
         <span>Ora: <span id="det-time"></span></span>
       </div>
-      <div id="det-desc" style="font-size:12px;color:#444;font-style:italic;margin-top:8px;line-height:1.5;display:none;"></div>
+      <div id="det-desc" style="font-size:13px;color:var(--det-desc);margin-top:8px;line-height:1.55;display:none;"></div>
     </div>
 
     <div class="edit-panel" id="edit-panel"></div>
@@ -1504,7 +1601,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
         <input type="number" id="new-day" placeholder="Giorno (es. 15)" min="1" max="31">
         <select id="new-cat">
           <option value="music">Musica</option>
-          <option value="film">Cinema</option>
+          <option value="film">Cineforum</option>
           <option value="lab">Laboratorio</option>
           <option value="art">Arte</option>
           <option value="meet">Riunioni</option>
@@ -1555,7 +1652,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     <div class="footer" id="main-footer">
       <div class="legend">
         <div class="li"><div class="ld" style="background:#534AB7"></div>Musica</div>
-        <div class="li"><div class="ld" style="background:#993C1D"></div>Cinema</div>
+        <div class="li"><div class="ld" style="background:#993C1D"></div>Cineforum</div>
         <div class="li"><div class="ld" style="background:#3B6D11"></div>Laboratorio</div>
         <div class="li"><div class="ld" style="background:#854F0B"></div>Arte</div>
         <div class="li"><div class="ld" style="background:#4B5563"></div>Riunioni</div>
@@ -1675,7 +1772,7 @@ const SUPABASE_KEY = "sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs";
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-const CAT_LABELS={music:'Musica',film:'Cinema',lab:'Laboratorio',art:'Arte',meet:'Riunioni'};
+const CAT_LABELS={music:'Musica',film:'Cineforum',lab:'Laboratorio',art:'Arte',meet:'Riunioni'};
 const CAT_COLORS={music:'#534AB7',film:'#993C1D',lab:'#3B6D11',art:'#854F0B',meet:'#4B5563'};
 
 let cur = new Date(); 
@@ -1699,6 +1796,7 @@ async function fetchAndBuild() {
   updateViewIcons();
   const carousel = document.getElementById("filter-carousel");
   if (carousel && window.getComputedStyle(carousel).display !== "none") carouselBuild();
+  if (typeof updateMonthNav === 'function') updateMonthNav();
   
   // NIENTE altro qui: la visibilità è gestita dal click di toggleListView
 }
@@ -2065,7 +2163,7 @@ function showDetail(ev) {
 
     if (evt.description) {
       const desc = document.createElement('div');
-      desc.style.cssText = 'font-size:12px;color:var(--det-desc);font-style:italic;margin-top:8px;line-height:1.5;';
+      desc.style.cssText = 'font-size:13px;color:var(--det-desc);margin-top:8px;line-height:1.55;max-width:62ch;';
       desc.textContent = evt.description;
       evBlock.appendChild(desc);
     }
@@ -2213,6 +2311,7 @@ function exportInstagramPNG() {
   container.id = 'ig-virtual-container';
 
   const headerClone = document.querySelector('.card-header').cloneNode(true);
+  headerClone.querySelectorAll('.mkey, .month-today, .header-right').forEach(n => n.remove());
   container.appendChild(headerClone);
 
   const bodyArea = document.createElement('div');
@@ -2282,10 +2381,60 @@ function exportInstagramPNG() {
 }
 
 // Ascolta il ridimensionamento della finestra per ricalcolare il layout
+let wasMobile = window.innerWidth <= 768;
 window.addEventListener('resize', () => {
-  isListView = window.innerWidth <= 768;
+  const nowMobile = window.innerWidth <= 768;
+  if (nowMobile !== wasMobile) { wasMobile = nowMobile; isListView = nowMobile; }
   buildGrid(cur);
 });
+
+
+// ── NAVIGAZIONE MESI ───────────────────────────────────────────
+function updateMonthNav() {
+  const now = new Date();
+  const p = new Date(cur.getFullYear(), cur.getMonth() - 1, 1), n = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+  const short = d => MONTHS[d.getMonth()].slice(0, 3).toLowerCase();
+  const pt = document.getElementById('mkey-prev-tip'), nt = document.getElementById('mkey-next-tip');
+  if (pt) pt.textContent = '← ' + short(p);
+  if (nt) nt.textContent = short(n) + ' →';
+  const t = document.getElementById('month-today');
+  if (t) t.hidden = cur.getMonth() === now.getMonth() && cur.getFullYear() === now.getFullYear();
+  document.getElementById('month-lbl').textContent = MONTHS[cur.getMonth()].toUpperCase();
+  document.getElementById('year-lbl').textContent = cur.getFullYear();
+}
+function slideMonth(dir) {
+  const el = document.getElementById('month-slide');
+  if (!el) return;
+  el.classList.remove('from-left', 'from-right');
+  void el.offsetWidth;
+  el.classList.add(dir > 0 ? 'from-right' : 'from-left');
+}
+function navMonth(dir) { changeMonth(dir); updateMonthNav(); slideMonth(dir); }
+function navToday() {
+  const now = new Date();
+  const dir = (now.getFullYear() * 12 + now.getMonth()) > (cur.getFullYear() * 12 + cur.getMonth()) ? 1 : -1;
+  cur = new Date(); fetchAndBuild(); updateMonthNav(); slideMonth(dir);
+}
+(function () {
+  const card = document.getElementById('cal-card');
+  let sx = 0, sy = 0, st = 0;
+  card.addEventListener('touchstart', e => {
+    if (e.target.closest('input, textarea, select, .add-area, .edit-panel, .booking-panel, .recap-booking-form')) { st = 0; return; }
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
+  }, { passive: true });
+  card.addEventListener('touchend', e => {
+    if (!st) return;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Date.now() - st < 600 && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8) navMonth(dx < 0 ? 1 : -1);
+    st = 0;
+  }, { passive: true });
+  window.addEventListener('keydown', e => {
+    if (document.querySelector('.location-overlay.open, .verifica-overlay.open')) return;
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    if (e.key === 'ArrowLeft') navMonth(-1);
+    if (e.key === 'ArrowRight') navMonth(1);
+  });
+})();
 
 // ── DARK MODE ──────────────────────────────────────────────
 function toggleTheme() {
@@ -2607,12 +2756,7 @@ function renderStylizedMap() {
     </g>
   </svg>`;
 
-  const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Via Ceva 47, 10144 Torino');
-  container.innerHTML = `<a href="${mapsUrl}" target="_blank" rel="noopener" aria-label="Apri Via Ceva 47 in Google Maps"
-      style="position:absolute;inset:0;display:block;cursor:pointer;text-decoration:none;">${svg}
-    <span style="position:absolute;left:12px;bottom:12px;font-family:${mono};font-size:11px;font-weight:bold;
-      padding:6px 12px;border-radius:20px;border:1px solid ${C.boxEdge};background:${C.boxBg};color:${C.label};">apri in maps &#8599;</span>
-  </a>`;
+  container.innerHTML = svg;
 }
 
 // ridisegna se cambia la dimensione mentre la mappa è aperta
@@ -2807,7 +2951,7 @@ function carouselBuild() {
   // Usa sempre la lista fissa per non dipendere dal DOM
   const items = CAROUSEL_CATS.map((cat, i) => ({
     cat,
-    label: {all:'Tutto',music:'Musica',film:'Cinema',lab:'Laboratorio',art:'Arte',meet:'Riunioni'}[cat]
+    label: {all:'Tutto',music:'Musica',film:'Cineforum',lab:'Laboratorio',art:'Arte',meet:'Riunioni'}[cat]
   }));
 
   // Ricostruisce: clone-last + originali + clone-first
@@ -2927,7 +3071,7 @@ window.addEventListener('resize', () => { if (window.innerWidth <= 768) carousel
 
 // ── TICKET OVERLAY ────────────────────────────────────────────
 const T_CAT_COLORS = { music:'#534AB7', film:'#993C1D', lab:'#3B6D11', art:'#854F0B', meet:'#4B5563' };
-const T_CAT_LABELS = { music:'Musica', film:'Cinema', lab:'Laboratorio', art:'Arte', meet:'Riunioni' };
+const T_CAT_LABELS = { music:'Musica', film:'Cineforum', lab:'Laboratorio', art:'Arte', meet:'Riunioni' };
 
 function genTicketCode(name, event, date) {
   const str = name + event + date;
@@ -13275,7 +13419,7 @@ function openEditPanel(evt) {
       <input type="number" id="edit-day" placeholder="Giorno" min="1" max="31" value="${evt.day}" style="width:70px;">
       <select id="edit-cat" style="width:140px;">
         <option value="music" ${evt.cat==='music'?'selected':''}>Musica</option>
-        <option value="film"  ${evt.cat==='film'?'selected':''}>Cinema</option>
+        <option value="film"  ${evt.cat==='film'?'selected':''}>Cineforum</option>
         <option value="lab"   ${evt.cat==='lab'?'selected':''}>Laboratorio</option>
         <option value="art"   ${evt.cat==='art'?'selected':''}>Arte</option>
         <option value="meet"  ${evt.cat==='meet'?'selected':''}>Riunioni</option>
