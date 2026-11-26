@@ -225,17 +225,6 @@
   .toast.ok { background:var(--c-e); }
   .toast.show { opacity:1; }
 
-
-  /* ── PAGA BUTTON (uscite rows) ── */
-  .e-pay {
-    font-size: 10px; color: var(--fg-muted); cursor: pointer;
-    opacity: 0; transition: opacity .1s; padding: 3px 8px;
-    background: none; border: 1px solid var(--border-light);
-    font-family: var(--font); flex-shrink: 0; border-radius: 10px;
-  }
-  .entry:hover .e-pay { opacity: 1; }
-  .e-pay:hover { color: var(--c-r); border-color: var(--c-r); background: var(--c-r-bg); }
-
   /* ── PAYMENT MODAL ── */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.45);
@@ -258,47 +247,10 @@
   }
   .modal-close:hover { color: var(--fg); }
   .modal-body { padding: 18px; display: flex; flex-direction: column; gap: 13px; }
-  .pay-row { display: flex; flex-direction: column; gap: 4px; }
-  .pay-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: .6px; color: var(--fg-muted); font-weight: bold; }
-  .pay-field { display: flex; align-items: center; gap: 6px; }
-  .pay-val {
-    flex: 1; font-size: 13px; padding: 7px 10px;
-    border: 1px solid var(--border-light); background: var(--hover);
-    color: var(--fg); font-family: var(--font); border-radius: 3px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .pay-input {
-    flex: 1; font-size: 13px; padding: 7px 10px;
-    border: 1px solid var(--border); background: var(--input-bg);
-    color: var(--input-fg); font-family: var(--font); border-radius: 3px; outline: none;
-  }
-  .pay-input:focus { border-color: var(--fg); }
-  .copy-btn {
-    font-size: 11px; padding: 7px 9px; border: 1px solid var(--border-light);
-    background: var(--pill-bg); color: var(--fg-muted); cursor: pointer;
-    border-radius: 3px; font-family: var(--font); transition: all .15s; flex-shrink: 0;
-  }
-  .copy-btn:hover { border-color: var(--border); color: var(--fg); }
-  .copy-btn.ok { background: var(--c-e-bg); color: var(--c-e); border-color: var(--c-e); }
-  .iban-hint { font-size: 10px; color: var(--c-e); margin-top: 2px; min-height: 14px; }
   .modal-foot {
     padding: 12px 18px; border-top: 1px solid var(--border);
     display: flex; gap: 8px;
   }
-  .btn-copy-all {
-    font-size: 12px; padding: 9px 14px; background: var(--pill-bg);
-    color: var(--fg); border: 1px solid var(--border); cursor: pointer;
-    border-radius: 3px; font-family: var(--font); transition: all .15s;
-  }
-  .btn-copy-all:hover { background: var(--hover); }
-  .btn-mailto {
-    flex: 1; font-size: 12px; padding: 9px 14px; background: var(--fg);
-    color: var(--bg); border: 1px solid var(--border); cursor: pointer;
-    font-weight: bold; border-radius: 3px; font-family: var(--font);
-    text-align: center; text-decoration: none; display: flex;
-    align-items: center; justify-content: center; gap: 5px; transition: opacity .15s;
-  }
-  .btn-mailto:hover { opacity: .75; }
 
   @media (max-width:860px) {
     body { padding:10px; }
@@ -310,93 +262,6 @@
     /* touch: niente hover → bottoni sempre visibili, input ≥16px contro lo zoom iOS */
     .e-del, .e-pay { opacity:1; }
     .f { font-size:16px; }
-  }
-
-  /* ── PAY SHEET ── */
-  .pay-sheet {
-    position:fixed; bottom:0; left:0; right:0; z-index:200;
-    background:var(--bg); border-top:2px solid var(--c-u);
-    padding:20px 24px 28px; box-shadow:0 -4px 24px rgba(0,0,0,.12);
-    transform:translateY(100%); transition:transform .35s cubic-bezier(.4,0,.2,1);
-  }
-  .pay-sheet.open { transform:translateY(0); }
-  .pay-sheet-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; }
-  .pay-sheet-title { font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:.7px; color:var(--c-u); margin-bottom:3px; }
-  .pay-sheet-nome  { font-size:18px; font-weight:bold; }
-  .pay-sheet-importo { font-size:28px; font-weight:bold; color:var(--c-u); letter-spacing:-1px; white-space:nowrap; }
-  .pay-sheet-close { font-size:18px; color:var(--fg-muted); cursor:pointer; background:none; border:none; font-family:var(--font); padding:0 4px; line-height:1; }
-  .pay-sheet-close:hover { color:var(--fg); }
-  .pay-sheet-body { display:grid; grid-template-columns:1fr 1fr; gap:10px 20px; margin-bottom:16px; }
-  .pay-field { display:flex; flex-direction:column; gap:4px; }
-  .pay-field label { font-size:9px; text-transform:uppercase; letter-spacing:.5px; color:var(--fg-muted); font-weight:bold; }
-  .pay-field input {
-    font-size:13px; padding:7px 10px; border:1px solid var(--border);
-    background:var(--input-bg); color:var(--input-fg); outline:none;
-    border-radius:3px; font-family:var(--font);
-  }
-  .pay-field input:focus { border-color:var(--c-u); }
-  .pay-field input[readonly] { color:var(--fg-muted); cursor:default; border-color:var(--border-light); }
-  .pay-field.wide { grid-column:1/-1; }
-  .pay-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .pay-btn-copy {
-    font-size:12px; padding:8px 20px; background:var(--fg); color:var(--bg);
-    border:1px solid var(--border); cursor:pointer; font-weight:bold;
-    border-radius:3px; font-family:var(--font); transition:opacity .15s;
-  }
-  .pay-btn-copy:hover { opacity:.75; }
-  .pay-btn-copy.done { background:var(--c-e); border-color:var(--c-e); color:#fff; }
-  .pay-btn-mail {
-    font-size:12px; padding:8px 18px; background:none; color:var(--fg);
-    border:1px solid var(--border); cursor:pointer;
-    border-radius:3px; font-family:var(--font); text-decoration:none;
-    display:inline-flex; align-items:center; gap:5px; transition:background .15s;
-  }
-  .pay-btn-mail:hover { background:var(--hover); }
-  .pay-save-iban { font-size:11px; color:var(--fg-muted); margin-left:auto; cursor:pointer; }
-  .pay-save-iban:hover { color:var(--fg); }
-  .pay-save-iban.saved { color:var(--c-e); }
-
-  /* ── PAY TRIGGER on entry row ── */
-  .e-pay {
-    font-size:11px; color:var(--border-light); cursor:pointer;
-    opacity:0; transition:opacity .1s; padding:2px 5px;
-    background:none; border:none; font-family:var(--font); flex-shrink:0;
-  }
-  .entry:hover .e-pay { opacity:1; }
-  .e-pay:hover { color:var(--c-u); }
-
-  @media(max-width:600px){
-    .pay-sheet-body { grid-template-columns:1fr; }
-    .pay-sheet-importo { font-size:22px; }
-  }
-
-  /* ── CHARTS ── */
-  .charts-wrap {
-    display:grid; grid-template-columns:1fr 1fr;
-    border:1px solid var(--border); border-top:none;
-  }
-  .chart-card {
-    padding:18px 20px; border-right:1px solid var(--border);
-    display:flex; flex-direction:column;
-  }
-  .chart-card:last-child { border-right:none; }
-  .chart-label {
-    font-size:10px; font-weight:bold; text-transform:uppercase;
-    letter-spacing:.7px; color:var(--fg-muted); margin-bottom:14px;
-  }
-  .chart-body { display:flex; align-items:center; gap:24px; }
-  .chart-svg  { flex-shrink:0; }
-  .chart-legend { display:flex; flex-direction:column; gap:7px; flex:1; }
-  .leg-row { display:flex; align-items:center; gap:7px; font-size:11px; }
-  .leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .leg-name { flex:1; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .leg-pct  { color:var(--fg-muted); font-size:11px; flex-shrink:0; }
-  .leg-amt  { color:var(--fg-muted); font-size:10px; flex-shrink:0; }
-  .chart-empty { font-size:12px; color:var(--fg-muted); font-style:italic; align-self:center; margin-top:10px; }
-  @media(max-width:860px){
-    .charts-wrap { grid-template-columns:1fr; }
-    .chart-card { border-right:none; border-bottom:1px solid var(--border); }
-    .chart-card:last-child { border-bottom:none; }
   }
 
   /* ── DIVISIONE BOLLETTE ── */
@@ -1102,52 +967,6 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
   </div>
 </div>
 
-<!-- PAYMENT MODAL -->
-<div class="modal-overlay" id="pay-overlay" onclick="closePayModal(event)">
-  <div class="modal">
-    <div class="modal-head">
-      <span class="modal-title">◎ Prepara bonifico</span>
-      <button class="modal-close" onclick="closePayModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="pay-row">
-        <span class="pay-lbl">Beneficiario</span>
-        <div class="pay-field">
-          <div class="pay-val" id="pay-bene">—</div>
-          <button class="copy-btn" id="cb-bene" onclick="copyField('pay-bene',false,'cb-bene')">copia</button>
-        </div>
-      </div>
-      <div class="pay-row">
-        <span class="pay-lbl">IBAN</span>
-        <div class="pay-field">
-          <input class="pay-input" id="pay-iban" type="text" placeholder="IT60 X000 0000 0000 0000 0000 000" autocomplete="off" />
-          <button class="copy-btn" id="cb-iban" onclick="copyField('pay-iban',true,'cb-iban')">copia</button>
-        </div>
-        <div class="iban-hint" id="iban-hint"></div>
-      </div>
-      <div class="pay-row">
-        <span class="pay-lbl">Importo</span>
-        <div class="pay-field">
-          <div class="pay-val" id="pay-importo">—</div>
-          <button class="copy-btn" id="cb-imp" onclick="copyField('pay-importo',false,'cb-imp')">copia</button>
-        </div>
-      </div>
-      <div class="pay-row">
-        <span class="pay-lbl">Causale</span>
-        <div class="pay-field">
-          <input class="pay-input" id="pay-causale" type="text" />
-          <button class="copy-btn" id="cb-caus" onclick="copyField('pay-causale',true,'cb-caus')">copia</button>
-        </div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-copy-all" id="btn-copy-all" onclick="copyAll()">📋 copia tutto</button>
-      <a class="btn-mailto" href="#" onclick="openMailto(event)">✉ apri email</a>
-    </div>
-  </div>
-</div>
-
-
 <div class="toast" id="toast"></div>
 <datalist id="pt-list"></datalist>
 
@@ -1181,53 +1000,6 @@ let allQuotes = [];       // tutte le quote, con join su finanze
 let splitReady = false;   // tabelle presenti?
 let calHasEsterno = true; // colonna events.esterno presente?
 let split = null;         // stato del modal aperto
-
-// ── SEED DATA ─────────────────────────────────────────────────
-const SEED = [
-  // SET-2025
-  {anno:2025,mese:9,tipo:'uscita',nome:'Affitto',importo:460,nota:'Sig.ra Bianco'},
-  // OTT-2025
-  {anno:2025,mese:10,tipo:'uscita',nome:'Affitto',importo:460,nota:'Sig.ra Bianco'},
-  {anno:2025,mese:10,tipo:'uscita',nome:'Attrezzatura — Vernici',importo:356.11,nota:'Colore Amico'},
-  {anno:2025,mese:10,tipo:'uscita',nome:'Attrezzatura — Vernici',importo:17.10,nota:'Max Factory'},
-  {anno:2025,mese:10,tipo:'uscita',nome:'Attrezzatura — Tubo gabinetto',importo:17.50,nota:'Ferramenta'},
-  {anno:2025,mese:10,tipo:'uscita',nome:'Attrezzatura — Vaschetta gabinetto',importo:40,nota:'Ferramenta'},
-  {anno:2025,mese:10,tipo:'uscita',nome:'Attrezzatura — Pulizia pavimenti',importo:78.45,nota:'Brico Center'},
-  // NOV-2025
-  {anno:2025,mese:11,tipo:'uscita',nome:'Affitto',importo:460,nota:'Sig.ra Bianco'},
-  {anno:2025,mese:11,tipo:'uscita',nome:'Attrezzatura — Vernici pt.2',importo:63,nota:'Color Point'},
-  // DIC-2025
-  {anno:2025,mese:12,tipo:'uscita',nome:'Affitto',importo:460,nota:'Sig.ra Bianco'},
-  {anno:2025,mese:12,tipo:'uscita',nome:'Bolletta luce',importo:45,nota:'Zicca'},
-  {anno:2025,mese:12,tipo:'uscita',nome:'Attrezzatura — Bastoni tende',importo:62,nota:'Ikea'},
-  {anno:2025,mese:12,tipo:'uscita',nome:'Lavoro — tecnigrafo',importo:50,nota:'Fade'},
-  {anno:2025,mese:12,tipo:'uscita',nome:'Attrezzatura — Polistirolo isolamento',importo:68,nota:'Brico Center'},
-  // GEN-2026
-  {anno:2026,mese:1,tipo:'uscita',nome:'Affitto',importo:460,nota:'Sig.ra Bianco'},
-  {anno:2026,mese:1,tipo:'uscita',nome:'Lavoro — acconto burnie',importo:200,nota:'Fade'},
-  {anno:2026,mese:1,tipo:'uscita',nome:'Attrezzatura — Burnie',importo:30.05,nota:'Ikea'},
-  {anno:2026,mese:1,tipo:'uscita',nome:'Luci burnie',importo:60,nota:'Amazon'},
-  // FEB-2026
-  {anno:2026,mese:2,tipo:'uscita',nome:'Affitto',importo:525.80,nota:'Sig.ra Bianco'},
-  {anno:2026,mese:2,tipo:'uscita',nome:'Bombola gas',importo:40,nota:'Bombolaro'},
-  {anno:2026,mese:2,tipo:'entrata',nome:'Rimborso affitto — Michela',importo:150,nota:'contributo feb'},
-  {anno:2026,mese:2,tipo:'entrata',nome:'Festa Giolo',importo:100,nota:'Giolito'},
-  // MAR-2026
-  {anno:2026,mese:3,tipo:'uscita',nome:'Affitto',importo:468.46,nota:'Sig.ra Bianco'},
-  {anno:2026,mese:3,tipo:'entrata',nome:'Rimborso affitto — Michela',importo:240,nota:'contributo mar'},
-  {anno:2026,mese:3,tipo:'entrata',nome:'Festa Anna',importo:150,nota:'Anna Feste'},
-  {anno:2026,mese:3,tipo:'entrata',nome:'Festa Stefania',importo:120,nota:'Stefania F.'},
-  {anno:2026,mese:3,tipo:'entrata',nome:'Sussulti',importo:150},
-  {anno:2026,mese:3,tipo:'entrata',nome:'Benni',importo:100},
-  {anno:2026,mese:3,tipo:'entrata',nome:'Mimmo',importo:100},
-  // APR-2026
-  {anno:2026,mese:4,tipo:'uscita',nome:'Affitto',importo:468.52,nota:'Sig.ra Bianco'},
-  // MAG-2026
-  {anno:2026,mese:5,tipo:'uscita',nome:'Affitto',importo:522.24,nota:'Sig.ra Bianco'},
-  {anno:2026,mese:5,tipo:'entrata',nome:'Rimborso affitto — Cami',importo:150},
-  {anno:2026,mese:5,tipo:'entrata',nome:'Rimborso affitto — Ste',importo:100},
-  {anno:2026,mese:5,tipo:'entrata',nome:'Ricky',importo:50}
-];
 
 // ── HELPERS ───────────────────────────────────────────────────
 // modalità demo: tutte le cifre diventano asterischi
@@ -1304,7 +1076,6 @@ function render() {
   const r = curEntries.filter(e => e.tipo === 'risparmio');
 
   renderList('u', u); renderList('e', e); renderList('r', r);
-  renderCharts(u, e, r);
   renderSplitPanel();
   renderBridge();
 
@@ -1953,190 +1724,6 @@ async function togglePaid(q, on) {
   renderSplitModal();
 }
 
-// ── SEED ─────────────────────────────────────────────────────
-async function checkSeed() {
-  // Controlla sempre il DB — ignora flag localStorage
-  const { count, error } = await db
-    .from('finanze').select('id', { count:'exact', head:true });
-  if (error) return; // tabella non ancora creata, load() mostrerà il banner
-  if (count === 0) {
-    setStatus('load', 'primo avvio — importo dati storici…');
-    await db.from('finanze').insert(SEED);
-  }
-}
-
-
-
-// ── CHARTS ────────────────────────────────────────────────────
-const CAT_PALETTE = {
-  'Affitto':      '#993C1D',
-  'Attrezzatura': '#534AB7',
-  'Lavori':       '#3B6D11',
-  'Bollette':     '#854F0B',
-  'Luci':         '#4B5563',
-  'Gas':          '#6B7280',
-  'Varie':        '#9CA3AF',
-};
-
-function getCategory(nome) {
-  if (/^affitto/i.test(nome))                    return 'Affitto';
-  if (/^attrezzatura/i.test(nome))               return 'Attrezzatura';
-  if (/^lavoro/i.test(nome))                     return 'Lavori';
-  if (/^bolletta|^luce|^bollette/i.test(nome))   return 'Bollette';
-  if (/^luci/i.test(nome))                       return 'Luci';
-  if (/^bombola|^gas/i.test(nome))               return 'Gas';
-  return nome.split(/\s[-–]\s/)[0].trim();
-}
-
-function drawDonut(svgId, segments) {
-  const svg = document.getElementById(svgId);
-  if (!svg) return;
-  svg.innerHTML = '';
-  const total = segments.reduce((s, x) => s + x.value, 0);
-  if (total === 0) {
-    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('cx','80'); c.setAttribute('cy','80'); c.setAttribute('r','58');
-    c.setAttribute('fill','none'); c.setAttribute('stroke','#e5e7eb'); c.setAttribute('stroke-width','22');
-    svg.appendChild(c); return;
-  }
-  const cx=80, cy=80, R=68, r=46, GAP=segments.length>1?0.03:0;
-  let start = -Math.PI/2;
-  segments.forEach(seg => {
-    if (!seg.value) return;
-    const sweep = (seg.value/total)*2*Math.PI - GAP;
-    const end   = start + sweep;
-    const large = sweep > Math.PI ? 1 : 0;
-    const cos = (a,rad) => cx + rad*Math.cos(a);
-    const sin = (a,rad) => cy + rad*Math.sin(a);
-    const d = `M${cos(start,R)},${sin(start,R)} A${R},${R} 0 ${large},1 ${cos(end,R)},${sin(end,R)} `
-            + `L${cos(end,r)},${sin(end,r)} A${r},${r} 0 ${large},0 ${cos(start,r)},${sin(start,r)} Z`;
-    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d', d); path.setAttribute('fill', seg.color);
-    svg.appendChild(path);
-    start = end + GAP;
-  });
-}
-
-function drawLegend(legId, segments, total) {
-  const el = document.getElementById(legId);
-  if (!el) return;
-  el.innerHTML = segments.filter(s=>s.value>0).map(s => `
-    <div class="leg-row">
-      <div class="leg-dot" style="background:${s.color}"></div>
-      <span class="leg-name">${s.label}</span>
-      <span class="leg-pct">${Math.round(s.value/total*100)}%</span>
-    </div>`).join('');
-}
-
-function renderCharts(uscite, entrate, risparmio) {
-  // Chart 1 — uscite breakdown by category
-  const cats = {};
-  uscite.forEach(e => {
-    const cat = getCategory(e.nome);
-    cats[cat] = (cats[cat]||0) + parseFloat(e.importo||0);
-  });
-  const uSeg = Object.entries(cats)
-    .map(([label,value]) => ({ label, value, color: CAT_PALETTE[label]||'#9CA3AF' }))
-    .sort((a,b) => b.value - a.value);
-  const uTotal = uSeg.reduce((s,x)=>s+x.value,0);
-  drawDonut('svg-u', uSeg);
-  drawLegend('leg-u', uSeg, uTotal);
-
-  // Chart 2 — flussi totali
-  const tE = sum(entrate), tU = sum(uscite), tR = sum(risparmio);
-  const fSeg = [
-    { label:'Entrate',   value:tE, color:'#3B6D11' },
-    { label:'Uscite',    value:tU, color:'#993C1D' },
-    { label:'Risparmio', value:tR, color:'#534AB7' },
-  ].filter(s=>s.value>0);
-  const fTotal = tE + tU + tR;
-  drawDonut('svg-f', fSeg);
-  drawLegend('leg-f', fSeg, fTotal);
-}
-
-// ── PAYMENT SHEET ─────────────────────────────────────────────
-const IBAN_SK = 's432-iban';
-let payEntry = null;
-
-function ibanStore() { try { return JSON.parse(localStorage.getItem(IBAN_SK)||'{}'); } catch { return {}; } }
-function getIban(nome) { return ibanStore()[nome] || ''; }
-function persistIban(nome, iban) { const s=ibanStore(); s[nome]=iban.trim(); localStorage.setItem(IBAN_SK, JSON.stringify(s)); }
-
-function openPay(entry) {
-  payEntry = entry;
-  const mese = MONTHS[entry.mese - 1];
-  const causale = `${entry.nome} - ${mese} ${entry.anno} - spazio 432`;
-  const iban = getIban(entry.nome);
-
-  document.getElementById('ps-nome').textContent    = entry.nome;
-  document.getElementById('ps-importo').textContent = fmt(entry.importo);
-  document.getElementById('ps-causale').value       = causale;
-  document.getElementById('ps-iban').value          = iban;
-
-  updateMailto();
-  updateSaveLabel();
-
-  document.getElementById('pay-sheet').classList.add('open');
-}
-
-function closePay() {
-  document.getElementById('pay-sheet').classList.remove('open');
-  payEntry = null;
-}
-
-function onIbanInput() { updateMailto(); updateSaveLabel(); }
-
-function updateMailto() {
-  if (!payEntry) return;
-  const causale = document.getElementById('ps-causale').value;
-  const iban    = document.getElementById('ps-iban').value.trim();
-  const subj    = `Bonifico - ${payEntry.nome} - spazio 432`;
-  let body = `Importo:  ${fmt(payEntry.importo)}\nCausale:  ${causale}`;
-  if (iban) body += `\nIBAN:     ${iban}`;
-  body += `\n\n— spazio 432`;
-  const link = document.getElementById('ps-mail');
-  link.href = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-}
-
-function updateSaveLabel() {
-  if (!payEntry) return;
-  const currentIban = document.getElementById('ps-iban').value.trim();
-  const saved       = getIban(payEntry.nome);
-  const lbl         = document.getElementById('ps-save');
-  if (saved && saved === currentIban) {
-    lbl.textContent = '✓ IBAN salvato'; lbl.className = 'pay-save-iban saved';
-  } else {
-    lbl.textContent = 'salva IBAN per questo fornitore'; lbl.className = 'pay-save-iban';
-  }
-}
-
-function saveIban() {
-  if (!payEntry) return;
-  const iban = document.getElementById('ps-iban').value.trim();
-  if (iban) { persistIban(payEntry.nome, iban); updateSaveLabel(); }
-}
-
-function copyPay() {
-  if (!payEntry) return;
-  const causale = document.getElementById('ps-causale').value;
-  const iban    = document.getElementById('ps-iban').value.trim();
-  let text = `Importo:  ${fmt(payEntry.importo)}\nCausale:  ${causale}`;
-  if (iban) text += `\nIBAN:     ${iban}`;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('ps-copy');
-    btn.textContent = '✓ Copiato'; btn.classList.add('done');
-    setTimeout(() => { btn.textContent = '📋 Copia dati'; btn.classList.remove('done'); }, 2000);
-  });
-}
-
-// Close sheet on backdrop click (outside the sheet)
-document.addEventListener('click', e => {
-  const sheet = document.getElementById('pay-sheet');
-  if (sheet && sheet.classList.contains('open') && !sheet.contains(e.target) && !e.target.classList.contains('e-pay')) {
-    closePay();
-  }
-});
-
 // ── PONTE DI COMANDO ─────────────────────────────────────────
 function toggleBridge(force) {
   const on = typeof force === 'boolean' ? force : !document.body.classList.contains('bridge-mode');
@@ -2267,7 +1854,6 @@ function toggleMask() {
   render();
   if (typeof split !== 'undefined' && split) renderSplitModal();
   renderBridge();
-  if (typeof payEntry !== 'undefined' && payEntry) { document.getElementById('ps-importo').textContent = fmt(payEntry.importo); updateMailto(); }
   showToast(masked ? 'Cifre nascoste: puoi mostrare il sito' : 'Cifre di nuovo visibili', true);
 }
 applyMaskUI();
@@ -2340,11 +1926,6 @@ document.getElementById('pt-new').addEventListener('keydown', e => { if (e.key =
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && split) closeSplit(); });
 
 // ── DARK MODE ─────────────────────────────────────────────────
-function toggleTheme() {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  localStorage.setItem('s432-theme', isDark ? 'light' : 'dark');
-}
 (function initTheme() {
   if (localStorage.getItem('s432-theme') === 'dark') {
     document.documentElement.setAttribute('data-theme','dark');
