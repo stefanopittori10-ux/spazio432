@@ -7,7 +7,8 @@
 <meta name="theme-color" content="#0a0a0a">
 <script>
   // senza login si torna al portale
-  if (sessionStorage.getItem('s432_auth') !== '1') location.replace('login.html');
+  // accesso riservato: serve una sessione Supabase (login con email e password)
+  try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.replace('login.html'); } catch (e) { location.replace('login.html'); }
   if (localStorage.getItem('s432-theme') === 'dark' || localStorage.getItem('s432_theme') === 'dark') document.documentElement.dataset.theme = 'dark';
 </script>
 <style>
@@ -10255,6 +10256,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 });</script>
 <script>
 const sb = supabase.createClient('https://udaymqqytagtayviwolr.supabase.co', 'sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs');
+
+// la sessione va confermata dal server: se è scaduta o revocata si torna al login
+sb.auth.getSession().then(({ data }) => { if (!data.session) location.replace('login.html'); });
+sb.auth.onAuthStateChange(ev => { if (ev === 'SIGNED_OUT') location.replace('login.html'); });
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const BK_COLS = 'id, name, email, seats, note, created_at, event_id, checked_in, checked_in_at, codice';
 const MONTHS = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 const DOW = ['dom','lun','mar','mer','gio','ven','sab'];
 const CAT = { music: ['musica', '#534AB7'], film: ['cineforum', '#993C1D'], lab: ['laboratorio', '#3B6D11'], art: ['arte', '#854F0B'], meet: ['riunione', '#4B5563'] };
@@ -10285,7 +10292,7 @@ async function load() {
   const ids = events.map(e => e.id);
   bookings = [];
   if (ids.length) {
-    const { data: bks } = await sb.from('bookings').select('id, name, email, seats, note, created_at, event_id, checked_in, checked_in_at').in('event_id', ids);
+    const { data: bks } = await sb.from('bookings').select(BK_COLS).in('event_id', ids);
     bookings = bks || [];
   }
   if (!selId || !events.some(e => String(e.id) === String(selId))) {
@@ -10461,11 +10468,21 @@ async function onQR(raw) {
   lastRaw = raw; lastAt = Date.now();
   if (!raw.startsWith('SPAZIO432|')) { showRes('fail', '✗ qr non riconosciuto', 'non è un biglietto spazio432', ''); return; }
   const p = raw.split('|');
-  const name = p[2] || '', evName = p[3] || '', when = p[4] || '';
-  const cands = bookings.filter(b => norm(b.name) === norm(name));
+  const code = p[1] || '', name = p[2] || '', evName = p[3] || '', when = p[4] || '';
+  const byCode = UUID_RE.test(code);
+  let cands;
+  if (byCode) {
+    // biglietto nuovo: il codice univoco identifica la prenotazione, il nome nel QR non conta
+    let hit = bookings.find(b => b.codice === code);
+    if (!hit) { const { data } = await sb.from('bookings').select(BK_COLS).eq('codice', code).maybeSingle(); hit = data || null; }
+    cands = hit ? [hit] : [];
+  } else {
+    // biglietto vecchio, emesso prima dei codici: confronto per nome come prima
+    cands = bookings.filter(b => norm(b.name) === norm(name));
+  }
   const evMatch = b => { const e = events.find(x => String(x.id) === String(b.event_id)); return e && norm(e.name) === norm(evName); };
   const sel = cands.find(b => String(b.event_id) === String(selId) && evMatch(b)) || cands.find(b => String(b.event_id) === String(selId));
-  const other = cands.find(evMatch);
+  const other = cands.find(evMatch) || (byCode ? cands[0] : undefined);
   const e = events.find(x => String(x.id) === String(selId));
   if (sel) {
     const n = parseInt(sel.seats) || 1;
@@ -10478,6 +10495,7 @@ async function onQR(raw) {
   }
   if (other) {
     const oe = events.find(x => String(x.id) === String(other.event_id));
+    if (!oe) { showRes('fail', '✗ biglietto di un evento passato', other.name, ''); return; }
     showRes('warn', '⚠ biglietto di un altro evento', other.name, `${esc(oe.name)} · ${oe.day} ${MONTHS[oe.month]} — seleziona quell'evento per farlo entrare`);
     return;
   }

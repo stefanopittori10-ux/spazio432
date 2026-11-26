@@ -421,7 +421,8 @@ function updateTicket(data) {
   const seats  = (data && data.seats) || '2';
 
   const color = CAT_COLORS[cat] || '#534AB7';
-  const code  = genCode(name, event, date);
+  const codice = data && data.codice;
+  const code  = codice ? 'S432-' + codice.slice(0, 4).toUpperCase() : genCode(name, event, date);
 
   // Aggiorna testi
   document.getElementById('t-cat').textContent    = CAT_LABELS[cat];
@@ -437,7 +438,7 @@ function updateTicket(data) {
   document.getElementById('t-stub-seats').textContent = seats + (seats == 1 ? ' posto' : ' posti');
 
   // Genera QR
-  const qrData = `SPAZIO432|${code}|${name}|${event}|${date} ${time}|posti:${seats}`;
+  const qrData = `SPAZIO432|${codice || code}|${name}|${event}|${date} ${time}|posti:${seats}`;
   const box = document.getElementById('qr-box');
   box._qrData = qrData;
   box.innerHTML = '';

@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Finanze · spazio 432</title>
 <script>
-  // session guard: senza login si torna al portale
-  if (sessionStorage.getItem('s432_auth') !== '1') location.replace('login.html');
+  // accesso riservato: serve una sessione Supabase (login con email e password)
+  try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token') || !localStorage.getItem('sb-rsgazxwkdyphdjogvbpe-auth-token')) location.replace('login.html'); } catch (e) { location.replace('login.html'); }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
@@ -844,7 +844,7 @@
 
 alter table finanze enable row level security;
 create policy "accesso totale" on finanze
-  for all using (true) with check (true);</div>
+  for all to authenticated using (true) with check (true);</div>
   </div>
 
   <!-- Setup banner — spese anticipate -->
@@ -892,8 +892,8 @@ create table if not exists quote_bollette (
 
 alter table partecipanti   enable row level security;
 alter table quote_bollette enable row level security;
-create policy "accesso totale" on partecipanti   for all using (true) with check (true);
-create policy "accesso totale" on quote_bollette for all using (true) with check (true);
+create policy "accesso totale" on partecipanti   for all to authenticated using (true) with check (true);
+create policy "accesso totale" on quote_bollette for all to authenticated using (true) with check (true);
 
 insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Alejandra');</div>
     <p class="setup-txt" style="margin-top:12px"><strong>2.</strong> Nel progetto <strong>calendario</strong> (udaymqqytagtayviwolr) → SQL Editor:</p>
@@ -1173,6 +1173,14 @@ const cal = createClient(
   'https://udaymqqytagtayviwolr.supabase.co',
   'sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs'
 );
+
+// la sessione va confermata dal server: se è scaduta o revocata si torna al login
+db.auth.getSession().then(({ data }) => { if (!data.session) location.replace('login.html'); });
+db.auth.onAuthStateChange(ev => { if (ev === 'SIGNED_OUT') location.replace('login.html'); });
+
+// la sessione va confermata dal server: se è scaduta o revocata si torna al login
+cal.auth.getSession().then(({ data }) => { if (!data.session) location.replace('login.html'); });
+cal.auth.onAuthStateChange(ev => { if (ev === 'SIGNED_OUT') location.replace('login.html'); });
 const K_EVENTO = 2;       // un giorno con evento esterno = 2 giornate normali
 let partecipanti = [];    // attivi
 let allQuotes = [];       // tutte le quote, con join su finanze

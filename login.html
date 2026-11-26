@@ -332,9 +332,9 @@
   <div id="login-section">
     <div class="panel active" id="panel-login">
       <div>
-        <label class="form-label" for="email-input">nome</label>
-        <input class="form-input" id="email-input" type="text"
-          placeholder="es. michela" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false"
+        <label class="form-label" for="email-input">email</label>
+        <input class="form-input" id="email-input" type="email" inputmode="email"
+          placeholder="nome@esempio.it" autocomplete="username" autocapitalize="off" spellcheck="false"
           onkeydown="if(event.key==='Enter') document.getElementById('pwd-input').focus()">
       </div>
       <div>
@@ -343,7 +343,7 @@
           placeholder="········" autocomplete="current-password"
           onkeydown="if(event.key==='Enter') doLogin()">
       </div>
-      <div class="error-msg" id="error-msg">nome o password errati</div>
+      <div class="error-msg" id="error-msg">email o password errate</div>
       <button class="login-btn" id="login-btn" onclick="doLogin()">entra →</button>
     </div>
   </div>
@@ -422,18 +422,16 @@ async function doLogin() {
   const pwdEl   = document.getElementById('pwd-input');
   const btn     = document.getElementById('login-btn');
   const err     = document.getElementById('error-msg');
-  const user = emailEl.value.trim().toLowerCase(), password = pwdEl.value;
-  // basta il nome: "michela" diventa michela@spazio432.org (una mail completa funziona lo stesso)
-  const email = !user ? '' : user.includes('@') ? user : user.replace(/\s+/g, '') + '@spazio432.org';
+  const email = emailEl.value.trim().toLowerCase(), password = pwdEl.value;
   pwdEl.classList.remove('err'); err.classList.remove('visible');
-  if (!email || !password) { loginError('inserisci nome e password'); return; }
+  if (!email || !password) { loginError('inserisci email e password'); return; }
 
   btn.disabled = true; btn.textContent = 'verifico…';
   const cal = await _supabase.auth.signInWithPassword({ email, password });
   if (cal.error) {
     btn.disabled = false; btn.textContent = 'entra →';
     pwdEl.value = ''; pwdEl.focus();
-    loginError(/invalid/i.test(cal.error.message) ? 'nome o password errati' : 'errore: ' + cal.error.message);
+    loginError(/invalid/i.test(cal.error.message) ? 'email o password errate' : 'errore: ' + cal.error.message);
     return;
   }
   // stesse credenziali sul progetto finanze; se non va, il calendario resta comunque accessibile

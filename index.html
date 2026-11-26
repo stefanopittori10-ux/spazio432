@@ -1716,6 +1716,15 @@ const SUPABASE_KEY = "sb_publishable_nFiO-dUTfrElolGJuJXbFQ_fjKbEAxs";
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// codice biglietto casuale e non indovinabile (va nel QR e nel database)
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function nuovoCodice() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16)); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
+}
+
 const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 const CAT_LABELS={music:'Musica',film:'Cineforum',lab:'Laboratorio',art:'Arte',meet:'Riunioni'};
 const CAT_COLORS={music:'#534AB7',film:'#993C1D',lab:'#3B6D11',art:'#854F0B',meet:'#4B5563'};
@@ -2816,7 +2825,8 @@ function closeRecapForm(uid) {
 
 async function loadBookingCount(eventId, counterEl) {
   try {
-    const { count } = await _supabase.from('bookings').select('id', { count: 'exact', head: true }).eq('event_id', eventId);
+    // il pubblico non può leggere le prenotazioni: chiede solo il numero a una funzione del database
+    const { data: count } = await _supabase.rpc('conta_prenotazioni', { ev: eventId });
     const n = count || 0;
     counterEl.textContent = n === 0 ? 'Nessuna prenotazione' : n === 1 ? '1 prenotazione' : `${n} prenotazioni`;
   } catch { counterEl.textContent = ''; }
@@ -2840,7 +2850,8 @@ async function submitBooking(uid, eventId) {
     setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'bk-message'; }, 3000); return;
   }
   subBtn.disabled = true; msgEl.textContent = 'Invio…'; msgEl.className = 'bk-message';
-  const { error } = await _supabase.from('bookings').insert([{ event_id: eventId, name, email, seats, note: note || null }]);
+  const codice = nuovoCodice();
+  const { error } = await _supabase.from('bookings').insert([{ event_id: eventId, name, email, seats, note: note || null, codice }]);
   if (error) {
     subBtn.disabled = false; msgEl.textContent = 'Errore: ' + error.message; msgEl.className = 'bk-message fail'; return;
   }
@@ -2863,6 +2874,7 @@ async function submitBooking(uid, eventId) {
     // Apri biglietto subito dopo — stesso frame, nessun popup bloccato
     if (evt) {
       openTicketOverlay({
+        codice,
         name,
         email,
         seats: String(seats),
@@ -3026,7 +3038,7 @@ function genTicketCode(name, event, date) {
 function openTicketOverlay(data) {
   const { name, email, event, cat, date, time, seats } = data;
   const color = T_CAT_COLORS[cat] || '#534AB7';
-  const code  = genTicketCode(name, event, date);
+  const code  = data.codice ? 'S432-' + data.codice.slice(0, 4).toUpperCase() : genTicketCode(name, event, date);
   const seatsN = String(seats);
 
   document.getElementById('t-stripe').style.background = color;
@@ -3041,7 +3053,7 @@ function openTicketOverlay(data) {
   document.getElementById('t-code').textContent   = code;
   document.getElementById('t-stub-seats').textContent = seatsN + (seatsN == '1' ? ' posto' : ' posti');
 
-  const qrData = `SPAZIO432|${code}|${name}|${event}|${date} ${time}|posti:${seatsN}`;
+  const qrData = `SPAZIO432|${data.codice || code}|${name}|${event}|${date} ${time}|posti:${seatsN}`;
   const box = document.getElementById('qr-box');
   box._qrData = qrData;
   box.innerHTML = '';
