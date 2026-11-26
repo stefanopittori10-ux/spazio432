@@ -1429,6 +1429,11 @@
     .toolbar .loc-home { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
     .toolbar .loc-home span { display: none; }
   }
+
+  .logo-area.logo-home { cursor: pointer; }
+  .ev-row { cursor: pointer; }
+  @media (hover: hover) { .ev-row:hover { background: var(--surface-hover); } }
+  .ev-row .ev-form, .ev-row .ev-details { cursor: auto; }
 </style>
 </head>
 <body class="is-home">
@@ -1535,10 +1540,9 @@
 
   <div class="card" id="cal-card">
     <div class="card-header">
-      <div class="logo-area logo-static">
+      <div class="logo-area logo-home" onclick="goHome()" title="Torna alla home" role="button" tabindex="0">
         <div class="logo-text-group">
           <div><span class="logo-spazio">spazio</span><span class="logo-num">432</span></div>
-          <div class="logo-subtitle">via ceva 47, torino</div>
         </div>
       </div>
       <div class="header-right month-nav">
@@ -1926,6 +1930,12 @@ function buildListView() {
       };
       row.querySelector('.ev-name').onclick = toggleDet;
       row.querySelector('.ev-more').onclick = toggleDet;
+      // anche un tocco ovunque sulla riga apre/chiude i dettagli (tranne bottoni, link e modulo)
+      row.addEventListener('click', e => {
+        if (e.target.closest('button, a, input, textarea, select, label, .ev-form, .ev-details')) return;
+        if (window.getSelection && String(window.getSelection()).length) return;
+        toggleDet();
+      });
       // vengo! a destra, il modulo di prenotazione si apre sotto a tutta larghezza
       const bk = buildRecapBookingBlock(first);
       const action = bk.firstElementChild; action.className = 'ev-action';

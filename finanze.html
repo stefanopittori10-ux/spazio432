@@ -574,6 +574,22 @@
     .foot-val { font-size: 20px; }
   }
   @media (prefers-reduced-motion: reduce) { .month-slide.from-right, .month-slide.from-left { animation: none; } }
+
+  /* ── bottone cifre nascoste ── */
+  .mask-pill { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 20px; cursor: pointer;
+    font-family: var(--font); font-size: 12px; font-weight: bold; border: 1px solid var(--fg); background: var(--pill-bg); color: var(--fg);
+    transition: background .15s, color .15s; flex-shrink: 0; }
+  .mask-pill .eye-ico { width: 17px; height: 17px; display: block; }
+  .mask-pill .eye-slash { opacity: 0; }
+  .mask-pill[aria-pressed="true"] { background: var(--fg); color: var(--bg); box-shadow: 3px 3px 0 var(--u-solid); }
+  .mask-pill[aria-pressed="true"] .eye-slash { opacity: 1; }
+  @media (hover: hover) { .mask-pill:hover { background: var(--fg); color: var(--bg); } }
+  /* in modalità demo la barra dell'obiettivo non rivela la percentuale */
+  body.masked .e-goal-fill { width: 35% !important; }
+  @media (max-width: 860px) {
+    .mask-pill { width: 36px; padding: 0; justify-content: center; }
+    .mask-lbl { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -582,6 +598,7 @@
   <div class="toolbar">
     <div class="logo"><span class="lg-s">spazio</span><span class="lg-n">432</span><span class="lg-page">finanze</span></div>
     <div class="spacer"></div>
+    <button class="mask-pill" id="mask-btn" onclick="toggleMask()" aria-pressed="false" title="Nascondi le cifre (per mostrare il sito)"><svg class="eye-ico" viewBox="0 0 20 20" aria-hidden="true"><path class="eye-shape" d="M1.5 10S5 4 10 4s8.5 6 8.5 6-3.5 6-8.5 6S1.5 10 1.5 10Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="10" r="2.8" fill="currentColor"/><path class="eye-slash" d="M3 17L17 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg><span class="mask-lbl">cifre visibili</span></button>
     <button class="icon-btn theme" id="theme-btn" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
     <button class="back-pill" onclick="backToLogin()" title="Torna al portale">← admin</button>
   </div>
@@ -955,7 +972,10 @@ const SEED = [
 ];
 
 // ── HELPERS ───────────────────────────────────────────────────
+// modalità demo: tutte le cifre diventano asterischi
+let masked = (() => { try { return localStorage.getItem('s432-mask') === '1'; } catch { return false; } })();
 function fmt(n) {
+  if (masked) return '€ ***,**';
   const s = Math.abs(n).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
   return (n < 0 ? '− ' : '') + '€ ' + s;
 }
@@ -1040,7 +1060,7 @@ function render() {
   const saldo = tE - tU - tR;
   const sEl = document.getElementById('f-s');
   sEl.textContent = fmt(saldo);
-  sEl.className = 'foot-val ' + (saldo > 0 ? 'e' : saldo < 0 ? 'u' : 'n');
+  sEl.className = 'foot-val ' + (masked ? 'n' : saldo > 0 ? 'e' : saldo < 0 ? 'u' : 'n');   // in demo il colore non tradisce il segno
 }
 
 function renderList(tipo, entries) {
@@ -1071,7 +1091,7 @@ function renderList(tipo, entries) {
       const pct = Math.min(100, (cum / e.target) * 100);
       const g = document.createElement('div'); g.className = 'e-goal';
       g.innerHTML = `<div class="e-goal-bar"><div class="e-goal-fill" style="width:${pct.toFixed(1)}%"></div></div>`
-        + `<div class="e-goal-lbl">${fmt(cum)} su ${fmt(e.target)} — ${pct.toFixed(0)}%</div>`;
+        + `<div class="e-goal-lbl">${fmt(cum)} su ${fmt(e.target)} — ${masked ? '**' : pct.toFixed(0)}%</div>`;
       info.appendChild(g);
     }
     // stato divisione (solo uscite)
@@ -1765,6 +1785,23 @@ document.addEventListener('click', e => {
     closePay();
   }
 });
+
+// ── CIFRE NASCOSTE ───────────────────────────────────────────
+function applyMaskUI() {
+  document.body.classList.toggle('masked', masked);
+  const b = document.getElementById('mask-btn');
+  if (b) { b.setAttribute('aria-pressed', masked); b.querySelector('.mask-lbl').textContent = masked ? 'cifre nascoste' : 'cifre visibili'; }
+}
+function toggleMask() {
+  masked = !masked;
+  try { localStorage.setItem('s432-mask', masked ? '1' : '0'); } catch {}
+  applyMaskUI();
+  render();
+  if (typeof split !== 'undefined' && split) renderSplitModal();
+  if (typeof payEntry !== 'undefined' && payEntry) { document.getElementById('ps-importo').textContent = fmt(payEntry.importo); updateMailto(); }
+  showToast(masked ? 'Cifre nascoste: puoi mostrare il sito' : 'Cifre di nuovo visibili', true);
+}
+applyMaskUI();
 
 // ── NAVIGAZIONE ──────────────────────────────────────────────
 function backToLogin() { location.href = 'login.html'; }
