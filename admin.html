@@ -1475,6 +1475,151 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
   .lg-page { margin-left: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px;
     padding: 4px 9px; background: var(--fg); color: var(--bg); line-height: 1.2; }
   @media (max-width: 768px) { .lg-page { margin-left: 8px; font-size: 10px; padding: 3px 7px; } }
+
+  /* ═══ TOOLBAR: filtra / esporta / aggiungi ═══════════════════ */
+  .toolbar { justify-content: space-between; }
+  .toolbar-filters { flex: 0 0 auto !important; overflow: visible !important; }
+  .pop-wrap { position: relative; }
+  .tb-filter { --tc: var(--fg); }
+  .tb-filter .tb-dot { display: none; width: 9px; height: 9px; border-radius: 50%; background: #fff; }
+  .tb-filter.active { background: var(--fc) !important; border-color: var(--fc) !important; color: #fff !important; }
+  .tb-filter.active .tb-dot { display: inline-block; }
+  .tbtn.busy { opacity: .5; pointer-events: none; }
+  .pop {
+    position: absolute; top: calc(100% + 10px); left: 0; z-index: 700; min-width: 230px;
+    background: var(--card-bg); border: 2px solid var(--fg); box-shadow: 5px 5px 0 var(--fg);
+    padding: 8px; display: none; flex-direction: column; gap: 2px;
+  }
+  .pop.pop-right { left: auto; right: 0; min-width: 290px; }
+  .pop.open { display: flex; animation: pop-in .14s ease-out; }
+  @keyframes pop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .pop-title { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.2px; color: var(--fg-muted); padding: 6px 8px 8px; }
+  .pop-item {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; cursor: pointer;
+    font-family: var(--font-mono); font-size: 13px; font-weight: bold; color: var(--fg);
+    background: none; border: none; padding: 9px 8px; transition: background .1s;
+  }
+  .pop-item:hover { background: var(--surface-hover); }
+  .pop-sq { width: 14px; height: 14px; border: 2px solid var(--fg); flex-shrink: 0; }
+  .pop-check { margin-left: auto; opacity: 0; }
+  .pop-item.on .pop-check { opacity: 1; }
+  .pop-item.big { padding: 12px 10px; border-bottom: 1px solid var(--border-light); }
+  .pop-item.big:last-child { border-bottom: none; }
+  .pop-ico { font-size: 20px; width: 26px; text-align: center; flex-shrink: 0; }
+  .pop-txt { display: flex; flex-direction: column; gap: 2px; }
+  .pop-txt small { font-size: 11px; font-weight: normal; color: var(--fg-muted); }
+  @media (max-width: 768px) {
+    /* su telefono "filtra" resta con la scritta: ora c'è spazio */
+    .tbtn.tb-filter { width: auto; padding: 0 14px; border-radius: 20px; }
+    .tbtn.tb-filter .tb-lbl { display: inline; }
+    .pop.pop-right { min-width: 260px; }
+  }
+
+  /* ═══ GESTIONE EVENTI ════════════════════════════════════════ */
+  body.manage-mode .toolbar, body.manage-mode #cal-card { display: none !important; }
+  .mgr[hidden] { display: none; }
+  .mgr { padding-bottom: 40px; }
+  .mgr-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+  .mgr-back { --tc: var(--fg); width: auto !important; padding: 0 16px !important; border-radius: 20px !important; }
+  .mgr-month { display: flex; align-items: center; gap: 14px; }
+  .mgr-month-txt { text-align: center; min-width: 9.5ch; }
+  .mgr-ml { font-size: 18px; font-weight: 900; letter-spacing: .5px; }
+  .mgr-yl { font-size: 11px; color: var(--fg-muted); letter-spacing: 1px; }
+
+  .mgr-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 26px; align-items: start; }
+  .mgr-card { border: 2px solid var(--fg); background: var(--card-bg); box-shadow: 6px 6px 0 var(--fg); }
+  .mgr-head { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px 18px; background: #534AB7; color: #fff; border-bottom: 2px solid var(--fg); }
+  .mgr-form.editing .mgr-head { background: #993C1D; }
+  .mgr-head.dark { background: var(--fg); color: var(--bg); }
+  .mgr-kicker { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; opacity: .85; }
+  .mgr-head-title { font-size: 32px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+
+  .mgr-fields { padding: 18px 20px 4px; display: flex; flex-direction: column; gap: 14px; }
+  .mf { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .mf > span { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-muted); }
+  .mf > span i { font-style: normal; text-transform: none; letter-spacing: 0; }
+  .mf input, .mf textarea {
+    font-family: var(--font-mono); font-size: 15px; padding: 10px 12px; width: 100%;
+    border: 2px solid var(--fg); background: var(--input-bg); color: var(--input-fg); outline: none; border-radius: 0;
+  }
+  .mf textarea { resize: vertical; min-height: 76px; line-height: 1.45; }
+  .mf input:focus, .mf textarea:focus { box-shadow: 3px 3px 0 #534AB7; }
+  .mf input.err { border-color: #c00; box-shadow: 3px 3px 0 #c00; }
+  .mf-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 10px; }
+  .mf-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mf-cats button {
+    font-family: var(--font-mono); font-size: 12px; font-weight: bold; padding: 7px 12px; border-radius: 20px; cursor: pointer;
+    border: 2px solid var(--c); color: var(--c); background: var(--card-bg); transition: background .12s, color .12s;
+  }
+  .mf-cats button.on { background: var(--c); color: #fff; }
+  [data-theme="dark"] .mf-cats button:not(.on) { color: var(--fg); }
+  .mf-check { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
+  .mf-check[hidden] { display: none; }
+  .mf-check input[type=checkbox] { width: 18px; height: 18px; accent-color: #534AB7; }
+  .mf-check input[type=number] { width: 58px; font-family: var(--font-mono); font-size: 14px; padding: 4px 6px; border: 2px solid var(--fg); background: var(--input-bg); color: var(--input-fg); }
+  .mgr-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 20px 20px; }
+  .mgr-ghost { font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted); background: none; border: none; cursor: pointer; padding: 6px 2px; }
+  .mgr-ghost:hover { color: var(--fg); text-decoration: underline; }
+  .mgr-save {
+    font-family: var(--font-mono); font-size: 14px; font-weight: bold; padding: 12px 22px; cursor: pointer;
+    background: var(--fg); color: var(--bg); border: 2px solid var(--fg); box-shadow: 4px 4px 0 #993C1D;
+    transition: transform .1s, box-shadow .1s;
+  }
+  .mgr-save:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 #993C1D; }
+  .mgr-save:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #993C1D; }
+  .mgr-save:disabled { opacity: .5; pointer-events: none; }
+
+  .mgr-list { max-height: calc(100vh - 220px); overflow-y: auto; }
+  .mgr-empty { padding: 34px 20px; font-size: 13px; color: var(--fg-muted); line-height: 1.6; }
+  .mgr-row {
+    display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 14px; align-items: center;
+    padding: 12px 16px 12px 12px; border-bottom: 1px solid var(--border-light); border-left: 5px solid var(--c);
+    transition: background .12s;
+  }
+  .mgr-row:last-child { border-bottom: none; }
+  .mgr-row.on { background: var(--surface-hover); }
+  .mgr-date { border: 2px solid var(--fg); text-align: center; padding: 4px 0; line-height: 1; background: var(--card-bg); }
+  .mgr-date span { display: block; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-muted); }
+  .mgr-date b { display: block; font-size: 21px; font-weight: 900; color: var(--c); margin-top: 3px; }
+  .mgr-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 10px; font-weight: bold; }
+  .mgr-cat { color: var(--c); text-transform: uppercase; letter-spacing: 1px; }
+  .mgr-time { color: var(--fg); border: 1px solid var(--border-light); border-radius: 20px; padding: 1px 7px; }
+  .mgr-serie { background: var(--fg); color: var(--bg); padding: 1px 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .mgr-name { font-size: 15px; font-weight: bold; margin-top: 4px; line-height: 1.25; overflow-wrap: anywhere; }
+  .mgr-acts { display: flex; gap: 6px; }
+  .mgr-a {
+    font-family: var(--font-mono); font-size: 11px; font-weight: bold; padding: 6px 10px; border-radius: 20px; cursor: pointer;
+    border: 1.5px solid var(--fg); background: var(--card-bg); color: var(--fg); transition: background .12s, color .12s;
+  }
+  .mgr-a:hover { background: var(--fg); color: var(--bg); }
+  .mgr-a.del { border-color: var(--border-light); color: var(--fg-muted); }
+  .mgr-a.del:hover, .mgr-a.del.armed { background: #c00; border-color: #c00; color: #fff; }
+
+  .adm-toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 1200;
+    background: var(--fg); color: var(--bg); font-family: var(--font-mono); font-size: 13px; font-weight: bold;
+    padding: 10px 18px; border: 2px solid var(--fg); box-shadow: 4px 4px 0 #3B6D11;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; white-space: nowrap;
+  }
+  .adm-toast.bad { box-shadow: 4px 4px 0 #c00; }
+  .adm-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 900px) {
+    .mgr-body { grid-template-columns: 1fr; gap: 22px; }
+    .mgr-list { max-height: none; }
+  }
+  @media (max-width: 768px) {
+    .mgr-top { gap: 8px; }
+    .mgr-month { gap: 8px; }
+    .mgr-month .mkey { width: 36px; height: 36px; }
+    .mgr-ml { font-size: 15px; }
+    .mgr-head-title { font-size: 26px; }
+    .mf-row { grid-template-columns: 1fr 1fr; }
+    .mf-row .mf:first-child { grid-column: 1 / -1; }
+    .mgr-row { grid-template-columns: 48px minmax(0, 1fr); }
+    .mgr-acts { grid-column: 2 / 3; }
+    .mgr-card { box-shadow: 5px 5px 0 var(--fg); }
+  }
 </style>
 </head>
 <body>
@@ -1507,57 +1652,106 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
   </div>
 
   <div class="toolbar">
-    <!-- Riga 1 (mobile): hamburger + drawer filtri -->
     <div class="toolbar-filters">
-      <button class="pill filter-toggle-btn" id="filter-toggle-btn" onclick="toggleFilters()" aria-label="Filtri">
-        <span class="hamburger-icon">
-          <span></span><span></span><span></span>
-        </span>
-      </button>
-      <div class="filter-drawer" id="filter-drawer">
-        <button class="pill active" data-cat="all" onclick="filterEvt(this,'all')">Tutto</button>
-        <button class="pill" data-cat="music" onclick="filterEvt(this,'music')">Musica</button>
-        <button class="pill" data-cat="film" onclick="filterEvt(this,'film')">Cineforum</button>
-        <button class="pill" data-cat="lab" onclick="filterEvt(this,'lab')">Laboratorio</button>
-        <button class="pill" data-cat="art" onclick="filterEvt(this,'art')">Arte</button>
-        <button class="pill" data-cat="meet" onclick="filterEvt(this,'meet')">Riunioni</button>
-      </div>
-      <!-- Carosello filtri (solo mobile) -->
-      <div class="filter-carousel" id="filter-carousel">
-        <button class="carousel-arrow" id="carousel-prev" onclick="carouselMove(-1)">&#8249;</button>
-        <div class="carousel-track" id="carousel-track">
-          <div class="carousel-pill-wrap" id="carousel-pills">
-            <button class="pill active" data-cat="all" onclick="carouselFilter(this,'all')">Tutto</button>
-            <button class="pill" data-cat="music" onclick="carouselFilter(this,'music')">Musica</button>
-            <button class="pill" data-cat="film" onclick="carouselFilter(this,'film')">Cineforum</button>
-            <button class="pill" data-cat="lab" onclick="carouselFilter(this,'lab')">Laboratorio</button>
-            <button class="pill" data-cat="art" onclick="carouselFilter(this,'art')">Arte</button>
-            <button class="pill" data-cat="meet" onclick="carouselFilter(this,'meet')">Riunioni</button>
-          </div>
+      <div class="pop-wrap">
+        <button class="tbtn tb-filter" id="filter-btn" onclick="togglePop('filter-pop', event)" aria-haspopup="true" aria-expanded="false">
+          <svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 3h16l-6 7.5V17l-4-2v-4.5Z" fill="currentColor"/></svg>
+          <span class="tb-lbl" id="filter-lbl">filtra</span>
+          <span class="tb-dot" id="filter-dot"></span>
+        </button>
+        <div class="pop" id="filter-pop" role="menu">
+          <div class="pop-title">mostra solo</div>
+          <button class="pop-item on" data-cat="all" onclick="pickFilter('all')"><span class="pop-sq" style="background:var(--fg)"></span>tutto<span class="pop-check">✓</span></button>
+          <button class="pop-item" data-cat="music" onclick="pickFilter('music')"><span class="pop-sq" style="background:#534AB7"></span>musica<span class="pop-check">✓</span></button>
+          <button class="pop-item" data-cat="film" onclick="pickFilter('film')"><span class="pop-sq" style="background:#993C1D"></span>cineforum<span class="pop-check">✓</span></button>
+          <button class="pop-item" data-cat="lab" onclick="pickFilter('lab')"><span class="pop-sq" style="background:#3B6D11"></span>laboratorio<span class="pop-check">✓</span></button>
+          <button class="pop-item" data-cat="art" onclick="pickFilter('art')"><span class="pop-sq" style="background:#854F0B"></span>arte<span class="pop-check">✓</span></button>
+          <button class="pop-item" data-cat="meet" onclick="pickFilter('meet')"><span class="pop-sq" style="background:#4B5563"></span>riunioni<span class="pop-check">✓</span></button>
         </div>
-        <button class="carousel-arrow" id="carousel-next" onclick="carouselMove(1)">&#8250;</button>
       </div>
     </div>
-    <!-- Riga 2 (mobile): navigazione mesi + azioni + dark toggle -->
     <div class="toolbar-actions">
-      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro" aria-label="Tema chiaro/scuro"><svg class="th-ico" viewBox="0 0 24 24" aria-hidden="true"><g class="th-moon"><path d="M20.8 14.6A9 9 0 1 1 9.4 3.2a7.2 7.2 0 0 0 11.4 11.4Z" fill="currentColor"/></g><g class="th-sun"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><path d="M12 1.2v3.4M12 19.4v3.4M1.2 12h3.4M19.4 12h3.4M4.4 4.4l2.4 2.4M17.2 17.2l2.4 2.4M4.4 19.6l2.4-2.4M17.2 6.8l2.4-2.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square"/></g></svg></button>
-      <button class="tbtn tb-verifica verifica-btn" onclick="openVerifica()" title="Verifica biglietti"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 7V2h5M13 2h5v5M18 13v5h-5M7 18H2v-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/><rect x="6" y="9" width="8" height="2.4" fill="currentColor"/></svg><span class="tb-lbl">verifica</span></button>
-      <button class="tbtn tb-export export-btn" onclick="exportInstagramPNG()" title="Esporta PNG per Instagram"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v10M5.5 8l4.5 4.5L14.5 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/><rect x="3" y="15.5" width="14" height="2.6" fill="currentColor"/></svg><span class="tb-lbl">esporta</span></button>
-      <button class="tbtn tb-add" id="toggle-add-btn" onclick="toggleAddArea()"><span class="btn-icon">+</span><span class="btn-label"> Aggiungi</span></button>
-      <!-- Menu ··· mobile -->
-      <div style="position:relative;">
-        <button class="more-btn" id="more-btn" onclick="toggleMoreMenu()">···</button>
-        <div class="more-menu" id="more-menu">
-          <button class="more-menu-item" onclick="openVerifica(); closeMoreMenu()">
-            <span class="mi-icon">⌗</span><span class="mi-label">Verifica biglietti</span>
+      <div class="pop-wrap">
+        <button class="tbtn tb-export" id="export-btn" onclick="togglePop('export-pop', event)" aria-haspopup="true" aria-expanded="false" title="Esporta">
+          <svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v10M5.5 8l4.5 4.5L14.5 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/><rect x="3" y="15.5" width="14" height="2.6" fill="currentColor"/></svg>
+          <span class="tb-lbl">esporta</span>
+        </button>
+        <div class="pop pop-right" id="export-pop" role="menu">
+          <div class="pop-title">esporta il mese</div>
+          <button class="pop-item big" onclick="closePops(); exportICS()">
+            <span class="pop-ico">📅</span>
+            <span class="pop-txt"><b>calendario</b><small>file .ics per Google, Apple, Outlook</small></span>
           </button>
-          <button class="more-menu-item" onclick="exportInstagramPNG(); closeMoreMenu()">
-            <span class="mi-icon">↓</span><span class="mi-label">Esporta PNG</span>
+          <button class="pop-item big" onclick="closePops(); exportInstagramPNG()">
+            <span class="pop-ico">▣</span>
+            <span class="pop-txt"><b>immagine</b><small>png con il programma, per Instagram</small></span>
           </button>
         </div>
       </div>
+      <button class="tbtn tb-add" id="toggle-add-btn" onclick="openManager()"><span class="btn-icon">+</span><span class="btn-label"> Aggiungi</span></button>
     </div>
   </div>
+
+  <!-- GESTIONE EVENTI (si apre con + Aggiungi) -->
+  <section class="mgr" id="manager" hidden>
+    <div class="mgr-top">
+      <button class="tbtn mgr-back" onclick="closeManager()">← calendario</button>
+      <div class="mgr-month">
+        <button class="mkey" onclick="navMonth(-1)" aria-label="Mese precedente"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg></button>
+        <div class="mgr-month-txt"><div class="mgr-ml" id="mgr-month-lbl">—</div><div class="mgr-yl" id="mgr-year-lbl">—</div></div>
+        <button class="mkey" onclick="navMonth(1)" aria-label="Mese successivo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg></button>
+      </div>
+    </div>
+
+    <div class="mgr-body">
+      <div class="mgr-card mgr-form" id="mgr-form">
+        <div class="mgr-head" id="mgr-form-head">
+          <span class="mgr-kicker" id="mgr-form-kicker">nuovo evento</span>
+          <span class="mgr-head-title" id="mgr-form-title">AGGIUNGI</span>
+        </div>
+        <div class="mgr-fields">
+          <label class="mf"><span>cosa</span><input type="text" id="mf-name" placeholder="titolo dell'evento" autocomplete="off"></label>
+          <div class="mf"><span>che tipo</span>
+            <div class="mf-cats" id="mf-cats">
+              <button type="button" data-cat="music" style="--c:#534AB7">musica</button>
+              <button type="button" data-cat="film" style="--c:#993C1D">cineforum</button>
+              <button type="button" data-cat="lab" style="--c:#3B6D11">laboratorio</button>
+              <button type="button" data-cat="art" style="--c:#854F0B">arte</button>
+              <button type="button" data-cat="meet" style="--c:#4B5563">riunione</button>
+            </div>
+          </div>
+          <div class="mf-row">
+            <label class="mf"><span>quando</span><input type="date" id="mf-date"></label>
+            <label class="mf mf-t"><span>dalle</span><input type="time" id="mf-time" value="19:00"></label>
+            <label class="mf mf-t"><span>alle</span><input type="time" id="mf-end"></label>
+          </div>
+          <label class="mf"><span>descrizione <i>(facoltativa)</i></span><textarea id="mf-desc" rows="3" placeholder="due righe per il pubblico"></textarea></label>
+          <label class="mf-check" id="mf-rep-wrap">
+            <input type="checkbox" id="mf-rep" onchange="document.getElementById('mf-weeks-wrap').hidden = !this.checked">
+            <span>ripeti ogni settimana</span>
+            <span id="mf-weeks-wrap" hidden>per <input type="number" id="mf-weeks" value="4" min="2" max="12"> volte</span>
+          </label>
+          <label class="mf-check" id="mf-series-wrap" hidden>
+            <input type="checkbox" id="mf-series">
+            <span>applica titolo, tipo, orari e descrizione a tutta la serie</span>
+          </label>
+        </div>
+        <div class="mgr-actions">
+          <button type="button" class="mgr-ghost" id="mf-cancel" onclick="mgrReset()">svuota</button>
+          <button type="button" class="mgr-save" id="mf-save" onclick="mgrSave()">salva evento →</button>
+        </div>
+      </div>
+
+      <div class="mgr-card mgr-list-card">
+        <div class="mgr-head dark">
+          <span class="mgr-kicker">in programma</span>
+          <span class="mgr-head-title" id="mgr-count">—</span>
+        </div>
+        <div class="mgr-list" id="mgr-list"></div>
+      </div>
+    </div>
+  </section>
+  <div class="adm-toast" id="adm-toast"></div>
    
 
   <div class="card" id="cal-card">
@@ -1604,60 +1798,6 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     <div class="edit-panel" id="edit-panel"></div>
 
     <div class="booking-panel" id="booking-panel"></div>
-
-    <div class="add-area">
-      <div class="section-label">+ nuovo evento per questo mese</div>
-      <div class="add-row">
-        <input type="number" id="new-day" placeholder="Giorno (es. 15)" min="1" max="31">
-        <select id="new-cat">
-          <option value="music">Musica</option>
-          <option value="film">Cineforum</option>
-          <option value="lab">Laboratorio</option>
-          <option value="art">Arte</option>
-          <option value="meet">Riunioni</option>
-        </select>
-        <input type="text" id="new-name" placeholder="Titolo o nome dell'evento...">
-        
-        <div class="time-row-mobile">
-          <div class="time-block">
-            <span>Ora Inizio:</span>
-            <input type="time" id="new-time" value="19:00">
-          </div>
-          
-          <div class="time-block">
-            <span>Ora Fine:</span>
-            <input type="time" id="new-time-end" value="">
-          </div>
-        </div>
-      </div>
-      <div class="add-desc">
-        <textarea id="new-desc" placeholder="Descrizione dell'evento (facoltativa)..."></textarea>
-      </div>
-      <div class="recur-row">
-        <label class="recur-label">
-          <input type="checkbox" class="recur-toggle" id="recur-on" onchange="toggleRecur()">
-          Evento ricorrente
-        </label>
-        <div class="recur-options" id="recur-options">
-          <span style="font-size:11px;color:var(--fg-muted);">ogni</span>
-          <select id="recur-weekday">
-            <option value="1">Lunedì</option>
-            <option value="2">Martedì</option>
-            <option value="3">Mercoledì</option>
-            <option value="4">Giovedì</option>
-            <option value="5">Venerdì</option>
-            <option value="6">Sabato</option>
-            <option value="0">Domenica</option>
-          </select>
-          <span style="font-size:11px;color:var(--fg-muted);">per</span>
-          <input type="number" id="recur-weeks" value="4" min="2" max="12">
-          <span style="font-size:11px;color:var(--fg-muted);">settimane</span>
-        </div>
-      </div>
-      <div class="add-submit-row">
-        <button class="add-btn" onclick="addEvent()">Aggiungi Evento</button>
-      </div>
-    </div>
 
     <div class="footer" id="main-footer">
       <div class="legend">
@@ -1807,6 +1947,7 @@ async function fetchAndBuild() {
   const carousel = document.getElementById("filter-carousel");
   if (carousel && window.getComputedStyle(carousel).display !== "none") carouselBuild();
   if (typeof updateMonthNav === 'function') updateMonthNav();
+  if (typeof renderManager === 'function') renderManager();
   
   // NIENTE altro qui: la visibilità è gestita dal click di toggleListView
 }
@@ -2316,7 +2457,7 @@ function changeMonth(dir) {
   fetchAndBuild();
 }
 
-function exportInstagramPNG() {
+function exportInstagramPNG_vecchio() {
   const container = document.createElement('div');
   container.id = 'ig-virtual-container';
 
@@ -13512,6 +13653,373 @@ function initGroupBtn() {
   const btn = document.getElementById('group-toggle-btn');
   if (btn) btn.classList.toggle('active', groupingEnabled);
 }
+
+
+// ══ FILTRO, ESPORTA, GESTIONE EVENTI ═════════════════════════════
+const DOW3 = ['dom','lun','mar','mer','gio','ven','sab'];
+const escH = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad2 = n => String(n).padStart(2, '0');
+
+function admToast(msg, bad) {
+  const t = document.getElementById('adm-toast');
+  t.textContent = msg; t.classList.toggle('bad', !!bad); t.classList.add('show');
+  clearTimeout(admToast._t); admToast._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ── menu a tendina ──
+function closePops() {
+  document.querySelectorAll('.pop.open').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+}
+function togglePop(id, e) {
+  e && e.stopPropagation();
+  const pop = document.getElementById(id);
+  const open = !pop.classList.contains('open');
+  closePops();
+  if (open) { pop.classList.add('open'); pop.previousElementSibling.setAttribute('aria-expanded', 'true'); }
+}
+document.addEventListener('click', e => { if (!e.target.closest('.pop')) closePops(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePops(); });
+
+// ── filtro unico ──
+function pickFilter(cat) {
+  closePops();
+  filterEvt(null, cat);
+  document.querySelectorAll('#filter-pop .pop-item').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
+  const btn = document.getElementById('filter-btn');
+  document.getElementById('filter-lbl').textContent = cat === 'all' ? 'filtra' : CAT_LABELS[cat].toLowerCase();
+  btn.classList.toggle('active', cat !== 'all');
+  btn.style.setProperty('--fc', cat === 'all' ? '' : CAT_COLORS[cat]);
+}
+
+// ── ESPORTA: calendario .ics ──
+function exportICS() {
+  const list = events.filter(e => activeFilter === 'all' || e.cat === activeFilter)
+    .sort((a, b) => a.day - b.day || String(a.time || '').localeCompare(String(b.time || '')));
+  if (!list.length) { admToast('nessun evento da esportare in questo mese', true); return; }
+  const icsEsc = s => String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  const fold = line => { const out = []; while (line.length > 74) { out.push(line.slice(0, 74)); line = ' ' + line.slice(74); } out.push(line); return out.join('\r\n'); };
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const loc = (d, h, m) => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(h)}${pad2(m)}00`;
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//spazio432//calendario//IT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'X-WR-CALNAME:spazio432', 'X-WR-TIMEZONE:Europe/Rome',
+    'BEGIN:VTIMEZONE', 'TZID:Europe/Rome',
+    'BEGIN:DAYLIGHT', 'TZOFFSETFROM:+0100', 'TZOFFSETTO:+0200', 'TZNAME:CEST', 'DTSTART:19700329T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU', 'END:DAYLIGHT',
+    'BEGIN:STANDARD', 'TZOFFSETFROM:+0200', 'TZOFFSETTO:+0100', 'TZNAME:CET', 'DTSTART:19701025T030000', 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU', 'END:STANDARD',
+    'END:VTIMEZONE'];
+  list.forEach(ev => {
+    const d = new Date(ev.year, ev.month, ev.day);
+    const st = /^(\d{1,2}):(\d{2})/.exec(ev.time || '');
+    L.push('BEGIN:VEVENT', `UID:s432-${ev.id}@spazio432.org`, `DTSTAMP:${stamp}`);
+    if (st) {
+      const sh = +st[1], sm = +st[2];
+      const en = /^(\d{1,2}):(\d{2})/.exec(ev.endTime || '');
+      let end = en ? new Date(ev.year, ev.month, ev.day, +en[1], +en[2]) : new Date(ev.year, ev.month, ev.day, sh + 2, sm);
+      if (end <= new Date(ev.year, ev.month, ev.day, sh, sm)) end = new Date(end.getTime() + 864e5);   // finisce dopo mezzanotte
+      L.push(`DTSTART;TZID=Europe/Rome:${loc(d, sh, sm)}`, `DTEND;TZID=Europe/Rome:${loc(end, end.getHours(), end.getMinutes())}`);
+    } else {
+      const nx = new Date(ev.year, ev.month, ev.day + 1);
+      const dd = x => `${x.getFullYear()}${pad2(x.getMonth() + 1)}${pad2(x.getDate())}`;
+      L.push(`DTSTART;VALUE=DATE:${dd(d)}`, `DTEND;VALUE=DATE:${dd(nx)}`);
+    }
+    L.push(`SUMMARY:${icsEsc(ev.name)}`, `CATEGORIES:${icsEsc(CAT_LABELS[ev.cat] || ev.cat)}`,
+      `LOCATION:${icsEsc('Spazio 432, Via Ceva 47, 10144 Torino')}`);
+    if (ev.description) L.push(`DESCRIPTION:${icsEsc(ev.description)}`);
+    L.push('URL:https://spazio432.org/#eventi', 'END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  const blob = new Blob([L.map(fold).join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `spazio432-${MONTHS[cur.getMonth()].toLowerCase()}-${cur.getFullYear()}.ics`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  admToast(`${list.length} eventi esportati`);
+}
+
+// ── ESPORTA: immagine per Instagram (1080×1350) ──
+function exportInstagramPNG() {
+  const SH = '#0a0a0a';
+  // stessa logica della lista: le serie diventano una card sola; riunioni escluse se non filtrate apposta
+  const src = events.filter(e => activeFilter === 'all' ? e.cat !== 'meet' : e.cat === activeFilter)
+    .sort((a, b) => a.day - b.day || String(a.time || '').localeCompare(String(b.time || '')));
+  const groups = [], seen = new Map();
+  src.forEach(e => {
+    const k = e.series_id ? 'sid:' + e.series_id : 'n:' + e.name.trim().toLowerCase() + '|' + e.cat;
+    if (seen.has(k)) seen.get(k).days.push(e.day);
+    else { const g = { ev: e, days: [e.day] }; seen.set(k, g); groups.push(g); }
+  });
+  const MAX = 12, shown = groups.slice(0, MAX), extra = groups.length - shown.length;
+  const two = shown.length > 4;
+  const mon = MONTHS[cur.getMonth()], y = cur.getFullYear();
+
+  const card = g => {
+    const e = g.ev, c = CAT_COLORS[e.cat], single = g.days.length === 1;
+    const t = (e.time || '') + (e.endTime ? '–' + e.endTime : '');
+    const dateBox = single
+      ? `<div class="x-d-dow">${DOW3[new Date(e.year, e.month, e.day).getDay()]}</div><div class="x-d-day" style="color:${c}">${e.day}</div><div class="x-d-mon">${mon.slice(0, 3)}</div>`
+      : `<div class="x-d-dow">ogni</div><div class="x-d-day x-d-wd" style="color:${c}">${DOW3[new Date(e.year, e.month, e.day).getDay()]}</div><div class="x-d-mon">${g.days.length} date</div>`;
+    const pills = (single ? '' : `<span class="x-pill">${g.days.join(' · ')} ${mon.slice(0, 3).toLowerCase()}</span>`) + (t ? `<span class="x-pill">${t}</span>` : '');
+    return `<div class="x-cw"><div class="x-sh"></div><div class="x-card" style="background:${c}">
+      <div class="x-date">${dateBox}</div>
+      <div class="x-info"><div class="x-cat">${CAT_LABELS[e.cat]}</div><div class="x-name">${escH(e.name)}</div>${pills ? `<div class="x-pills">${pills}</div>` : ''}</div>
+    </div></div>`;
+  };
+  const legend = [...new Set(shown.map(g => g.ev.cat))].map(k => `<span class="x-leg"><i style="background:${CAT_COLORS[k]}"></i>${CAT_LABELS[k]}</span>`).join('');
+  const dia = `<svg viewBox="0 0 60 80" width="62" height="83"><path d="M14 4 H22 V36 A8 8 0 0 0 38 36 V4 H46 V36 A16 16 0 0 1 14 36 Z" fill="#993C1D" stroke="${SH}" stroke-width="2.2" stroke-linejoin="round"/>
+    <circle cx="18" cy="15" r="3.4" fill="#fff" stroke="${SH}"/><circle cx="42" cy="15" r="3.4" fill="#fff" stroke="${SH}"/><circle cx="18.8" cy="15.6" r="1.6" fill="#000"/><circle cx="42.8" cy="15.6" r="1.6" fill="#000"/>
+    <path d="M25 46.5 Q30 50 35 46.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+    <rect x="27" y="51" width="6" height="18" fill="#993C1D" stroke="${SH}" stroke-width="2.2"/><circle cx="30" cy="72" r="5.5" fill="#993C1D" stroke="${SH}" stroke-width="2.2"/></svg>`;
+
+  const box = document.createElement('div');
+  box.id = 'ig-x';
+  box.innerHTML = `<style>
+    #ig-x { position:fixed; left:-99999px; top:0; width:1080px; height:1350px; background:#f4f1ea; color:${SH}; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Courier New",monospace; padding:60px 64px 56px; box-sizing:border-box; display:flex; flex-direction:column; }
+    #ig-x * { box-sizing:border-box; margin:0; padding:0; }
+    #ig-x .x-head { display:flex; justify-content:space-between; align-items:flex-end; padding-bottom:26px; border-bottom:8px solid ${SH}; }
+    #ig-x .x-logo { font-size:66px; font-weight:900; letter-spacing:-2px; line-height:1; }
+    #ig-x .x-logo span { color:#8a8a8a; margin-left:6px; }
+    #ig-x .x-addr { font-size:20px; letter-spacing:2px; margin-top:12px; color:#555; }
+    #ig-x .x-right { text-align:right; }
+    #ig-x .x-tag { display:inline-block; background:${SH}; color:#f4f1ea; font-size:20px; font-weight:bold; letter-spacing:4px; padding:6px 12px; }
+    #ig-x .x-mon { font-size:78px; font-weight:900; letter-spacing:-2px; line-height:.9; margin-top:12px; }
+    #ig-x .x-yr { font-size:26px; letter-spacing:6px; color:#555; margin-top:6px; }
+    #ig-x .x-area { flex:1; min-height:0; padding:38px 12px 12px 0; display:grid; grid-template-columns:${two ? '1fr 1fr' : '1fr'}; gap:${two ? '1.3em 1.5em' : '1.4em'}; align-content:start; font-size:20px; overflow:hidden; }
+    #ig-x .x-cw { position:relative; }
+    #ig-x .x-sh { position:absolute; left:.55em; top:.55em; right:-.55em; bottom:-.55em; background:${SH}; }
+    #ig-x .x-card { position:relative; display:flex; gap:1.1em; align-items:center; border:.25em solid ${SH}; padding:${two ? '.9em' : '1.1em 1.3em'}; color:#fff; height:100%; }
+    #ig-x .x-date { flex:0 0 auto; width:${two ? '4.6em' : '5.6em'}; background:#fff; border:.2em solid ${SH}; text-align:center; padding:.45em 0 .5em; color:${SH}; }
+    #ig-x .x-d-dow, #ig-x .x-d-mon { font-size:.9em; font-weight:bold; letter-spacing:.12em; text-transform:uppercase; }
+    #ig-x .x-d-day { font-size:${two ? '2.2em' : '2.8em'}; font-weight:900; line-height:1.05; letter-spacing:-.04em; }
+    #ig-x .x-d-wd { font-size:${two ? '1.5em' : '1.9em'}; text-transform:uppercase; padding:.1em 0; }
+    #ig-x .x-info { min-width:0; flex:1; }
+    #ig-x .x-cat { font-size:.85em; font-weight:bold; letter-spacing:.2em; text-transform:uppercase; opacity:.85; }
+    #ig-x .x-name { font-size:${two ? '1.45em' : '2em'}; font-weight:900; line-height:1.08; letter-spacing:-.02em; margin-top:.2em; word-break:break-word; }
+    #ig-x .x-pills { margin-top:.5em; display:flex; flex-wrap:wrap; gap:.4em; }
+    #ig-x .x-pill { font-size:.9em; font-weight:bold; border:.13em solid #fff; border-radius:2em; padding:.12em .7em; }
+    #ig-x .x-more { grid-column:1/-1; font-size:1.1em; font-weight:bold; padding-top:.4em; }
+    #ig-x .x-empty { font-size:44px; font-weight:900; line-height:1.15; padding-top:80px; }
+    #ig-x .x-foot { display:flex; justify-content:space-between; align-items:flex-end; border-top:8px solid ${SH}; padding-top:22px; gap:20px; }
+    #ig-x .x-legend { display:flex; flex-wrap:wrap; gap:10px 22px; font-size:19px; font-weight:bold; }
+    #ig-x .x-leg { display:inline-flex; align-items:center; gap:8px; }
+    #ig-x .x-leg i { width:18px; height:18px; border:3px solid ${SH}; display:inline-block; }
+    #ig-x .x-url { font-size:30px; font-weight:900; letter-spacing:1px; margin-top:12px; }
+    #ig-x .x-dia { display:flex; align-items:flex-end; gap:10px; flex-shrink:0; }
+    #ig-x .x-bubble { background:#fff; border:3px solid ${SH}; font-size:19px; font-weight:bold; padding:8px 12px; margin-bottom:46px; position:relative; }
+  </style>
+  <div class="x-head">
+    <div><div class="x-logo">spazio<span>432</span></div><div class="x-addr">VIA CEVA 47 · TORINO</div></div>
+    <div class="x-right"><span class="x-tag">${activeFilter === 'all' ? 'IN PROGRAMMA' : CAT_LABELS[activeFilter].toUpperCase()}</span><div class="x-mon">${mon.toUpperCase()}</div><div class="x-yr">${y}</div></div>
+  </div>
+  <div class="x-area" id="ig-x-area">${shown.length ? shown.map(card).join('') + (extra > 0 ? `<div class="x-more">+ altri ${extra} appuntamenti su spazio432.org</div>` : '') : '<div class="x-empty">il programma del mese<br>è in arrivo.<br>restate sintonizzati.</div>'}</div>
+  <div class="x-foot">
+    <div><div class="x-legend">${legend}</div><div class="x-url">spazio432.org</div></div>
+    <div class="x-dia"><div class="x-bubble">ci vediamo lì!</div>${dia}</div>
+  </div>`;
+  document.body.appendChild(box);
+
+  // le card partono grandi e si rimpiccioliscono finché il programma entra: con pochi eventi riempiono la pagina
+  const area = box.querySelector('#ig-x-area');
+  let fs = shown.length <= 2 ? 40 : 34;
+  area.style.fontSize = fs + 'px';
+  while (area.scrollHeight > area.clientHeight + 1 && fs > 11) { fs -= 1; area.style.fontSize = fs + 'px'; }
+
+  const btn = document.getElementById('export-btn');
+  btn.classList.add('busy');
+  html2canvas(box, { width: 1080, height: 1350, scale: 2, backgroundColor: '#f4f1ea', useCORS: true, logging: false })
+    .then(canvas => {
+      const a = document.createElement('a');
+      a.download = `spazio432-${mon.toLowerCase()}-${y}.png`;
+      a.href = canvas.toDataURL('image/png');
+      document.body.appendChild(a); a.click(); a.remove();
+      admToast('immagine pronta');
+    })
+    .catch(err => admToast('errore: ' + err.message, true))
+    .finally(() => { box.remove(); btn.classList.remove('busy'); });
+}
+
+// ── GESTIONE EVENTI ──
+let mgrEditing = null;        // evento in modifica (null = nuovo)
+let mgrCat = 'music';
+
+function mgrSetCat(cat) {
+  mgrCat = cat;
+  document.querySelectorAll('#mf-cats button').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
+}
+document.querySelectorAll('#mf-cats button').forEach(b => b.addEventListener('click', () => mgrSetCat(b.dataset.cat)));
+
+function mgrDefaultDate() {
+  const now = new Date();
+  const d = (cur.getMonth() === now.getMonth() && cur.getFullYear() === now.getFullYear()) ? now : new Date(cur.getFullYear(), cur.getMonth(), 1);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+function mgrReset() {
+  mgrEditing = null;
+  ['mf-name', 'mf-end', 'mf-desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mf-time').value = '19:00';
+  document.getElementById('mf-date').value = mgrDefaultDate();
+  document.getElementById('mf-rep').checked = false;
+  document.getElementById('mf-weeks-wrap').hidden = true;
+  document.getElementById('mf-rep-wrap').hidden = false;
+  document.getElementById('mf-series-wrap').hidden = true;
+  mgrSetCat('music');
+  document.getElementById('mgr-form').classList.remove('editing');
+  document.getElementById('mgr-form-kicker').textContent = 'nuovo evento';
+  document.getElementById('mgr-form-title').textContent = 'AGGIUNGI';
+  document.getElementById('mf-save').textContent = 'salva evento →';
+  document.getElementById('mf-cancel').textContent = 'svuota';
+  renderManagerList();
+}
+
+function mgrFill(ev, asCopy) {
+  document.getElementById('mf-name').value = ev.name || '';
+  document.getElementById('mf-date').value = `${ev.year}-${pad2(ev.month + 1)}-${pad2(ev.day)}`;
+  document.getElementById('mf-time').value = ev.time || '';
+  document.getElementById('mf-end').value = ev.endTime || '';
+  document.getElementById('mf-desc').value = ev.description || '';
+  mgrSetCat(ev.cat || 'music');
+  document.getElementById('mf-rep').checked = false;
+  document.getElementById('mf-weeks-wrap').hidden = true;
+  const form = document.getElementById('mgr-form');
+  if (asCopy) {
+    mgrEditing = null;
+    form.classList.remove('editing');
+    document.getElementById('mf-rep-wrap').hidden = false;
+    document.getElementById('mf-series-wrap').hidden = true;
+    document.getElementById('mgr-form-kicker').textContent = 'copia di un evento';
+    document.getElementById('mgr-form-title').textContent = 'DUPLICA';
+    document.getElementById('mf-save').textContent = 'salva copia →';
+    document.getElementById('mf-cancel').textContent = 'annulla';
+  } else {
+    mgrEditing = ev;
+    form.classList.add('editing');
+    document.getElementById('mf-rep-wrap').hidden = true;
+    document.getElementById('mf-series-wrap').hidden = !ev.series_id;
+    document.getElementById('mf-series').checked = false;
+    document.getElementById('mgr-form-kicker').textContent = 'modifica evento';
+    document.getElementById('mgr-form-title').textContent = 'MODIFICA';
+    document.getElementById('mf-save').textContent = 'salva modifiche →';
+    document.getElementById('mf-cancel').textContent = 'annulla';
+  }
+  renderManagerList();
+  if (window.innerWidth <= 900) document.getElementById('mgr-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => document.getElementById('mf-name').focus({ preventScroll: true }), 250);
+}
+
+async function mgrSave() {
+  const nameEl = document.getElementById('mf-name'), dateEl = document.getElementById('mf-date');
+  const name = nameEl.value.trim(), dateV = dateEl.value;
+  [nameEl, dateEl].forEach(el => el.classList.remove('err'));
+  if (!name) { nameEl.classList.add('err'); nameEl.focus(); admToast('manca il titolo', true); return; }
+  if (!dateV) { dateEl.classList.add('err'); dateEl.focus(); admToast('manca la data', true); return; }
+  const [yy, mm, dd] = dateV.split('-').map(Number);
+  const base = {
+    cat: mgrCat, name,
+    time: document.getElementById('mf-time').value || '',
+    endTime: document.getElementById('mf-end').value || null,
+    description: document.getElementById('mf-desc').value.trim() || null
+  };
+  const saveBtn = document.getElementById('mf-save');
+  saveBtn.disabled = true;
+  let error;
+  if (mgrEditing) {
+    ({ error } = await _supabase.from('events').update({ ...base, year: yy, month: mm - 1, day: dd }).eq('id', mgrEditing.id));
+    if (!error && mgrEditing.series_id && document.getElementById('mf-series').checked) {
+      ({ error } = await _supabase.from('events').update(base).eq('series_id', mgrEditing.series_id));
+    }
+  } else {
+    const rep = document.getElementById('mf-rep').checked;
+    const n = rep ? Math.min(12, Math.max(2, parseInt(document.getElementById('mf-weeks').value) || 4)) : 1;
+    const sid = rep ? 'series_' + Date.now() : null;
+    const rows = [];
+    for (let i = 0; i < n; i++) {
+      const d = new Date(yy, mm - 1, dd + i * 7);
+      const r = { ...base, year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
+      if (sid) r.series_id = sid;
+      rows.push(r);
+    }
+    ({ error } = await _supabase.from('events').insert(rows));
+  }
+  saveBtn.disabled = false;
+  if (error) { admToast('errore: ' + error.message, true); return; }
+  admToast(mgrEditing ? 'modifiche salvate' : 'evento aggiunto');
+  // se l'evento è in un altro mese, ci si sposta lì
+  if (yy !== cur.getFullYear() || mm - 1 !== cur.getMonth()) { cur = new Date(yy, mm - 1, 1); updateMonthNav(); }
+  mgrReset();
+  document.getElementById('mf-date').value = dateV;
+  fetchAndBuild();
+}
+
+function mgrDelete(id, btn) {
+  if (!btn.classList.contains('armed')) {
+    btn.classList.add('armed'); btn.textContent = 'sicuro?';
+    setTimeout(() => { if (btn.isConnected) { btn.classList.remove('armed'); btn.textContent = 'elimina'; } }, 3000);
+    return;
+  }
+  btn.disabled = true;
+  _supabase.from('events').delete().eq('id', id).then(({ error }) => {
+    if (error) { admToast('errore: ' + error.message, true); btn.disabled = false; return; }
+    if (mgrEditing && String(mgrEditing.id) === String(id)) mgrReset();
+    admToast('evento eliminato');
+    fetchAndBuild();
+  });
+}
+
+function renderManagerList() {
+  const wrap = document.getElementById('mgr-list');
+  if (!wrap || document.getElementById('manager').hidden) return;
+  document.getElementById('mgr-month-lbl').textContent = MONTHS[cur.getMonth()].toUpperCase();
+  document.getElementById('mgr-year-lbl').textContent = cur.getFullYear();
+  const list = [...events].sort((a, b) => a.day - b.day || String(a.time || '').localeCompare(String(b.time || '')));
+  document.getElementById('mgr-count').textContent = list.length === 0 ? 'NIENTE' : list.length === 1 ? '1 EVENTO' : list.length + ' EVENTI';
+  if (!list.length) { wrap.innerHTML = '<div class="mgr-empty">nessun evento questo mese.<br>aggiungine uno qui accanto ←</div>'; return; }
+  wrap.innerHTML = '';
+  list.forEach(ev => {
+    const c = CAT_COLORS[ev.cat];
+    const row = document.createElement('div');
+    row.className = 'mgr-row' + (mgrEditing && String(mgrEditing.id) === String(ev.id) ? ' on' : '');
+    row.style.setProperty('--c', c);
+    const t = (ev.time || '') + (ev.endTime ? '–' + ev.endTime : '');
+    row.innerHTML = `
+      <div class="mgr-date"><span>${DOW3[new Date(ev.year, ev.month, ev.day).getDay()]}</span><b>${ev.day}</b></div>
+      <div class="mgr-info">
+        <div class="mgr-meta"><span class="mgr-cat">${CAT_LABELS[ev.cat]}</span>${t ? `<span class="mgr-time">${t}</span>` : ''}${ev.series_id ? '<span class="mgr-serie">serie</span>' : ''}</div>
+        <div class="mgr-name">${escH(ev.name)}</div>
+      </div>
+      <div class="mgr-acts">
+        <button class="mgr-a edit">modifica</button>
+        <button class="mgr-a dup">duplica</button>
+        <button class="mgr-a del">elimina</button>
+      </div>`;
+    row.querySelector('.edit').onclick = () => mgrFill(ev, false);
+    row.querySelector('.dup').onclick = () => mgrFill(ev, true);
+    row.querySelector('.del').onclick = e => mgrDelete(ev.id, e.currentTarget);
+    wrap.appendChild(row);
+  });
+}
+function renderManager() { renderManagerList(); }
+
+function openManager(ev) {
+  closePops();
+  document.getElementById('manager').hidden = false;
+  document.body.classList.add('manage-mode');
+  window.scrollTo(0, 0);
+  if (ev) mgrFill(ev, false); else mgrReset();
+}
+function closeManager() {
+  document.getElementById('manager').hidden = true;
+  document.body.classList.remove('manage-mode');
+  mgrEditing = null;
+  window.scrollTo(0, 0);
+}
+// "Modifica" dal dettaglio del calendario apre la stessa schermata
+openEditPanel = function (evt) { openManager(evt); };
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape' || document.getElementById('manager').hidden) return;
+  if (e.target.closest && e.target.closest('input, textarea, select')) { e.target.blur(); return; }
+  closeManager();
+});
 
 fetchAndBuild();
 </script>
