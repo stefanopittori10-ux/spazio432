@@ -2906,7 +2906,7 @@ async function submitBooking(uid, eventId) {
   const codice = nuovoCodice();
   const { error } = await _supabase.from('bookings').insert([{ event_id: eventId, name, email, seats, note: note || null, codice }]);
   if (error) {
-    subBtn.disabled = false; msgEl.textContent = 'Errore: ' + error.message; msgEl.className = 'bk-message fail'; return;
+    subBtn.disabled = false; msgEl.textContent = error.code === 'P0001' ? error.message : 'qualcosa non è andato, riprova tra poco'; msgEl.className = 'bk-message fail'; return;
   }
   msgEl.textContent = `Prenotazione confermata per ${name}!`; msgEl.className = 'bk-message ok';
   document.querySelectorAll(`[id^="cnt-bk-${eventId}"],[id^="cnt-rbk-${eventId}"]`).forEach(el => loadBookingCount(eventId, el));
