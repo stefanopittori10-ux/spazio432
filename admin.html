@@ -13810,8 +13810,7 @@ function exportInstagramPNG() {
       <div class="x-info"><div class="x-cat">${CAT_LABELS[e.cat]}</div><div class="x-name">${escH(e.name)}</div>${pills ? `<div class="x-pills">${pills}</div>` : ''}</div>
     </div></div>`;
   };
-  const legend = [...new Set(shown.map(g => g.ev.cat))].map(k => `<span class="x-leg"><i style="background:${CAT_COLORS[k]}"></i>${CAT_LABELS[k]}</span>`).join('');
-  const dia = `<svg viewBox="0 0 60 80" width="62" height="83"><path d="M14 4 H22 V36 A8 8 0 0 0 38 36 V4 H46 V36 A16 16 0 0 1 14 36 Z" fill="#993C1D" stroke="${SH}" stroke-width="2.2" stroke-linejoin="round"/>
+  const dia = `<svg viewBox="0 0 60 80" width="74" height="99"><path d="M14 4 H22 V36 A8 8 0 0 0 38 36 V4 H46 V36 A16 16 0 0 1 14 36 Z" fill="#993C1D" stroke="${SH}" stroke-width="2.2" stroke-linejoin="round"/>
     <circle cx="18" cy="15" r="3.4" fill="#fff" stroke="${SH}"/><circle cx="42" cy="15" r="3.4" fill="#fff" stroke="${SH}"/><circle cx="18.8" cy="15.6" r="1.6" fill="#000"/><circle cx="42.8" cy="15.6" r="1.6" fill="#000"/>
     <path d="M25 46.5 Q30 50 35 46.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
     <rect x="27" y="51" width="6" height="18" fill="#993C1D" stroke="${SH}" stroke-width="2.2"/><circle cx="30" cy="72" r="5.5" fill="#993C1D" stroke="${SH}" stroke-width="2.2"/></svg>`;
@@ -13844,13 +13843,13 @@ function exportInstagramPNG() {
     #ig-x .x-pill { font-size:.9em; font-weight:bold; border:.13em solid #fff; border-radius:2em; padding:.12em .7em; }
     #ig-x .x-more { grid-column:1/-1; font-size:1.1em; font-weight:bold; padding-top:.4em; }
     #ig-x .x-empty { font-size:44px; font-weight:900; line-height:1.15; padding-top:80px; }
-    #ig-x .x-foot { display:flex; justify-content:space-between; align-items:flex-end; border-top:8px solid ${SH}; padding-top:22px; gap:20px; }
-    #ig-x .x-legend { display:flex; flex-wrap:wrap; gap:10px 22px; font-size:19px; font-weight:bold; }
-    #ig-x .x-leg { display:inline-flex; align-items:center; gap:8px; }
-    #ig-x .x-leg i { width:18px; height:18px; border:3px solid ${SH}; display:inline-block; }
-    #ig-x .x-url { font-size:30px; font-weight:900; letter-spacing:1px; margin-top:12px; }
-    #ig-x .x-dia { display:flex; align-items:flex-end; gap:10px; flex-shrink:0; }
-    #ig-x .x-bubble { background:#fff; border:3px solid ${SH}; font-size:19px; font-weight:bold; padding:8px 12px; margin-bottom:46px; position:relative; }
+    #ig-x .x-foot { position:relative; display:flex; justify-content:space-between; align-items:center; border-top:8px solid ${SH}; padding-top:24px; height:118px; }
+    #ig-x .x-site { display:flex; flex-direction:column; gap:8px; }
+    #ig-x .x-url { font-size:46px; font-weight:900; letter-spacing:-1px; line-height:1; }
+    #ig-x .x-cta { font-size:19px; font-weight:bold; letter-spacing:3px; color:#555; text-transform:uppercase; }
+    #ig-x .x-dia { display:flex; align-items:center; gap:18px; }
+    #ig-x .x-bubble { position:relative; background:#fff; border:4px solid ${SH}; font-size:24px; font-weight:900; padding:12px 18px; box-shadow:6px 6px 0 ${SH}; }
+    #ig-x .x-bubble::after { content:''; position:absolute; right:-17px; top:50%; margin-top:-11px; width:0; height:0; border-top:11px solid transparent; border-bottom:11px solid transparent; border-left:15px solid ${SH}; }
   </style>
   <div class="x-head">
     <div><div class="x-logo">spazio<span>432</span></div><div class="x-addr">VIA CEVA 47 · TORINO</div></div>
@@ -13858,7 +13857,7 @@ function exportInstagramPNG() {
   </div>
   <div class="x-area" id="ig-x-area">${shown.length ? shown.map(card).join('') + (extra > 0 ? `<div class="x-more">+ altri ${extra} appuntamenti su spazio432.org</div>` : '') : '<div class="x-empty">il programma del mese<br>è in arrivo.<br>restate sintonizzati.</div>'}</div>
   <div class="x-foot">
-    <div><div class="x-legend">${legend}</div><div class="x-url">spazio432.org</div></div>
+    <div class="x-site"><div class="x-url">spazio432.org</div><div class="x-cta">programma e prenotazioni</div></div>
     <div class="x-dia"><div class="x-bubble">ci vediamo lì!</div>${dia}</div>
   </div>`;
   document.body.appendChild(box);
