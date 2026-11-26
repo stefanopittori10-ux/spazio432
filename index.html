@@ -1591,6 +1591,21 @@
   /* rassegna del cineforum: sopra il titolo del film */
   .ev-rass { font-size: 11px; font-weight: bold; color: var(--c); letter-spacing: .3px; margin-top: 4px; overflow-wrap: anywhere; }
   .ev-rass[hidden] { display: none; }
+  .det-open .ev-rass { color: #fff; opacity: .85; }   /* aperto: la riga è colorata, la rassegna diventa bianca */
+
+  /* le descrizioni rispettano gli a capo scritti nel campo */
+  .ev-desc, .recap-desc, #det-desc { white-space: pre-line; }
+
+  /* lista eventi più asciutta: due righe (rassegna o tipo + orario, poi titolo).
+     "dimmi di +" diventa un + accanto al titolo; si apre toccando la riga o il titolo */
+  .ev-row .ev-more { display: none; }
+  .ev-row .ev-name::after { content: '+'; display: inline-block; margin-left: 8px; color: var(--c); font-weight: 900;
+    transition: transform .2s; text-decoration: none; }
+  .ev-row.det-open .ev-name::after { content: '−'; color: #fff; }
+  .ev-hour { display: block; align-self: stretch; text-align: center; margin: 5px 0 -5px; padding: 3px 0 2px; font-size: 10px; font-weight: bold; letter-spacing: .3px;
+    background: var(--c); color: #fff; }
+  .ev-row.det-open .ev-hour { background: #fff; color: var(--c); }
+  .ev-row .ev-cat { overflow-wrap: anywhere; }
 </style>
 </head>
 <body class="is-home">
@@ -2076,16 +2091,16 @@ function buildListView() {
           <span class="ev-dow">${EV_DOW[wd]}</span>
           <span class="ev-day">${first.day}</span>
           <span class="ev-mon">${MONTHS[first.month].slice(0, 3)}</span>
+          ${first.time ? `<span class="ev-hour">${first.time}</span>` : ''}
         </div>
         <div class="ev-body">
-          <div class="ev-top"><span class="ev-cat">${CAT_LABELS[first.cat]}</span>${t ? `<span class="ev-time">${t}</span>` : ''}</div>
-          <div class="ev-rass" hidden></div>
+          <div class="ev-top"><span class="ev-cat"></span></div>
           <button class="ev-name" type="button" aria-expanded="false"></button>
           <button class="ev-more" type="button">dimmi di + !</button>
         </div>
         <div class="ev-details"><div class="ev-details-inner"></div></div>`;
       row.querySelector('.ev-name').textContent = first.name;
-      if (first.rassegna) { const rs = row.querySelector('.ev-rass'); rs.hidden = false; rs.textContent = 'rassegna · ' + first.rassegna; }
+      row.querySelector('.ev-cat').textContent = first.rassegna || CAT_LABELS[first.cat];
       fillEventDetails(row.querySelector('.ev-details-inner'), first);
       const toggleDet = () => {
         const open = row.classList.toggle('det-open');
@@ -2120,15 +2135,14 @@ function buildListView() {
       header.innerHTML = `
         <div class="ev-date"><span class="ev-dow">serie</span><span class="ev-day">${evts.length}</span><span class="ev-mon">date</span></div>
         <div class="recap-group-left">
-          <div class="ev-top"><span class="ev-cat">${CAT_LABELS[first.cat]}</span></div>
-          <div class="ev-rass" hidden></div>
+          <div class="ev-top"><span class="ev-cat"></span></div>
           <div class="ev-name"></div>
           ${first.description ? '<p class="ev-desc"></p>' : ''}
         </div>
         <span class="recap-group-arrow">›</span>
       `;
       header.querySelector('.ev-name').textContent = first.name;
-      if (first.rassegna) { const rs = header.querySelector('.ev-rass'); rs.hidden = false; rs.textContent = 'rassegna · ' + first.rassegna; }
+      header.querySelector('.ev-cat').textContent = first.rassegna || CAT_LABELS[first.cat];
       if (first.description) header.querySelector('.ev-desc').textContent = first.description;
 
       const body = document.createElement('div');
@@ -2243,7 +2257,7 @@ function showDetail(ev) {
 
     if (evt.description) {
       const desc = document.createElement('div');
-      desc.style.cssText = 'font-size:13px;color:var(--det-desc);margin-top:8px;line-height:1.55;max-width:62ch;';
+      desc.style.cssText = 'font-size:13px;color:var(--det-desc);margin-top:8px;line-height:1.55;max-width:62ch;white-space:pre-line;';
       desc.textContent = evt.description;
       evBlock.appendChild(desc);
     }
