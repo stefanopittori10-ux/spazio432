@@ -1748,7 +1748,7 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
   .tk-dia { display: flex; align-items: center; gap: 10px; }
   .tk-bubble { position: relative; background: #fff; border: 2px solid #0a0a0a; font-size: 12px; font-weight: 900; padding: 6px 9px; box-shadow: 3px 3px 0 #0a0a0a; white-space: nowrap; }
   .tk-bubble::after { content: ''; position: absolute; right: -9px; top: 50%; margin-top: -6px; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 8px solid #0a0a0a; }
-  .tk-dia-svg { width: 34px; height: 45px; display: block; }
+  .tk-dia-svg { width: 40px; height: 53px; display: block; }
   @media (max-width: 420px) {
     .tk-in { padding: 16px 14px 14px; }
     .tk-logo { font-size: 25px; }
@@ -1800,6 +1800,15 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
   @media (hover: hover) { .ag-new:hover, .ag-door:hover { transform: translate(-1px, -1px); } }
 
   .mgr-rass { color: var(--c); border: 1.5px solid var(--c); padding: 0 6px; overflow-wrap: anywhere; }
+
+  /* modulo "aggiungi": prende il colore del tipo di evento scelto */
+  .mgr-form { --fc: #534AB7; }
+  .mgr-form .mgr-head, .mgr-form.editing .mgr-head { background: var(--fc); transition: background .25s; }
+  .mgr-form .mf input:focus, .mgr-form .mf textarea:focus { box-shadow: 3px 3px 0 var(--fc); }
+  .mgr-form .mf-check input[type=checkbox] { accent-color: var(--fc); }
+  .mgr-form.mgr-card { box-shadow: 6px 6px 0 var(--fc); transition: box-shadow .25s; }
+  #mf-rass-wrap[hidden] { display: none; }
+  .mgr-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -1881,7 +1890,10 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
         <div class="mgr-month-txt"><div class="mgr-ml" id="mgr-month-lbl">—</div><div class="mgr-yl" id="mgr-year-lbl">—</div></div>
         <button class="mkey" onclick="navMonth(1)" aria-label="Mese successivo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg></button>
       </div>
-      <button class="tb-manage mgr-close" onclick="closeManager()" title="Torna al calendario"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="3.5" width="17" height="15" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="1.5" y="3.5" width="17" height="4.5" fill="currentColor"/><path d="M6 1v4M14 1v4" stroke="currentColor" stroke-width="2.2"/><rect x="5" y="10.5" width="3" height="3" fill="currentColor"/><rect x="12" y="10.5" width="3" height="3" fill="currentColor"/></svg><span class="tm-long">torna al calendario</span><span class="tm-short">calendario</span><span class="tm-arrow">→</span></button>
+      <div class="mgr-right">
+        <button class="tb-manage mgr-close" onclick="closeManager()" title="Torna al calendario"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="3.5" width="17" height="15" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="1.5" y="3.5" width="17" height="4.5" fill="currentColor"/><path d="M6 1v4M14 1v4" stroke="currentColor" stroke-width="2.2"/><rect x="5" y="10.5" width="3" height="3" fill="currentColor"/><rect x="12" y="10.5" width="3" height="3" fill="currentColor"/></svg><span class="tm-long">torna al calendario</span><span class="tm-short">calendario</span><span class="tm-arrow">→</span></button>
+        <a class="home-pill" href="login.html" title="Torna al portale" aria-label="Torna al portale"><svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/><path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/><rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/></svg><span class="hp-lbl">home</span></a>
+      </div>
     </div>
 
     <div class="mgr-body">
@@ -1901,7 +1913,7 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
               <button type="button" data-cat="meet" style="--c:#4B5563">riunione</button>
             </div>
           </div>
-          <label class="mf" id="mf-rass-wrap" hidden><span>rassegna <i>(facoltativa: nel titolo resta solo il film)</i></span><input type="text" id="mf-rass" list="mf-rass-list" placeholder="es. Porta I: La Chiamata" autocomplete="off"><datalist id="mf-rass-list"></datalist></label>
+          <label class="mf" id="mf-rass-wrap" hidden><span>rassegna <i>(facoltativa)</i></span><input type="text" id="mf-rass" list="mf-rass-list" placeholder="es. Porta I: La Chiamata" autocomplete="off"><datalist id="mf-rass-list"></datalist></label>
           <div class="mf-row">
             <label class="mf"><span>quando</span><input type="date" id="mf-date"></label>
             <label class="mf mf-t"><span>dalle</span><input type="time" id="mf-time" value="19:00"></label>
@@ -2069,7 +2081,7 @@ try { if (!localStorage.getItem('sb-udaymqqytagtayviwolr-auth-token')) location.
           </div>
           <div class="tk-foot">
             <div><div class="tk-lbl">codice</div><div class="tk-code" id="t-code"></div></div>
-            <div class="tk-dia"><div class="tk-bubble">ci vediamo lì!</div><svg class="tk-dia-svg" viewBox="0 0 60 80" aria-hidden="true"><path d="M14 4 H22 V36 A8 8 0 0 0 38 36 V4 H46 V36 A16 16 0 0 1 14 36 Z" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2" stroke-linejoin="round"/><circle cx="18" cy="15" r="3.4" fill="#fff" stroke="#0a0a0a"/><circle cx="42" cy="15" r="3.4" fill="#fff" stroke="#0a0a0a"/><circle cx="18.8" cy="15.6" r="1.6" fill="#000"/><circle cx="42.8" cy="15.6" r="1.6" fill="#000"/><path d="M25 46.5 Q30 50 35 46.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><rect x="27" y="51" width="6" height="18" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2"/><circle cx="30" cy="72" r="5.5" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2"/></svg></div>
+            <div class="tk-dia"><svg class="tk-dia-svg" viewBox="0 0 60 80" aria-hidden="true"><path d="M14 4 H22 V36 A8 8 0 0 0 38 36 V4 H46 V36 A16 16 0 0 1 14 36 Z" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2" stroke-linejoin="round"/><circle cx="18" cy="15" r="3.4" fill="#fff" stroke="#0a0a0a"/><circle cx="42" cy="15" r="3.4" fill="#fff" stroke="#0a0a0a"/><circle cx="18.8" cy="15.6" r="1.6" fill="#000"/><circle cx="42.8" cy="15.6" r="1.6" fill="#000"/><path d="M25 46.5 Q30 50 35 46.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><rect x="27" y="51" width="6" height="18" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2"/><circle cx="30" cy="72" r="5.5" fill="#993C1D" stroke="#0a0a0a" stroke-width="2.2"/></svg></div>
           </div>
         </div>
       </div>
@@ -14129,6 +14141,7 @@ let mgrCat = 'music';
 function mgrSetCat(cat) {
   mgrCat = cat;
   document.querySelectorAll('#mf-cats button').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
+  document.getElementById('mgr-form').style.setProperty('--fc', CAT_COLORS[cat] || '#534AB7');
   // la rassegna vale per il cineforum: lì il titolo è solo quello del film
   document.getElementById('mf-rass-wrap').hidden = cat !== 'film';
   document.getElementById('mf-name').placeholder = cat === 'film' ? 'titolo del film' : "titolo dell'evento";
