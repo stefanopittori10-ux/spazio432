@@ -15,7 +15,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="432 staff">
+<meta name="apple-mobile-web-app-title" content="staff432">
 <meta name="theme-color" content="#0a0a0a">
 
 <style>
@@ -493,7 +493,7 @@ const t = localStorage.getItem('s432-theme') || localStorage.getItem('s432_theme
 if (t === 'dark') document.documentElement.dataset.theme = 'dark';
 </script>
 <script>
-// installabile come app "432 staff" (stesso service worker del sito: nessuna cache)
+// installabile come app "staff432" (stesso service worker del sito: nessuna cache)
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
 </script>
 </body>

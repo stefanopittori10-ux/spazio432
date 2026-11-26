@@ -1,6 +1,6 @@
 {
-  "name": "spazio 432 · staff",
-  "short_name": "432 staff",
+  "name": "staff432",
+  "short_name": "staff432",
   "description": "Area riservata dello staff di spazio 432: calendario, finanze e ingresso.",
   "lang": "it",
   "id": "/login.html?app=staff",
