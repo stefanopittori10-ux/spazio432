@@ -478,22 +478,121 @@
     .split-panel { grid-template-columns:1fr; }
     .sp-col:first-child { border-right:none; border-bottom:1px solid var(--border); }
   }
+
+  /* ═══ NUOVO LINGUAGGIO VISIVO (come la home) ═════════════════ */
+  :root { --sh: #000; --u-solid: #993C1D; --e-solid: #3B6D11; --r-solid: #534AB7; }
+  [data-theme="dark"] { --sh: #e8e8e8; }
+  a, button { touch-action: manipulation; }
+
+  /* toolbar */
+  .toolbar { margin-bottom: 14px; }
+  .logo { display: flex; align-items: baseline; gap: 0; font-size: 22px; }
+  .lg-s { font-weight: bold; }
+  .lg-n { color: var(--fg-muted); font-weight: bold; margin-left: 4px; }
+  .lg-page { margin-left: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 4px 9px; background: var(--fg); color: var(--bg); align-self: center; }
+  .icon-btn.theme { width: 36px; height: 36px; font-size: 15px; }
+  .back-pill { font-family: var(--font); font-size: 12px; font-weight: bold; height: 36px; padding: 0 16px; border-radius: 20px;
+    border: 1px solid var(--fg); background: var(--pill-bg); color: var(--fg); cursor: pointer; transition: background .15s, color .15s; }
+  .back-pill:hover { background: var(--fg); color: var(--bg); }
+
+  /* barra del mese */
+  .month-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    border: 2px solid var(--fg); background: var(--card-bg); padding: 12px 14px; margin-bottom: 14px; box-shadow: 6px 6px 0 var(--sh); }
+  .mkey { width: 40px; height: 40px; padding: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    border: 2px solid var(--fg); background: var(--card-bg); color: var(--fg); box-shadow: 3px 3px 0 var(--u-solid);
+    transition: transform .1s, box-shadow .1s, background .12s, color .12s; -webkit-tap-highlight-color: transparent; }
+  .mkey svg { width: 15px; height: 15px; display: block; }
+  @media (hover: hover) { .mkey:hover { background: var(--fg); color: var(--bg); } }
+  .mkey:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--u-solid); }
+  .month-display { display: flex; flex-direction: column; align-items: center; overflow: hidden; min-width: 10ch; }
+  .month-bar .month-name { font-size: 22px; font-weight: 900; letter-spacing: .5px; }
+  .month-sub { display: flex; gap: 8px; align-items: center; margin-top: 2px; }
+  .month-bar .month-year { margin-left: 0; font-size: 11px; letter-spacing: 1px; }
+  .month-today { font-family: var(--font); font-size: 10px; font-weight: bold; color: var(--c-u); background: none; border: none;
+    cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 2px; }
+  .month-slide.from-right { animation: m-in-r .32s cubic-bezier(.2,.8,.2,1); }
+  .month-slide.from-left  { animation: m-in-l .32s cubic-bezier(.2,.8,.2,1); }
+  @keyframes m-in-r { from { transform: translateX(40%); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes m-in-l { from { transform: translateX(-40%); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* colonne: blocchi separati, bordo spesso, ombra netta, testata piena */
+  .grid { border: none; gap: 22px; align-items: stretch; }
+  .e-del { color: var(--fg-muted); }
+  .col { border: 2px solid var(--fg) !important; background: var(--card-bg); box-shadow: 6px 6px 0 var(--sh); min-height: 0; }
+  .col-head, [data-theme="dark"] .col-head { border-top: none !important; border-bottom: 2px solid var(--fg); padding: 16px 18px 18px; }
+  .col-head.u, [data-theme="dark"] .col-head.u { background: var(--u-solid); }
+  .col-head.e, [data-theme="dark"] .col-head.e { background: var(--e-solid); }
+  .col-head.r, [data-theme="dark"] .col-head.r { background: var(--r-solid); }
+  .col-cat, .col-cat.u, .col-cat.e, .col-cat.r { color: rgba(255,255,255,.85); display: flex; justify-content: space-between; align-items: center;
+    letter-spacing: 1.5px; margin-bottom: 14px; }
+  .col-ico { font-size: 18px; color: #fff; }
+  .col-total, .col-total.u, .col-total.e, .col-total.r { color: #fff; font-size: 34px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+  .col-list { min-height: 90px; }
+  .entry { padding: 11px 18px; }
+  .e-name { font-weight: bold; }
+  .e-note { font-size: 11px; }
+  .empty { font-style: normal; color: var(--fg-muted); }
+  .col-trigger { padding: 12px 14px; border-top: 2px solid var(--fg); }
+  .add-pill { border: 2px solid var(--fg); color: var(--fg); font-weight: bold; font-size: 12px; padding: 8px 14px; border-radius: 20px;
+    transition: background .15s, color .15s; }
+  .add-pill:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .add-form.open { border-top: 2px solid var(--fg); }
+  .btn-save { border: 2px solid var(--fg); box-shadow: 3px 3px 0 var(--u-solid); transition: transform .1s, box-shadow .1s; }
+  .btn-save:hover { opacity: 1; transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--u-solid); }
+  .btn-save:active { transform: translate(3px,3px); box-shadow: 0 0 0 var(--u-solid); }
+  .e-split { border-width: 1.5px; font-weight: bold; }
+
+  /* totali e bollette: stessi blocchi */
+  .fin-footer { border: 2px solid var(--fg); border-top: 2px solid var(--fg); margin-top: 22px; padding: 16px 22px; box-shadow: 6px 6px 0 var(--sh); background: var(--card-bg); }
+  .foot-val { font-size: 22px; font-weight: 900; }
+  .foot-lbl { letter-spacing: 1px; }
+  .split-panel { border: 2px solid var(--fg); border-top: 2px solid var(--fg); margin-top: 22px; box-shadow: 6px 6px 0 var(--sh); background: var(--card-bg); }
+  .sp-col:first-child { border-right: 2px solid var(--fg); }
+  .sp-title { color: var(--fg); letter-spacing: 1.2px; }
+  .chip { border-width: 1.5px; font-weight: bold; }
+  .sp-empty, .chart-empty { font-style: normal; }
+
+  /* finestre */
+  .modal { border: 2px solid var(--fg); box-shadow: 8px 8px 0 var(--sh); }
+  .modal-head, .modal-foot { border-color: var(--fg); }
+  .setup-banner { border-width: 2px; }
+  .toast { border: 2px solid var(--fg); box-shadow: 4px 4px 0 var(--sh); font-weight: bold; }
+
+  @media (max-width: 860px) {
+    .grid { gap: 18px; }
+    .col { border-bottom: 2px solid var(--fg) !important; box-shadow: 5px 5px 0 var(--sh); }
+    .col-total { font-size: 30px; }
+    .month-bar { box-shadow: 5px 5px 0 var(--sh); }
+    .month-bar .month-name { font-size: 18px; }
+    .lg-page { margin-left: 8px; }
+    .sp-col:first-child { border-right: none; border-bottom: 2px solid var(--fg); }
+    .fin-footer, .split-panel { box-shadow: 5px 5px 0 var(--sh); }
+    .fin-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; padding: 16px 18px; }
+    .foot-sep { display: none; }
+    .foot-item { padding-right: 0; }
+    .foot-val { font-size: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .month-slide.from-right, .month-slide.from-left { animation: none; } }
 </style>
 </head>
 <body>
 <div class="root">
 
   <div class="toolbar">
-    <div class="logo">spazio<span>432</span></div>
+    <div class="logo"><span class="lg-s">spazio</span><span class="lg-n">432</span><span class="lg-page">finanze</span></div>
     <div class="spacer"></div>
-    <button class="icon-btn prev" onclick="changeMonth(-1)">←</button>
-    <div class="month-pill" onclick="goToToday()" title="Torna al mese corrente">
-      <span class="month-name" id="lbl-month">—</span>
-      <span class="month-year"  id="lbl-year">—</span>
+    <button class="icon-btn theme" id="theme-btn" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
+    <button class="back-pill" onclick="backToLogin()" title="Torna al portale">← admin</button>
+  </div>
+
+  <div class="month-bar">
+    <button class="mkey" id="mkey-prev" onclick="navMonth(-1)" aria-label="Mese precedente"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg></button>
+    <div class="month-display">
+      <div class="month-slide" id="month-slide"><span class="month-name" id="lbl-month">—</span></div>
+      <div class="month-sub"><span class="month-year" id="lbl-year">—</span><button class="month-today" id="month-today" onclick="navToday()" hidden>oggi ↺</button></div>
     </div>
-    <button class="icon-btn next" onclick="changeMonth(1)">→</button>
-    <button class="icon-btn theme" id="theme-btn" onclick="toggleTheme()">☾</button>
-    <button class="icon-btn theme" onclick="backToLogin()" title="Torna al login">←</button>
+    <button class="mkey" id="mkey-next" onclick="navMonth(1)" aria-label="Mese successivo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg></button>
   </div>
 
   <!-- Setup banner -->
@@ -570,7 +669,7 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
     <!-- USCITE -->
     <div class="col">
       <div class="col-head u">
-        <div class="col-cat u">↓ Uscite</div>
+        <div class="col-cat u"><span>01 / uscite</span><span class="col-ico">↓</span></div>
         <div class="col-total u" id="tot-u">€ —</div>
       </div>
       <div class="col-list" id="list-u"></div>
@@ -595,7 +694,7 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
     <!-- ENTRATE -->
     <div class="col">
       <div class="col-head e">
-        <div class="col-cat e">↑ Entrate</div>
+        <div class="col-cat e"><span>02 / entrate</span><span class="col-ico">↑</span></div>
         <div class="col-total e" id="tot-e">€ —</div>
       </div>
       <div class="col-list" id="list-e"></div>
@@ -620,7 +719,7 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
     <!-- RISPARMIO -->
     <div class="col">
       <div class="col-head r">
-        <div class="col-cat r">◎ Risparmio</div>
+        <div class="col-cat r"><span>03 / risparmio</span><span class="col-ico">◎</span></div>
         <div class="col-total r" id="tot-r">€ —</div>
       </div>
       <div class="col-list" id="list-r"></div>
@@ -711,7 +810,7 @@ insert into partecipanti (nome) values ('Stefano'),('Michela'),('Cinus'),('Aleja
       <div class="sm-sec">
         <span class="sm-lbl">Eventi nel periodo — tocca quelli esterni</span>
         <div id="sm-ev"></div>
-        <span class="sm-hint">Un giorno con evento esterno conta come 2 giornate normali e lo paga l'evento. Cinema, serate e attività vostre lasciale non segnate.</span>
+        <span class="sm-hint">Un giorno con evento esterno conta come 2 giornate normali e lo paga l'evento. Cineforum, serate e attività vostre lasciale non segnate.</span>
       </div>
 
       <div class="sm-sec">
@@ -918,6 +1017,8 @@ async function load() {
 function render() {
   document.getElementById('lbl-month').textContent = MONTHS[cur.getMonth()].toUpperCase();
   document.getElementById('lbl-year').textContent  = cur.getFullYear();
+  const _now = new Date();
+  document.getElementById('month-today').hidden = cur.getMonth() === _now.getMonth() && cur.getFullYear() === _now.getFullYear();
 
   const u = curEntries.filter(e => e.tipo === 'uscita');
   const e = curEntries.filter(e => e.tipo === 'entrata');
@@ -1145,7 +1246,7 @@ async function deleteEntry(id) {
 
 // ── DIVISIONE BOLLETTE ────────────────────────────────────────
 const MONTHS_SHORT = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
-const CAT_LBL = { music:'musica', film:'cinema', lab:'laboratorio', art:'arte', meet:'riunione' };
+const CAT_LBL = { music:'musica', film:'cineforum', lab:'laboratorio', art:'arte', meet:'riunione' };
 const round2 = x => Math.round(x * 100) / 100;
 const pad    = n => String(n).padStart(2, '0');
 const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -1684,6 +1785,26 @@ function closeAllForms() {
 }
 function changeMonth(d) { cur.setMonth(cur.getMonth() + d); editingId = null; closeAllForms(); load(); }
 function goToToday()    { cur = new Date(); cur.setDate(1); editingId = null; closeAllForms(); load(); }
+function slideMonth(dir) {
+  const el = document.getElementById('month-slide'); if (!el) return;
+  el.classList.remove('from-left', 'from-right'); void el.offsetWidth;
+  el.classList.add(dir > 0 ? 'from-right' : 'from-left');
+}
+function showMonthNow() {
+  document.getElementById('lbl-month').textContent = MONTHS[cur.getMonth()].toUpperCase();
+  document.getElementById('lbl-year').textContent = cur.getFullYear();
+}
+function navMonth(dir) { changeMonth(dir); showMonthNow(); slideMonth(dir); }
+function navToday() {
+  const now = new Date();
+  const dir = (now.getFullYear() * 12 + now.getMonth()) > (cur.getFullYear() * 12 + cur.getMonth()) ? 1 : -1;
+  goToToday(); showMonthNow(); slideMonth(dir);
+}
+document.addEventListener('keydown', e => {
+  if (split || (e.target.closest && e.target.closest('input, textarea, select'))) return;
+  if (e.key === 'ArrowLeft') navMonth(-1);
+  if (e.key === 'ArrowRight') navMonth(1);
+});
 
 // keyboard shortcuts
 ['u','e','r'].forEach(t => {
