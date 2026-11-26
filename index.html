@@ -1412,6 +1412,23 @@
     .month-display .month-label { font-size: 14px; }
   }
   @media (prefers-reduced-motion: reduce) { .month-slide.from-right, .month-slide.from-left { animation: none; } }
+
+  /* ── CALENDARIO: logo non cliccabile + bottone mappa ─────── */
+  .logo-area.logo-static { cursor: default; }
+  .logo-area.logo-static:hover .logo-subtitle { color: var(--fg-muted); }
+  .toolbar-actions { gap: 8px; }
+  .loc-map { color: #993C1D; border-color: #993C1D; }
+  .loc-map .map-ico { width: 16px; height: 16px; display: block; }
+  @media (hover: hover) {
+    .loc-map:hover { background: #993C1D; color: #fff; border-color: #993C1D; }
+    .loc-map:hover .map-ico circle { fill: #993C1D; }
+  }
+  [data-theme="dark"] .loc-map { color: #d4825e; border-color: #d4825e; }
+  @media (max-width: 768px) {
+    /* su telefono i due bottoni diventano tondi con sola icona, per lasciare spazio ai filtri */
+    .toolbar .loc-home { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+    .toolbar .loc-home span { display: none; }
+  }
 </style>
 </head>
 <body class="is-home">
@@ -1511,16 +1528,17 @@
     <!-- Riga 2 (mobile): navigazione mesi + azioni + dark toggle -->
     <div class="toolbar-actions">
       <button class="location-close loc-home" id="home-toolbtn" onclick="goHome()" aria-label="Torna alla home"><svg class="house-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="13" y="3.5" width="2.4" height="4.5" fill="currentColor"/><path d="M10 2 L19 10 H16.5 V18 H3.5 V10 H1 Z" fill="currentColor"/><rect x="8.4" y="12" width="3.2" height="6" fill="#993C1D"/></svg><span>home</span></button>
+      <button class="location-close loc-home loc-map" id="map-toolbtn" onclick="openLocation()" aria-label="Dove siamo"><svg class="map-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 19.5S3.5 12.6 3.5 8A6.5 6.5 0 0 1 16.5 8C16.5 12.6 10 19.5 10 19.5Z" fill="currentColor"/><circle cx="10" cy="8" r="2.6" fill="var(--pill-bg)"/></svg><span>mappa</span></button>
     </div>
   </div>
    
 
   <div class="card" id="cal-card">
     <div class="card-header">
-      <div class="logo-area" onclick="openLocation()" title="Dove siamo">
+      <div class="logo-area logo-static">
         <div class="logo-text-group">
           <div><span class="logo-spazio">spazio</span><span class="logo-num">432</span></div>
-          <div class="logo-subtitle"><svg class="loc-pin" viewBox="0 0 10 13" aria-hidden="true"><path d="M5 12.5S1 7.8 1 4.8A4 4 0 0 1 9 4.8C9 7.8 5 12.5 5 12.5Z" fill="currentColor"/><circle cx="5" cy="4.8" r="1.5" fill="#fff"/></svg>via ceva 47 · <span class="loc-link">mappa</span> ↗</div>
+          <div class="logo-subtitle">via ceva 47, torino</div>
         </div>
       </div>
       <div class="header-right month-nav">
@@ -3149,14 +3167,14 @@ fetchAndBuild();
   const firstVisible = sel => [...document.querySelectorAll(sel)].find(visible) || null;
 
   const STEPS = [
-    { el: () => firstVisible('#home .logo-area, .card-header .logo-area'),
-      text: 'Tocca il <b>logo</b> e si apre la <b>mappa</b>: ti mostro dove siamo e le fermate GTT più vicine.' },
+    { el: () => firstVisible('#home .logo-area, #map-toolbtn'),
+      text: () => document.body.classList.contains('is-home')
+        ? 'Tocca il <b>logo</b> e si apre la <b>mappa</b>: ti mostro dove siamo e le fermate GTT più vicine.'
+        : 'Con <b>mappa</b> vedi dove siamo e le fermate GTT più vicine. Con la <b>casetta</b> torni alla home.' },
     { el: () => document.getElementById('home-btn-eventi'),
       text: '<b>Eventi</b>: tutto quello che succede, in lista, con il tasto per prenotarti.' },
     { el: () => document.getElementById('home-btn-cal'),
       text: '<b>Calendario</b>: il mese intero a colpo d\'occhio. I quadratini pieni sono i giorni con qualcosa in programma.' },
-    { el: () => document.getElementById('home-toolbtn'),
-      text: 'Da qui torni alla <b>home</b> quando vuoi.' },
     { el: () => isMobile() ? document.getElementById('filter-carousel') : document.getElementById('filter-drawer'),
       text: () => isMobile()
         ? 'Con le <b>frecce</b> scegli cosa vedere: musica, cineforum, laboratori, arte.'
