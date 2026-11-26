@@ -1156,7 +1156,7 @@
     transition: opacity .2s, transform .2s;
   }
   .dia-bubble.open { opacity: 1; transform: none; pointer-events: auto; }
-  .dia-bubble.top { bottom: auto; top: 14px; }
+  .dia-bubble.top { bottom: auto !important; top: 14px; }   /* !important: in home la posizione in basso è scritta dallo script */
   .dia-bubble::after {
     content: ''; position: absolute; right: 26px; bottom: -9px; width: 14px; height: 14px;
     background: var(--card-bg); border-right: 1px solid var(--fg); border-bottom: 1px solid var(--fg);
@@ -3870,30 +3870,39 @@ fetchAndBuild();
   const visible = el => !!el && el.getClientRects().length > 0 && el.getBoundingClientRect().width > 0;
   const firstVisible = sel => [...document.querySelectorAll(sel)].find(visible) || null;
 
+  // il giro passa per le tre schermate: home → calendario → eventi (view = dove si trova il pezzo da mostrare)
   const STEPS = [
-    { el: () => firstVisible('#home .home-mapbtn, #map-toolbtn'),
-      text: () => document.body.classList.contains('is-home')
-        ? 'Con <b>mappa</b> vedi dove siamo e le fermate GTT più vicine.'
-        : 'Con <b>mappa</b> vedi dove siamo e le fermate GTT più vicine. Con la <b>casetta</b> torni alla home.' },
-    { el: () => document.getElementById('home-btn-eventi'),
+    { view: 'home', el: () => firstVisible('#home .home-mapbtn, #map-toolbtn'),
+      text: 'Con <b>mappa</b> vedi dove siamo e le fermate GTT più vicine.' },
+    { view: 'home', el: () => document.getElementById('home-btn-eventi'),
       text: '<b>Eventi</b>: tutto quello che succede, in lista, con il tasto per prenotarti.' },
-    { el: () => document.getElementById('home-btn-cal'),
+    { view: 'home', el: () => document.getElementById('home-btn-cal'),
       text: '<b>Calendario</b>: il mese intero a colpo d\'occhio. I quadratini pieni sono i giorni con qualcosa in programma.' },
-    { el: () => isMobile() ? document.getElementById('filter-carousel') : document.getElementById('filter-drawer'),
+    { view: 'home', el: () => document.getElementById('s432-cta'),
+      text: 'E se hai un <b>progetto</b> (un concerto, una mostra, un workshop), scrivici da qui. Leggiamo tutto.' },
+    { view: 'home', el: () => firstVisible('#theme-fab'), has: () => !isMobile(),
+      text: 'Modalità <b>notte</b>, per chi ci legge alle tre.' },
+    { view: 'calendario', el: () => isMobile() ? document.getElementById('filter-carousel') : document.getElementById('filter-drawer'),
       text: () => isMobile()
-        ? 'Con le <b>frecce</b> scegli cosa vedere: musica, cineforum, laboratori, arte.'
-        : 'Da qui <b>filtri per tipo</b>: musica, cineforum, laboratori, arte.' },
-    { el: () => document.querySelector('.month-nav'),
+        ? 'Questo è il <b>calendario</b>. Con le <b>frecce</b> qui scegli cosa vedere: musica, cineforum, laboratori, arte.'
+        : 'Questo è il <b>calendario</b>. Da qui <b>filtri per tipo</b>: musica, cineforum, laboratori, arte.' },
+    { view: 'calendario', el: () => document.querySelector('.month-nav'),
       text: () => isMobile()
         ? 'Con le <b>frecce</b> sfogli i mesi. Oppure fai <b>swipe</b> a destra e a sinistra sul calendario.'
         : 'Con le <b>frecce</b> sfogli i mesi (vanno bene anche quelle della tastiera).' },
-    { el: () => firstVisible('.btn-prenota'), optional: true,
-      text: 'Tocca il <b>titolo</b> per i dettagli, e <b>vengo!</b> per prenotarti: lasci nome ed email e ricevi il biglietto con il QR.' },
-    { el: () => firstVisible('.theme-toggle:not(.home-toolbtn)'),
-      text: 'Modalità <b>notte</b>, per chi ci legge alle tre.' },
-    { el: () => document.getElementById('s432-cta'),
-      text: 'E se hai un <b>progetto</b> (un concerto, una mostra, un workshop), scrivici da qui. Leggiamo tutto.' }
+    { view: 'eventi', el: () => firstVisible('.btn-prenota'), has: () => !!document.querySelector('.btn-prenota'),
+      text: 'Questa è la lista degli <b>eventi</b>. Tocca il <b>titolo</b> per i dettagli, e <b>vengo!</b> per prenotarti: ricevi subito il biglietto con il QR.' },
+    { view: 'eventi', el: () => firstVisible('#tix-toolbtn'), has: () => !document.getElementById('tix-toolbtn')?.hidden,
+      text: 'Qui ritrovi <b>i tuoi biglietti</b>: per rivederli, cambiare i posti o annullare.' },
+    { view: 'eventi', el: () => firstVisible('#home-toolbtn'),
+      text: 'Con la <b>casetta</b> torni alla home. Buon giro!' }
   ];
+  const vistaAttuale = () => document.body.classList.contains('is-home') ? 'home' : location.hash === '#eventi' ? 'eventi' : 'calendario';
+  function vaiA(view) {
+    if (vistaAttuale() === view) return false;
+    if (view === 'home') window.goHome(); else location.hash = view;
+    return true;
+  }
 
   let steps = [], idx = -1, target = null, raf = 0;
 
@@ -3918,11 +3927,20 @@ fetchAndBuild();
   }
   function loop() { placeRing(); raf = requestAnimationFrame(loop); }
 
-  function showStep(i) {
+  function showStep(i, dir = 1) {
     idx = i;
     const s = steps[i];
+    // cambio schermata: aspetta che sia disegnata, poi cerca il pezzo da indicare
+    if (vaiA(s.view)) {
+      cancelAnimationFrame(raf); target = null; ring.classList.remove('on'); bubble.classList.remove('open');
+      setTimeout(() => { if (idx === i) showStep(i, dir); }, 560);
+      return;
+    }
     target = s.el();
-    if (!visible(target)) { return i + 1 < steps.length ? showStep(i + 1) : endTour(); }
+    if (!visible(target)) {   // non c'è (es. nessun evento prenotabile): passa oltre nella stessa direzione
+      const j = i + dir;
+      return j >= 0 && j < steps.length ? showStep(j, dir) : endTour();
+    }
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     const last = i === steps.length - 1;
     say(typeof s.text === 'function' ? s.text() : s.text,
@@ -3932,13 +3950,13 @@ fetchAndBuild();
         ${last ? '' : '<button class="dia-btn ghost" data-a="end">salta</button>'}
       </div>`, `dia · ${i + 1}/${steps.length}`);
     bubble.querySelector('[data-a="next"]').onclick = () => last ? endTour() : showStep(i + 1);
-    const prev = bubble.querySelector('[data-a="prev"]'); if (prev) prev.onclick = () => showStep(i - 1);
+    const prev = bubble.querySelector('[data-a="prev"]'); if (prev) prev.onclick = () => showStep(i - 1, -1);
     const end = bubble.querySelector('[data-a="end"]'); if (end) end.onclick = endTour;
     cancelAnimationFrame(raf); loop();
   }
 
   function startTour() {
-    steps = STEPS.filter(s => !s.optional || visible(s.el()));
+    steps = STEPS.filter(s => !s.has || s.has());
     showStep(0);
   }
 
