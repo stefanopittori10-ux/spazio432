@@ -1450,14 +1450,6 @@
   .corner-theme .th-ico { width: 15px; height: 15px; }
   @media (hover: hover) { .corner-theme:hover { border-color: var(--fg) !important; } }
 
-  /* tasto tema fuori dal riquadro, a destra dell'intestazione */
-  .home-head { display: flex; align-items: center; gap: 10px; flex: none; }
-  .home-head .home-top { flex: 1; min-width: 0; }
-  .home-head .corner-theme { position: static; flex-shrink: 0; width: 34px !important; height: 34px !important;
-    border: 1px solid var(--fg) !important; background: var(--bg) !important; }
-  @media (max-width: 768px) { .home-head { gap: 8px; } .home-head .corner-theme { width: 30px !important; height: 30px !important; } }
-  body.is-home .home-head .home-top, .home-head .home-top { flex: 1 1 auto; }
-  .home-head { width: 100%; }
 </style>
 </head>
 <body class="is-home">
@@ -1490,7 +1482,6 @@
 
 <!-- HOME -->
 <div id="home">
-  <div class="home-head">
   <header class="home-top">
     <div class="logo-area" onclick="openLocation()" title="Dove siamo">
       <div class="logo-text-group">
@@ -1498,9 +1489,8 @@
         <div class="logo-subtitle"><svg class="loc-pin" viewBox="0 0 10 13" aria-hidden="true"><path d="M5 12.5S1 7.8 1 4.8A4 4 0 0 1 9 4.8C9 7.8 5 12.5 5 12.5Z" fill="currentColor"/><circle cx="5" cy="4.8" r="1.5" fill="#fff"/></svg>via ceva 47 · <span class="loc-link">mappa</span> ↗</div>
       </div>
     </div>
+    <button class="theme-toggle corner-theme" onclick="toggleTheme()" title="Tema chiaro/scuro" aria-label="Tema chiaro/scuro"><svg class="th-ico" viewBox="0 0 24 24" aria-hidden="true"><g class="th-moon"><path d="M20.8 14.6A9 9 0 1 1 9.4 3.2a7.2 7.2 0 0 0 11.4 11.4Z" fill="currentColor"/></g><g class="th-sun"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><path d="M12 1.2v3.4M12 19.4v3.4M1.2 12h3.4M19.4 12h3.4M4.4 4.4l2.4 2.4M17.2 17.2l2.4 2.4M4.4 19.6l2.4-2.4M17.2 6.8l2.4-2.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square"/></g></svg></button>
   </header>
-  <button class="theme-toggle corner-theme" onclick="toggleTheme()" title="Tema chiaro/scuro" aria-label="Tema chiaro/scuro"><svg class="th-ico" viewBox="0 0 24 24" aria-hidden="true"><g class="th-moon"><path d="M20.8 14.6A9 9 0 1 1 9.4 3.2a7.2 7.2 0 0 0 11.4 11.4Z" fill="currentColor"/></g><g class="th-sun"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><path d="M12 1.2v3.4M12 19.4v3.4M1.2 12h3.4M19.4 12h3.4M4.4 4.4l2.4 2.4M17.2 17.2l2.4 2.4M4.4 19.6l2.4-2.4M17.2 6.8l2.4-2.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square"/></g></svg></button>
-  </div>
   <div class="home-tagline">spazio culturale a torino · musica, cineforum, laboratori, arte</div>
 
   <nav class="home-grid">
