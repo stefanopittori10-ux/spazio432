@@ -264,11 +264,53 @@
 
   /* Counter check-in nei stats */
   .bk-stat.checkin-stat .bk-stat-num { color: #3B6D11; }
+
+  /* ── icona tema: luna/sole pieni e spessi ── */
+  .th-ico { width: 18px; height: 18px; display: block; }
+  .th-sun { display: none; }
+  [data-theme="dark"] .th-moon { display: none; }
+  [data-theme="dark"] .th-sun { display: inline; }
+
+  /* ═══ BOTTONI COME LA HOME DEL SITO ═══════════════════════ */
+  .login-wrap { max-width: 440px; }
+  .sections { gap: 18px; }
+  .section-title { margin-bottom: 0; }
+  .hub-btn {
+    position: relative; display: flex; flex-direction: column; gap: 10px;
+    padding: 18px 20px 20px; text-decoration: none; color: #fff; cursor: pointer; user-select: none;
+    border: 2px solid var(--fg); box-shadow: 6px 6px 0 var(--fg);
+    transition: transform .12s ease, box-shadow .12s ease;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  .hub-btn.cal  { background: #534AB7; }
+  .hub-btn.fin  { background: #3B6D11; }
+  .hub-btn.pren { background: #854F0B; }
+  @media (hover: hover) {
+    .hub-btn:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--fg); }
+    .hub-btn:hover .hb-arrow { transform: translateX(5px); }
+  }
+  .hub-btn:active, .hub-btn.pressed { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--fg); }
+  .hub-btn.pren.open { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--fg); }
+  .hub-btn.pren.open .hb-arrow { transform: none; }
+  .hb-top { display: flex; justify-content: space-between; align-items: center; }
+  .hb-kicker { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; opacity: .85; }
+  .hb-arrow { font-size: 24px; font-weight: bold; line-height: .8; transition: transform .15s; }
+  .hb-title { font-size: 34px; font-weight: 900; letter-spacing: -1px; line-height: .95; }
+  .hb-sub { font-size: 11px; opacity: .9; }
+  #scanner-panel { margin-top: -4px; }
+
+  /* bottone "entra" e tema nello stesso stile */
+  .login-btn { border-width: 2px; box-shadow: 4px 4px 0 #993C1D; transition: transform .1s, box-shadow .1s; }
+  .login-btn:hover { opacity: 1; transform: translate(-1px, -1px); box-shadow: 5px 5px 0 #993C1D; }
+  .login-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #993C1D; }
+  .theme-toggle { width: 36px; height: 36px; border: 1px solid var(--fg); }
+  .theme-toggle:hover { background: var(--fg); color: var(--bg); }
+  @media (max-width: 400px) { .hb-title { font-size: 30px; } }
 </style>
 </head>
 <body>
 
-<button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☾</button>
+<button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Tema chiaro/scuro" aria-label="Tema chiaro/scuro"><svg class="th-ico" viewBox="0 0 24 24" aria-hidden="true"><g class="th-moon"><path d="M20.8 14.6A9 9 0 1 1 9.4 3.2a7.2 7.2 0 0 0 11.4 11.4Z" fill="currentColor"/></g><g class="th-sun"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><path d="M12 1.2v3.4M12 19.4v3.4M1.2 12h3.4M19.4 12h3.4M4.4 4.4l2.4 2.4M17.2 17.2l2.4 2.4M4.4 19.6l2.4-2.4M17.2 6.8l2.4-2.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square"/></g></svg></button>
 
 <div class="login-wrap">
 
@@ -295,29 +337,23 @@
   <div class="sections" id="sections">
     <div class="section-title">dove vuoi andare?</div>
 
-    <a class="section-card calendar" href="admin.html">
-      <div class="section-card-left">
-        <div class="section-card-name">calendario</div>
-        <div class="section-card-desc">gestione eventi e prenotazioni</div>
-      </div>
-      <div class="section-card-arrow">→</div>
+    <a class="hub-btn cal" href="admin.html">
+      <div class="hb-top"><span class="hb-kicker">01 / eventi</span><span class="hb-arrow">→</span></div>
+      <div class="hb-title">CALENDARIO</div>
+      <div class="hb-sub">gestione eventi e prenotazioni</div>
     </a>
 
-    <a class="section-card finance" href="finanze.html">
-      <div class="section-card-left">
-        <div class="section-card-name">finanze</div>
-        <div class="section-card-desc">entrate, uscite e rendiconto</div>
-      </div>
-      <div class="section-card-arrow">→</div>
+    <a class="hub-btn fin" href="finanze.html">
+      <div class="hb-top"><span class="hb-kicker">02 / conti</span><span class="hb-arrow">→</span></div>
+      <div class="hb-title">FINANZE</div>
+      <div class="hb-sub">entrate, uscite e rendiconto</div>
     </a>
 
-    <!-- Gestione prenotazioni — card + pannello collassabile -->
-    <div class="section-card scanner-card" onclick="toggleScanner()" id="scanner-card">
-      <div class="section-card-left">
-        <div class="section-card-name">gestione prenotazioni</div>
-        <div class="section-card-desc">scanner QR e lista prenotati</div>
-      </div>
-      <div class="section-card-arrow" id="scanner-arrow">→</div>
+    <!-- Gestione prenotazioni — blocco + pannello collassabile -->
+    <div class="hub-btn pren" onclick="toggleScanner()" id="scanner-card" role="button" tabindex="0">
+      <div class="hb-top"><span class="hb-kicker">03 / ingresso</span><span class="hb-arrow" id="scanner-arrow">→</span></div>
+      <div class="hb-title">PRENOTAZIONI</div>
+      <div class="hb-sub">scanner QR e lista prenotati</div>
     </div>
 
     <div id="scanner-panel" style="display:none;flex-direction:column;gap:10px;">
@@ -10826,18 +10862,26 @@ function showScanResult(type, status, name, event, meta) {
   setTimeout(() => { frame.className = 'scanner-frame'; }, 2500);
 }
 
+// ── BOTTONI: effetto pressione prima di cambiare pagina ──────
+document.querySelectorAll('a.hub-btn').forEach(b => b.addEventListener('click', e => {
+  e.preventDefault();
+  if (b.classList.contains('pressed')) return;
+  b.classList.add('pressed');
+  setTimeout(() => { location.href = b.getAttribute('href'); }, 140);
+}));
+document.getElementById('scanner-card').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleScanner(); }
+});
+window.addEventListener('pageshow', () => document.querySelectorAll('.hub-btn.pressed').forEach(b => b.classList.remove('pressed')));
+
 // ── TEMA ─────────────────────────────────────────────────────
 function toggleTheme() {
   const dark = document.documentElement.dataset.theme === 'dark';
   document.documentElement.dataset.theme = dark ? '' : 'dark';
-  document.getElementById('theme-btn').textContent = dark ? '☾' : '☀';
-  localStorage.setItem('s432_theme', dark ? 'light' : 'dark');
+  localStorage.setItem('s432-theme', dark ? 'light' : 'dark');   // stessa chiave di sito, admin e finanze
 }
-const t = localStorage.getItem('s432_theme');
-if (t === 'dark') {
-  document.documentElement.dataset.theme = 'dark';
-  document.getElementById('theme-btn').textContent = '☀';
-}
+const t = localStorage.getItem('s432-theme') || localStorage.getItem('s432_theme');
+if (t === 'dark') document.documentElement.dataset.theme = 'dark';
 </script>
 </body>
 </html>

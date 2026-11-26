@@ -1463,6 +1463,18 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     .month-nav .month-label { font-size: 16px; }
   }
   @media (prefers-reduced-motion: reduce) { .month-slide.from-right, .month-slide.from-left { animation: none; } }
+
+  /* ── icona tema: luna/sole pieni e spessi ── */
+  .th-ico { width: 18px; height: 18px; display: block; }
+  .th-sun { display: none; }
+  [data-theme="dark"] .th-moon { display: none; }
+  [data-theme="dark"] .th-sun { display: inline; }
+
+  /* etichetta ADMIN, come FINANZE */
+  .logo-line { display: flex; align-items: center; }
+  .lg-page { margin-left: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 4px 9px; background: var(--fg); color: var(--bg); line-height: 1.2; }
+  @media (max-width: 768px) { .lg-page { margin-left: 8px; font-size: 10px; padding: 3px 7px; } }
 </style>
 </head>
 <body>
@@ -1528,8 +1540,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     </div>
     <!-- Riga 2 (mobile): navigazione mesi + azioni + dark toggle -->
     <div class="toolbar-actions">
-      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro">☾</button>
-      <button class="tbtn tb-map" id="map-toolbtn" onclick="openLocation()" title="Dove siamo"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 19.5S3.5 12.6 3.5 8A6.5 6.5 0 0 1 16.5 8C16.5 12.6 10 19.5 10 19.5Z" fill="currentColor"/><circle cx="10" cy="8" r="2.6" fill="var(--pill-bg)"/></svg><span class="tb-lbl">mappa</span></button>
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Tema chiaro/scuro" aria-label="Tema chiaro/scuro"><svg class="th-ico" viewBox="0 0 24 24" aria-hidden="true"><g class="th-moon"><path d="M20.8 14.6A9 9 0 1 1 9.4 3.2a7.2 7.2 0 0 0 11.4 11.4Z" fill="currentColor"/></g><g class="th-sun"><circle cx="12" cy="12" r="4.6" fill="currentColor"/><path d="M12 1.2v3.4M12 19.4v3.4M1.2 12h3.4M19.4 12h3.4M4.4 4.4l2.4 2.4M17.2 17.2l2.4 2.4M4.4 19.6l2.4-2.4M17.2 6.8l2.4-2.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square"/></g></svg></button>
       <button class="tbtn tb-verifica verifica-btn" onclick="openVerifica()" title="Verifica biglietti"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 7V2h5M13 2h5v5M18 13v5h-5M7 18H2v-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/><rect x="6" y="9" width="8" height="2.4" fill="currentColor"/></svg><span class="tb-lbl">verifica</span></button>
       <button class="tbtn tb-export export-btn" onclick="exportInstagramPNG()" title="Esporta PNG per Instagram"><svg class="tb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v10M5.5 8l4.5 4.5L14.5 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/><rect x="3" y="15.5" width="14" height="2.6" fill="currentColor"/></svg><span class="tb-lbl">esporta</span></button>
       <button class="tbtn tb-add" id="toggle-add-btn" onclick="toggleAddArea()"><span class="btn-icon">+</span><span class="btn-label"> Aggiungi</span></button>
@@ -1553,8 +1564,7 @@ if (sessionStorage.getItem('s432_auth') !== '1') {
     <div class="card-header">
       <div class="logo-area logo-static">
         <div class="logo-text-group">
-          <div><span class="logo-spazio">spazio</span><span class="logo-num">432</span></div>
-          <div class="logo-subtitle">via ceva 47, torino · admin</div>
+          <div class="logo-line"><span class="logo-spazio">spazio</span><span class="logo-num">432</span><span class="lg-page">admin</span></div>
         </div>
       </div>
       <div class="header-right">
@@ -2311,7 +2321,7 @@ function exportInstagramPNG() {
   container.id = 'ig-virtual-container';
 
   const headerClone = document.querySelector('.card-header').cloneNode(true);
-  headerClone.querySelectorAll('.mkey, .month-today, .header-right').forEach(n => n.remove());
+  headerClone.querySelectorAll('.mkey, .month-today, .header-right, .lg-page').forEach(n => n.remove());
   container.appendChild(headerClone);
 
   const bodyArea = document.createElement('div');
@@ -2440,7 +2450,6 @@ function navToday() {
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('theme-toggle').textContent = isDark ? '☾' : '☀';
   localStorage.setItem('s432-theme', isDark ? 'light' : 'dark');
 }
 (function initTheme() {
@@ -2449,7 +2458,6 @@ function toggleTheme() {
     document.documentElement.setAttribute('data-theme', 'dark');
     window.addEventListener('DOMContentLoaded', () => {
       const btn = document.getElementById('theme-toggle');
-      if (btn) btn.textContent = '☀';
     });
   }
 })();
