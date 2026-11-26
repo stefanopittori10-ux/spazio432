@@ -1553,6 +1553,31 @@
   .ticket-overlay .t-act-pdf:active { transform: translate(4px,4px); box-shadow: 0 0 0 #993C1D; }
   .ticket-overlay .t-act-pdf:disabled { opacity: .7; cursor: progress; }
   @media (hover: hover) { .ticket-overlay .t-act-close:hover { background: #fff; color: #0a0a0a; } }
+  /* stampa: solo l'immagine del biglietto, identica al PNG scaricato */
+  #tk-grande { display: none; position: fixed; inset: 0; z-index: 9999; background: #0a0a0a; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom)); }
+  #tk-grande.open { display: flex; }
+  #tk-grande img { max-width: 100%; max-height: 72vh; -webkit-touch-callout: default; user-select: auto; }
+  #tk-grande .tkg-msg { color: #fff; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-align: center; }
+  #tk-grande .tkg-x { font: bold 13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-transform: uppercase; letter-spacing: .8px;
+    min-height: 46px; padding: 0 22px; background: transparent; color: #fff; border: 2px solid #fff; cursor: pointer; }
+  @media print { #tk-grande { display: none !important; } }
+  #print-sheet { display: none; }
+  @media print {
+    html, body { background: #fff !important; overflow: visible !important; height: auto !important; min-height: 0 !important; }
+    body.print-img > *:not(#print-sheet) { display: none !important; }
+    body.print-img #print-sheet { display: flex !important; justify-content: center; padding-top: 4mm; }
+    body.print-img #print-sheet img { width: 125mm; max-width: 100%; height: auto; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+  .t-share { display: inline-flex; align-items: center; justify-content: center; }
+  .t-share[hidden] { display: none !important; }
+  .t-share svg { width: 22px; height: 22px; }
+  .t-share.again { animation: tkpulse .5s 2; }
+  @keyframes tkpulse { 50% { transform: scale(1.12); } }
+  .ticket-overlay .t-act-pdf.t-share { flex: none; width: 52px; padding: 0; }
+  .ticket-overlay .t-row2 { margin-top: -4px; }
+  .ticket-overlay .t-row2 .t-act-close { flex: 1; min-height: 42px; font-size: 12px; }
   .ticket-hint { color: rgba(255,255,255,.7); font-size: 11px; text-align: center; line-height: 1.5;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   @media (max-width: 420px) {
@@ -1900,8 +1925,12 @@
         </div>
       </div>
     <div class="ticket-overlay-actions">
-      <button class="t-act-close" onclick="closeTicketOverlay()">✕ chiudi</button>
       <button class="t-act-pdf" onclick="saveTicketImage()" id="t-act-img">↓ salva biglietto</button>
+      <button class="t-act-pdf t-share" onclick="shareTicket()" id="t-act-share" aria-label="condividi il biglietto" title="condividi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/><path d="M5 12v8h14v-8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg></button>
+    </div>
+    <div class="ticket-overlay-actions t-row2">
+      <button class="t-act-close" onclick="closeTicketOverlay()">✕ chiudi</button>
+      <button class="t-act-close" onclick="printTicket()" id="t-act-print">stampa</button>
     </div>
     <div class="ticket-hint">all'ingresso basta mostrare il QR: salvalo o fai uno screenshot</div>
     <a class="ticket-manage" id="t-manage" href="#" hidden>cambia posti o annulla la prenotazione →</a>
@@ -3120,7 +3149,14 @@ async function submitBooking(uid, eventId) {
   // Prepara dati biglietto
   const MONTHS_TICK = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   const evt = events.find(e => String(e.id) === String(eventId));
-  if (evt) salvaMio(codice, evt);
+  if (evt) {
+    salvaMio(codice, evt);
+    try {
+      localStorage.setItem('s432_tk_' + codice, JSON.stringify({ codice, name, email: email || null, seats, annullata_il: null, entrato: false,
+        event: { id: evt.id, name: evt.name, cat: evt.cat, rassegna: evt.rassegna || null, year: evt.year, month: evt.month, day: evt.day, time: evt.time || null, endTime: evt.endTime || null },
+        limite: null, modificabile: false, stato: null }));
+    } catch (e) {}
+  }
 
   // Chiudi form e pannello dopo 1.2s, poi apri biglietto
   setTimeout(() => {
@@ -3219,12 +3255,13 @@ async function openMiei() {
     a.querySelector('.miei-name').textContent = x.n + (x.t ? ' · ' + x.t : '');
     box.appendChild(a);
     // stato vero dal database (la prenotazione potrebbe essere stata cambiata o annullata)
-    _supabase.rpc('biglietto_info', { c: x.c }).then(({ data }) => {
+    _supabase.rpc('biglietto_info', { c: x.c }).then(({ data, error }) => {
       const st = a.querySelector('.miei-st');
+      if (error) { st.textContent = 'senza rete · salvato sul telefono'; return; }
       if (!data) { st.textContent = 'biglietto non trovato'; a.classList.add('off'); return; }
       if (data.annullata_il) { st.textContent = 'annullata'; a.classList.add('off'); return; }
       st.textContent = data.seats + (data.seats === 1 ? ' posto' : ' posti') + (data.modificabile ? '' : ' · modifiche chiuse');
-    }).catch(() => {});
+    }).catch(() => { a.querySelector('.miei-st').textContent = 'senza rete · salvato sul telefono'; });
   });
   ov.classList.add('open');
   document.documentElement.classList.add('ticket-open');
@@ -3464,11 +3501,13 @@ function openTicketOverlay(data) {
   btn.textContent = '↓ salva biglietto'; btn.disabled = false;
   overlay.classList.add('open');
   overlay.scrollTop = 0;
+  tkPrepara();
   document.documentElement.classList.add('ticket-open');
   setTimeout(() => btn.focus({ preventScroll: true }), 50);
 }
 
 function closeTicketOverlay() {
+  document.body.classList.remove('print-img');
   document.getElementById('ticket-overlay').classList.remove('open');
   document.documentElement.classList.remove('ticket-open');
   document.body.style.overflow = '';
@@ -3489,51 +3528,144 @@ function ticketFileName(t) {
   return ['biglietto-spazio432', slug(t.event), slug(t.date), slug(t.name), slug(t.code)].filter(Boolean).join('_') + '.png';
 }
 
-async function saveTicketImage() {
-  if (!_ticket) return;
-  const btn = document.getElementById('t-act-img');
-  const reset = ms => setTimeout(() => { btn.textContent = '↓ salva biglietto'; btn.disabled = false; }, ms);
-  btn.textContent = 'preparo…';
-  btn.disabled = true;
-  try {
-    const canvas = await html2canvas(document.getElementById('ticket'), {
-      scale: 3, useCORS: true, backgroundColor: '#f4f1ea', logging: false
-    });
-    // cornice chiara intorno
+const TK_PRINT_AUTO = false;   // qui il biglietto è una finestra sopra il calendario: stampa solo dal suo bottone
+// ── SALVA · CONDIVIDI · STAMPA ──
+// tutti e tre partono dalla stessa immagine PNG del biglietto, preparata in anticipo:
+// così "condividi" parte subito (i telefoni lo bloccano se si aspetta troppo dopo il tocco)
+// e la stampa è identica al file scaricato, senza bottoni né altro intorno.
+let _tkPng = null, _tkPngKey = '', _tkPngUrl = null;
+function tkKey() {
+  const t = _ticket || {};
+  return [t.code, t.name, t.email, t.seats, t.event, t.date, t.time, t.rassegna, document.getElementById('ticket').className.replace(/\s*tk-loading/, '')].join('|');
+}
+function tkInvalida() {
+  _tkPng = null; _tkPngKey = '';
+  document.body.classList.remove('print-img');
+}
+function ticketPng() {
+  const key = tkKey();
+  if (_tkPng && _tkPngKey === key) return _tkPng;
+  const p = (async () => {
+    if (!window.html2canvas) throw new Error('html2canvas non caricato');
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const canvas = await html2canvas(document.getElementById('ticket'), { scale: 3, useCORS: true, backgroundColor: '#f4f1ea', logging: false });
     const pad = 48, out = document.createElement('canvas');
     out.width = canvas.width + pad * 2; out.height = canvas.height + pad * 2;
     const ctx = out.getContext('2d');
     ctx.fillStyle = '#f4f1ea'; ctx.fillRect(0, 0, out.width, out.height);
     ctx.drawImage(canvas, pad, pad);
-
-    const blob = await new Promise(res => out.toBlob(res, 'image/png'));
+    const blob = await new Promise((res, rej) => out.toBlob(b => b ? res(b) : rej(new Error('png vuoto')), 'image/png'));
+    if (_tkPngUrl) URL.revokeObjectURL(_tkPngUrl);
+    _tkPngUrl = URL.createObjectURL(blob);
     const name = ticketFileName(_ticket);
-    const file = new File([blob], name, { type: 'image/png' });
-
-    // su telefono: foglio di condivisione (→ "Salva immagine" finisce nella galleria)
-    const touch = window.matchMedia('(pointer: coarse)').matches;
-    if (touch && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: 'Biglietto spazio 432' });
-        btn.textContent = '✓ fatto'; reset(1800); return;
-      } catch (err) {
-        if (err && err.name === 'AbortError') { btn.textContent = '↓ salva biglietto'; btn.disabled = false; return; }
-      }
-    }
-    // computer (o share non disponibile): download diretto
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
-    btn.textContent = '✓ salvato'; reset(1800);
-  } catch (e) {
-    console.error(e);
-    btn.textContent = 'errore, riprova'; reset(2200);
-  }
+    const r = { blob, url: _tkPngUrl, name, file: new File([blob], name, { type: 'image/png' }) };
+    // copia per la stampa: un'immagine sola, identica al file
+    let sheet = document.getElementById('print-sheet');
+    if (!sheet) { sheet = document.createElement('div'); sheet.id = 'print-sheet'; sheet.innerHTML = '<img alt="biglietto spazio 432">'; document.body.appendChild(sheet); }
+    const img = sheet.querySelector('img'); img.src = r.url;
+    try { await img.decode(); } catch (e) {}
+    if (TK_PRINT_AUTO) document.body.classList.add('print-img');
+    return r;
+  })();
+  _tkPng = p; _tkPngKey = key;
+  p.catch(() => { if (_tkPng === p) { _tkPng = null; _tkPngKey = ''; } });
+  return p;
+}
+// prepara l'immagine poco dopo che il biglietto è a schermo
+let _tkPrepT;
+function tkPrepara() {
+  tkInvalida();
+  clearTimeout(_tkPrepT);
+  _tkPrepT = setTimeout(() => { if (_ticket) ticketPng().catch(() => {}); }, 450);
+}
+function tkBtn(id, text, label, ms) {
+  const b = document.getElementById(id); if (!b) return;
+  if (text) { b.dataset.l = b.dataset.l || b.innerHTML; b.innerHTML = text; b.disabled = true; }
+  if (ms != null) setTimeout(() => { b.innerHTML = b.dataset.l || label; b.disabled = false; delete b.dataset.l; }, ms);
 }
 
-function ticketPrint() { window.print(); }
+// salva: su iPhone/iPad una pagina web non può scaricare nelle Foto, quindi apre il foglio
+// di condivisione ("Salva immagine" → Foto); se non si può, mostra il biglietto grande da tenere premuto.
+// su Android e computer: download del file PNG (Android lo mostra in galleria, album Download).
+const TK_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+async function saveTicketImage() {
+  if (!_ticket) return;
+  tkBtn('t-act-img', 'preparo…');
+  let p;
+  try { p = await ticketPng(); }
+  catch (e) { console.error(e); tkBtn('t-act-img', 'errore, riprova'); tkBtn('t-act-img', null, '↓ salva biglietto', 2200); return; }
+  if (TK_IOS) {
+    if (TK_SHARE_OK) {
+      try {
+        await navigator.share({ files: [p.file] });
+        tkBtn('t-act-img', '✓ fatto'); tkBtn('t-act-img', null, '↓ salva biglietto', 1800); return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') { tkBtn('t-act-img', null, '↓ salva biglietto', 0); return; }
+      }
+    }
+    tkBtn('t-act-img', null, '↓ salva biglietto', 0);
+    tkMostraGrande(p);
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = p.url; a.download = p.name; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  tkBtn('t-act-img', '✓ scaricato'); tkBtn('t-act-img', null, '↓ salva biglietto', 1800);
+}
+// riserva per iPhone: biglietto a tutto schermo, tieni premuto → "Salva in Foto"
+function tkMostraGrande(p) {
+  let ov = document.getElementById('tk-grande');
+  if (!ov) {
+    ov = document.createElement('div'); ov.id = 'tk-grande';
+    ov.innerHTML = '<div class="tkg-msg">tieni premuto sul biglietto e scegli <b>«Salva in Foto»</b></div><img alt="biglietto spazio 432"><button type="button" class="tkg-x">✕ chiudi</button>';
+    ov.querySelector('.tkg-x').onclick = () => ov.classList.remove('open');
+    document.body.appendChild(ov);
+  }
+  const img = ov.querySelector('img');
+  const r = new FileReader();   // data: invece di blob: perché "Salva in Foto" funzioni su tutte le versioni di iOS
+  r.onload = () => { img.src = r.result; ov.classList.add('open'); };
+  r.readAsDataURL(p.blob);
+}
+
+// condividi = foglio di condivisione del telefono con l'immagine del biglietto
+const TK_SHARE_OK = (() => {
+  try { return !!(navigator.share && navigator.canShare && navigator.canShare({ files: [new File(['x'], 'x.png', { type: 'image/png' })] })); } catch (e) { return false; }
+})();
+async function shareTicket() {
+  if (!_ticket) return;
+  const b = document.getElementById('t-act-share');
+  b.disabled = true;
+  try {
+    const p = await ticketPng();
+    await navigator.share({ files: [p.file], title: 'Biglietto spazio 432' });
+  } catch (err) {
+    if (err && err.name === 'NotAllowedError') { b.classList.add('again'); setTimeout(() => b.classList.remove('again'), 2500); }   // il telefono vuole un tocco nuovo: ora l'immagine è pronta
+    else if (!err || err.name !== 'AbortError') { console.error(err); saveTicketImage(); }
+  }
+  b.disabled = false;
+}
+
+// stampa = solo l'immagine del biglietto, come il PNG
+async function printTicket() {
+  if (!_ticket) return;
+  tkBtn('t-act-print', '…');
+  try {
+    await ticketPng();
+    document.body.classList.add('print-img');
+    tkBtn('t-act-print', null, 'stampa', 0);
+    setTimeout(() => window.print(), 60);
+  } catch (e) {
+    console.error(e);
+    tkBtn('t-act-print', null, 'stampa', 0);
+    window.print();
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const s = document.getElementById('t-act-share');
+  if (s) s.hidden = !TK_SHARE_OK;
+});
+
+function ticketPrint() { printTicket(); }
 
 let groupingEnabled = true; // attivo di default
 
