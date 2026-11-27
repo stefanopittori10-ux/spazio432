@@ -683,6 +683,22 @@
   [data-theme="dark"] .bridge .pc-top { color: #0a0a0a; }
   @media (max-width: 860px) { .bridge .radar { gap: 12px; } .bridge .rd { border-bottom: 2px solid var(--pk) !important; } }
 </style>
+<script>
+// barra del telefono e fondo oltre la pagina: seguono il tema scelto (chiaro, giallo, scuro)
+(function () {
+  const C = { '': '#ffffff', giallo: '#FFCC00', dark: '#111111' };
+  function upd() {
+    const c = C[document.documentElement.dataset.theme || ''] || '#ffffff';
+    let m = document.querySelector('meta[name="theme-color"]');
+    if (!m) { m = document.createElement('meta'); m.name = 'theme-color'; document.head.appendChild(m); }
+    m.content = c;
+    document.documentElement.style.backgroundColor = c;
+  }
+  new MutationObserver(upd).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  document.addEventListener('DOMContentLoaded', upd);
+  upd();
+})();
+</script>
 </head>
 <body>
 <div class="root">

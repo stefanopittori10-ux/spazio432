@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <script>
 // le pagine pubbliche stanno su spazio432.org (se aperte dall'indirizzo dello staff, si torna lì)
-(function () { if (location.hostname === 'staff.spazio432.org') location.replace('https://spazio432.org' + location.pathname + location.search + location.hash); })();
+(function () {
+  // sull'indirizzo dello staff la pagina principale è il login; il calendario pubblico resta su spazio432.org
+  if (location.hostname === 'staff.spazio432.org') {
+    if (location.pathname === '/' || location.pathname === '/index.html' || location.pathname === '/index') location.replace('/login.html' + location.search);
+    else location.replace('https://spazio432.org' + location.pathname + location.search + location.hash);
+  }
+})();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="/favicon.ico" sizes="any">
